@@ -32,7 +32,7 @@ class Parser {
 
         $this->p++;
 
-        return $token[1];
+        return isset($token[1]) ? $token[1] : null;
     }
 
     /**
@@ -42,7 +42,7 @@ class Parser {
      *
      * Was consume?
      */
-    public function tryConsume($type) {
+    public function try_consume($type) {
         if (!isset($this->tokens[$this->p])) {
             return false;
         }
@@ -59,7 +59,7 @@ class Parser {
     }
 
     /**
-     * Like tryConsume except for an id token of a certain name
+     * Like try_consume except for an id token of a certain name
      */
     public function tryId($id) {
         $token = $this->tokens[$this->p];

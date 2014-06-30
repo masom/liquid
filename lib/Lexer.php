@@ -1,6 +1,6 @@
 <?php
 
-namespace \Liquid;
+namespace Liquid;
 
 use \Liquid\Vendor\StringScanner\StringScanner;
 
@@ -77,11 +77,12 @@ class Lexer {
                     }
                     break;
             }
-
             $this->output[] = $tok;
         }
 
-        $this->output[] = array(static::TOKEN_END_OF_STRING);
+        $this->output[] = array(static::TOKEN_ENDOFSTRING);
+
+        return $this->output;
     }
 
 

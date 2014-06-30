@@ -2,6 +2,7 @@
 
 namespace Liquid;
 
+use \Liquid\Lexer;
 use \Liquid\Liquid;
 use \Liquid\Parser;
 
@@ -16,19 +17,26 @@ class Variable {
     const EasyParse = '/\A *(\w+(?:\.\w+)*) *\z/';
 
     public static function init() {
-        static::$init = true;
-        static::$FilterParser = '/(?:' . Liquid::FilterSeparator . '|(?:\s*(?:' . Liquid::QuotedFragment . '|' . Liquid::ArgumentSeparator . ')\s*)+)/o';
+        static::$FilterParser = '/(?:' . Liquid::FilterSeparator . '|(?:\s*(?:' . Liquid::$QuotedFragment . '|' . Liquid::ArgumentSeparator . ')\s*)+)/o';
     }
 
     public function __construct($markup, array $options = array()) {
-        if (!static::$init) {
-            static::init();
-        }
-
         $this->markup = $markup;
         $this->options = $options;
 
         $this->strict_parse($markup);
+    }
+
+    public function name() {
+        return $this->name;
+    }
+
+    public function options(){ 
+        return $this->options();
+    }
+    
+    public function filters() {
+        return $this->filters;
     }
 
     public function strict_parse($markup) {
@@ -43,14 +51,14 @@ class Variable {
         $p = new Parser($markup);
 
         try{
-        $this->name = $p->look('pipe') ? '' : $p->expression();
-        while($p->tryConsume('id')) {
-            $filtername = $p->consume('id');
-            $filterargs = $p->tryConsume('colon') ? $this->parse_filterargs($p) : array();
-            $this->filters[] = array($filtername, $filterargs);
-        }
+            $this->name = $p->look('pipe') ? '' : $p->expression();
+            while($p->try_consume('id')) {
+                $filtername = $p->consume('id');
+                $filterargs = $p->try_consume('colon') ? $this->parse_filterargs($p) : array();
+                $this->filters[] = array($filtername, $filterargs);
+            }
 
-        $p->consume('end_of_string');
+            $p->consume(Lexer::TOKEN_ENDOFSTRING);
         } catch(\Liquid\Exceptions\SyntaxError $e) {
             $e->setMessage($e->getMessage() . ' in "{{' . $markup . '}}"');
             throw $e;
@@ -59,7 +67,7 @@ class Variable {
 
     public function parse_filterargs($p) {
         $filterargs = array($p->argument());
-        while($p->tryConsume('comma')) {
+        while($p->try_consume('comma')) {
             $filterargs[] = $p->argument();
         }
         return $filterargs;
@@ -95,3 +103,4 @@ class Variable {
         }, $context[$this->name]);
     }
 }
+Variable::init();

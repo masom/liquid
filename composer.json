@@ -1,0 +1,19 @@
+{
+    "name": "masom/liquid",
+    "description": "Liquid markup language. Safe, customer facing template language for flexible web apps.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Martin Samson",
+            "email": "martin@canvaspop.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "4.1.*"
+    },
+    "autoload": {
+        "psr-4": {"Liquid\\": "lib/"}
+    }
+}

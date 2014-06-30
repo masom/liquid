@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<phpunit bootstrap="bootstrap.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningstoExceptions="true">
+
+    <testsuites>
+        <testsuite name="Liquid test suite">
+            <directory>Unit</directory>
+        </testsuite>
+    </testsuites>
+
+</phpunit>

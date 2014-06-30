@@ -24,11 +24,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 namespace Liquid\Vendor\StringScanner;
 
-class StringScannerException extends Exception {
+class StringScannerException extends \Liquid\Exceptions\LiquidException {
 };
 
 class StringScanner implements \ArrayAccess {
-  function StringScanner($str) {
+  function __construct($str) {
     $this->string = $str;
     $this->length = strlen($str);
 
@@ -118,7 +118,7 @@ class StringScanner implements \ArrayAccess {
     $this->pushState();
     
     $string = $this->rest();
-    $re = "/^$re/";
+    //$re = "/^$re/";
     $res = preg_match($re, $string, $this->matches, PREG_OFFSET_CAPTURE);
     if ($res == 0) {
       $this->match_length = null;
@@ -185,7 +185,7 @@ class StringScanner implements \ArrayAccess {
    **/
   function scanFull($re, $returnStringP = false, $advanceScanPointerP = false) {
     $this->pushState();
-    
+
     $res = $this->isMatch($re);
     if ($res !== null) {
       if ($advanceScanPointerP) {
