@@ -40,9 +40,11 @@ class Variable {
     }
 
     public function strict_parse($markup) {
-        $matches = null;
+
         $this->filters = array();
 
+
+        $matches = null;
         if (preg_match(static::EasyParse, $markup, $matches)) {
             $this->name = $matches[1];
             return;
@@ -51,10 +53,11 @@ class Variable {
         $p = new Parser($markup);
 
         try{
-            $this->name = $p->look('pipe') ? '' : $p->expression();
-            while($p->try_consume('id')) {
-                $filtername = $p->consume('id');
-                $filterargs = $p->try_consume('colon') ? $this->parse_filterargs($p) : array();
+            $this->name = $p->look(Lexer::TOKEN_PIPE) ? '' : $p->expression();
+
+            while($p->try_consume(Lexer::TOKEN_PIPE)) {
+                $filtername = $p->consume(Lexer::TOKEN_ID);
+                $filterargs = $p->try_consume(Lexer::TOKEN_COLON) ? $this->parse_filterargs($p) : array();
                 $this->filters[] = array($filtername, $filterargs);
             }
 
@@ -66,8 +69,10 @@ class Variable {
     }
 
     public function parse_filterargs($p) {
+        // first argument
         $filterargs = array($p->argument());
-        while($p->try_consume('comma')) {
+        // followed by comma separated others
+        while($p->try_consume(Lexer::TOKEN_COMMA)) {
             $filterargs[] = $p->argument();
         }
         return $filterargs;

@@ -110,7 +110,7 @@ class Parser {
     public function argument() {
         $str = '';
 
-        if ($this->look(Lexer::TOKEN_ID) && $this->look('colon', 1)) {
+        if ($this->look(Lexer::TOKEN_ID) && $this->look(Lexer::TOKEN_COLON, 1)) {
             $str .= $this->consume();
             $str .= $this->consume();
             $str .= ' ';

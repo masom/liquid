@@ -29,9 +29,11 @@ class VariableTest extends \Liquid\Tests\TestCase {
         );
         $this->assertEquals($expected, $var->filters());
 
+
         $var = new Variable(' hello | strftime: \'%Y\'');
         $this->assertEquals('hello', $var->name());
         $this->assertEquals(array(array('strftime', array("'%Y'"))), $var->filters());
+
 
         $var = new Variable(" 'typo' | link_to: 'Typo', true ");
         $this->assertEquals("'typo'", $var->name());
@@ -40,6 +42,7 @@ class VariableTest extends \Liquid\Tests\TestCase {
         );
         $this->assertEquals($expected, $var->filters());
 
+
         $var = new Variable(" 'typo' | link_to: 'Typo', false ");
         $this->assertEquals("'typo'", $var->name());
         $expected = array(
@@ -47,19 +50,23 @@ class VariableTest extends \Liquid\Tests\TestCase {
         );
         $this->assertEquals($expected, $var->filters());
 
+
         $var = new Variable(" 'foo' | repeat: 3 ");
         $this->assertEquals("'foo'", $var->name());
         $this->assertEquals(array(array('repeat', array('3'))), $var->filters());
 
+
         $var = new Variable(" 'foo' | repeat: 3, 3 ");
         $this->assertEquals("'foo'", $var->name());
-        $this->assertEquals(array(array('repeat', array('3','3'))), $var->fiters());
+        $this->assertEquals(array(array('repeat', array('3','3'))), $var->filters());
+
 
         $var = new Variable(" 'foo' | repeat: 3, 3, 3 ");
         $this->assertEquals("'foo'", $var->name());
-        $this->assertEquals(array(array('repeat', array('3','3','3'))), $var->fiters());
+        $this->assertEquals(array(array('repeat', array('3','3','3'))), $var->filters());
 
-        $var = new Variable("' hello | strftime: '%Y, okay?'");
+
+        $var = new Variable(" hello | strftime: '%Y, okay?'");
         $this->assertEquals('hello', $var->name());
         $this->assertEquals(array(array('strftime', array("'%Y, okay?'"))), $var->filters());
 
@@ -69,6 +76,21 @@ class VariableTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_filter_with_date_parameter() {
-
+        $var = new Variable(" '2006-06-06' | date: \"%m/%d/%Y\"");
+        $this->assertEquals("'2006-06-06'", $var->name());
+        $this->assertEquals(array(array('date', array('"%m/%d/%Y"'))), $var->filters());
     }
+
+    public function test_filter_without_whitespace() {
+        $var = new Variable('hello | textileze | paragraph');
+        $this->assertEquals('hello', $var->name());
+
+        $expected = array(
+            array('textileze', array()),
+            array('paragraph', array()),
+        );
+        $this->assertEquals($expected, $var->filters());
+    }
+
+
 }

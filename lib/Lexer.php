@@ -21,7 +21,10 @@ class Lexer {
     const TOKEN_NUMBER = 'number';
     const TOKEN_ID = 'id';
     const TOKEN_DOTDOT = 'dotdot';
+    const TOKEN_COLON = 'colon';
+    const TOKEN_COMMA = 'comma';
     const TOKEN_ENDOFSTRING = 'end_of_string';
+    const TOKEN_PIPE = 'pipe';
 
     const IDENTIFIER = '/[\w\-?!]+/';
     const SINGLE_STRING_LITERAL = '/\'[^\\\']*\'/';
@@ -46,7 +49,7 @@ class Lexer {
     public function tokenize() {
         $this->output = array();
 
-        while(!$this->ss->isEos()) {
+        while(!$this->ss->eos) {
             $this->ss->skip('/\s*/');
             $tok = null;
             switch(true) {
