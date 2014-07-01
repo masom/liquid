@@ -96,8 +96,7 @@ class Strainer {
                 break;
             }
         } else {
-            // Interesting behaviour.
-            return array_pop($args);
+            return array_shift($args);
         }
     }
 

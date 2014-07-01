@@ -34,4 +34,26 @@ class StrainerTest extends \Liquid\Tests\TestCase {
 
         $this->assertTrue($strainer->is_invokable('size'));
     }
+
+    public function test_strainer_returns_null_if_no_filter_method_found() {
+        $strainer = Strainer::create(null);
+
+        $this->assertNull($strainer->invoke('private_filter'));
+        $this->assertNull($strainer->invoke('undef_the_filter'));
+    }
+
+    public function test_strainer_returns_first_arguments_if_no_method_and_arguments_given() {
+        $strainer = Strainer::create(null);
+
+        $this->assertEquals('password', $strainer->invoke('undef_the_method', 'password'));
+    }
+
+    public function test_strainer_only_allows_method_defined_in_filters() {
+        $strainer = Strainer::create(null);
+        $this->assertEquals('1 + 1', $strainer->invoke('instance_eval', '1 + 1'));
+        $this->assertEquals('1 + 1', $strainer->invoke('eval', '1 + 1'));
+        $this->assertEquals('puts', $strainer->invoke('__send__', 'puts', 'Hi Mom'));
+        $this->assertEquals('puts', $strainer->invoke('eval', 'puts', 'Hi Mom'));
+        $this->assertEquals('has_method?', $strainer->invoke('invoke', 'has_method?', 'invoke'));
+    }
 }
