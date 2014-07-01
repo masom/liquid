@@ -90,7 +90,87 @@ class VariableTest extends \Liquid\Tests\TestCase {
             array('paragraph', array()),
         );
         $this->assertEquals($expected, $var->filters());
+
+        $var = new Variable('hello|textileze|paragraph');
+        $this->assertEquals('hello', $var->name());
+
+        $expected = array(
+            array('textileze', array()),
+            array('paragraph', array())
+        );
+        $this->assertEquals($expected, $var->filters());
+
+        $var = new Variable("hello|replace:'foo','bar'|textileze");
+        $this->assertEquals('hello', $var->name());
+        $expected = array(
+            array('replace', array("'foo'", "'bar'")),
+            array('textileze', array())
+        );
+        $this->assertEquals($expected, $var->filters());
     }
 
+    public function test_symbol() {
+        /**
+         * TODO implement the lax parser.
+         */
+        $this->markTestSKipped( 'Requires the lax parser.' );
 
+        $var = new Variable("http://disney.com/logo.gif | image: 'med' ");
+
+        $this->assertEquals('http://disney.com/logo.gif', $var->name());
+        $this->assertEquals(array(array('image', array('med'))), $var->filters());
+    }
+
+    public function test_string_to_filter() {
+        $var = new Variable("'http://disney.com/logo.gif' | image: 'med' ");
+        $this->assertEquals("'http://disney.com/logo.gif'", $var->name());
+        $this->assertEquals(array(array('image', array("'med'"))), $var->filters());
+    }
+
+    public function test_string_single_quoted() {
+        $var = new Variable(" 'hello' ");
+        $this->assertEquals("'hello'", $var->name());
+    }
+
+    public function test_string_double_quoted() {
+        $var = new Variable(' "hello" ');
+        $this->assertEquals('"hello"', $var->name());
+    }
+
+    public function test_integer() {
+        $var = new Variable(' 1000 ');
+        $this->assertEquals( '1000', $var->name());
+    }
+
+    public function test_float() {
+        $var = new Variable(' 1000.01 ');
+        $this->assertEquals( '1000.01', $var->name());
+    }
+
+    public function test_string_with_special_chars() {
+        $var = new Variable(' \'hello! $!@.;"ddasd" \' ');
+        $this->assertEquals('\'hello! $!@.;"ddasd" \'', $var->name());
+    }
+
+    public function test_string_dot() {
+        $var = new Variable(' test.test ');
+        $this->assertEquals('test.test', $var->name());
+    }
+
+    public function test_filter_with_keyword_arguments() {
+        $var = new Variable(' hello | things: greeting: "world", farewell: \'goodbye\'');
+        $this->assertEquals('hello', $var->name());
+        $expected = array(
+            array('things', array("greeting: \"world\"", "farewell: 'goodbye'"))
+        );
+        $this->assertEquals($expected, $var->filters());
+    }
+
+    public function test_strict_filter_argument_parsing() {
+        try{
+            new Variable(' number_of_comments | pluralize: \'comment\': \'comments\' ');
+            $this->fail("A SyntaxError should have been raised.");
+        } catch(\Liquid\Exceptions\SyntaxError $e) {
+        }
+    }
 }
