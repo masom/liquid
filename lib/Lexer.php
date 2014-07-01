@@ -63,7 +63,7 @@ class Lexer {
                     $tok = array(static::TOKEN_STRING, $t);
                     break;
                 case $t = $this->ss->scan(static::DOUBLE_STRING_LITERAL):
-                    $tok = array(Static::TOKEN_STRING, $t);
+                    $tok = array(static::TOKEN_STRING, $t);
                     break;
                 case $t = $this->ss->scan(static::NUMBER_LITERAL):
                     $tok = array(static::TOKEN_NUMBER, $t);
