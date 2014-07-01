@@ -1,6 +1,6 @@
 <?php
 
-namespace \Liquid;
+namespace Liquid;
 
 class Strainer {
 
@@ -9,6 +9,7 @@ class Strainer {
     protected static $known_methods = array();
     protected static $strainer_class_cache = array();
 
+    /** @var \Liquid\Context $context */
     protected $context;
 
     public function __construct( $context ) {
@@ -53,23 +54,30 @@ class Strainer {
 
     public static function create($context, array $filters = array())
     {
-        //TODO Not sure why this is being created like that.
         $filters = static::$filters + $filters;
         $instance = new static($context);
-        
-        static::$strainer_class_cache[$filters] = $instance;
+
+        /**
+         * TODO figure a way to serialize the filters
+         */
+        //static::$strainer_class_cache[$filters] = $instance;
 
         return $instance;
     }
 
-    public function invoke($method, array $args = array() ) {
-        if ($this->invokable($method)) {
+    public function invoke($method) {
+
+        $args = func_get_args($method);
+        array_shift($args);
+
+        if ($this->is_invokable($method)) {
+
             $class = static::$known_methods[$method];
             $instance = static::$known_filters[$class];
 
             /**
-             * Optimize calling the method with less than 5 arguments 
-             */
+            * Optimize calling the method with less than 5 arguments 
+            */
             switch(count($args)) {
                 case 0:
                     return $instance->{$method}();
@@ -93,7 +101,7 @@ class Strainer {
         }
     }
 
-    public function invokable($method) {
+    public function is_invokable($method) {
 
         if (!isset(static::$known_methods[$method])) {
             return false;

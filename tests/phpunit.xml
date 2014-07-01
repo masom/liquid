@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<phpunit bootstrap="bootstrap.php" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningstoExceptions="true">
+<phpunit bootstrap="bootstrap.php" convertErrorsToExceptions="false" convertNoticesToExceptions="false" convertWarningstoExceptions="false">
 
     <testsuites>
         <testsuite name="Liquid test suite">

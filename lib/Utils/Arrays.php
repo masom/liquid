@@ -8,6 +8,6 @@ class Arrays {
      */
     public static function flatten(array $array) {
         $iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array));
-        return iterator_to_array($array, true);
+        return iterator_to_array($iterator, true);
     }
 }

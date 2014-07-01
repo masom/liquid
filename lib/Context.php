@@ -5,6 +5,7 @@ namespace Liquid;
 use \Liquid\Strainer;
 use \Liquid\Utils\Arrays;
 use \Liquid\Utils\Registers;
+use \Liquid\Utils\Environments;
 
 class Context implements \ArrayAccess {
 
@@ -42,11 +43,10 @@ class Context implements \ArrayAccess {
         'empty' => 'empty?'
     );
 
-
     public function __construct(array $environments = array(), array $outer_scope = array(), array $registers = array(), $rethrow_errors = false, array $resource_limits = array()) {
         $this->environment = new Environments(Arrays::flatten($environments));
 
-        $this->scopes = array($this->outer_scope);
+        $this->scopes = array($outer_scope);
 
         $this->registers = new Registers($registers);
 

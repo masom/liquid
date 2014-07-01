@@ -14,23 +14,22 @@ class Tag {
     protected $nodelist;
     protected $warnings;
 
-    public static function parse() {
-        if (isset($this) && $this instanceof Tag) {
-            // non static context
+    public static function __callStatic($method, $args) {
+        if ($method === 'parse') {
+            $tag = new static($args[0], $args[1], $args[3]);
+            $tag->parse($args[2]);
+            return $tag;
+        }
+
+        throw new \BadMethodCallException("Method `" . __CLASS__ . "::{$method}` is undefined.");
+    }
+
+    public function __call($method, $arguments) {
+        if ($method === 'parse') {
             return;
         }
 
-        /** $tag_name, $markup, $tokens, array $options */
-        $args = func_get_args();
-
-        if (count($args) != 4)
-        {
-            throw new \InvalidArgumentException('4 parameters should have been passed.');
-        }
-
-        $tag = new static($args[0], $args[1], $args[3]);
-        $tag->parse($args[2]);
-        return $tag;
+        throw new \BadMethodCallException("Method `" . __CLASS__ ."->{$method}` is undefined.");
     }
 
     public function __construct($tag_name, $markup, array $options) {
@@ -55,7 +54,7 @@ class Tag {
         $lastNsPos = strrpos(__CLASS__, '\\');
         $namespace = substr(__CLASS__, 0, $lastNsPos);
 
-        return strtolower(substr(__CLASS__, $lastNsPos + 1));
+        return 'liquid::' . strtolower(substr(__CLASS__, $lastNsPos + 1));
     }
 
     public function render($context) {
