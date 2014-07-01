@@ -61,7 +61,7 @@ class Parser {
     /**
      * Like try_consume except for an id token of a certain name
      */
-    public function tryId($id) {
+    public function try_id($id) {
         $token = $this->tokens[$this->p];
 
         if (!isset($this->tokens[$this->p])) {
@@ -103,7 +103,8 @@ class Parser {
 
             return "({$first}..{$last})";
         } else {
-            throw new \Liquid\Exceptions\SyntaxError("`{$token}` is not a valid expression");
+            $token = json_encode($token);
+            throw new \Liquid\Exceptions\SyntaxError("`{$token[1]}` is not a valid expression");
         }
     }
 

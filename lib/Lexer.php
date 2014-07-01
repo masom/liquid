@@ -21,6 +21,7 @@ class Lexer {
     const TOKEN_NUMBER = 'number';
     const TOKEN_ID = 'id';
     const TOKEN_DOTDOT = 'dotdot';
+    const TOKEN_DOT = 'dot';
     const TOKEN_COLON = 'colon';
     const TOKEN_COMMA = 'comma';
     const TOKEN_ENDOFSTRING = 'end_of_string';
