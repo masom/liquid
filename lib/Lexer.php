@@ -26,6 +26,8 @@ class Lexer {
     const TOKEN_COMMA = 'comma';
     const TOKEN_ENDOFSTRING = 'end_of_string';
     const TOKEN_PIPE = 'pipe';
+    const TOKEN_OPENSQUARE = 'open_square';
+    const TOKEN_CLOSESQUARE = 'close_square';
 
     const IDENTIFIER = '/[\w\-?!]+/';
     const SINGLE_STRING_LITERAL = '/\'[^\\\']*\'/';
