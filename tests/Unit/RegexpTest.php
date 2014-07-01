@@ -45,7 +45,7 @@ class RegexpTest extends \Liquid\Tests\TestCase {
 
     public function test_quoted_words_in_the_middle() {
         $this->assertEquals(4, preg_match_all(Liquid::$QuotedFragment, 'arg1 arg2 "arg 3" arg4   ', $matches));
-        $this->assertEquals(['arg1', 'arg2', '"arg 3"', 'arg4'], $matches[0]);
+        $this->assertEquals(array('arg1', 'arg2', '"arg 3"', 'arg4'), $matches[0]);
     }
 
     public function test_variable_parser() {
