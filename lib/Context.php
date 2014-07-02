@@ -258,10 +258,9 @@ class Context implements \ArrayAccess {
         case preg_match('/\A(-?\d+)\z/', $key, $matches): // Integer
             return (int) $matches[1];
         case preg_match('/\A\((\S+)\.\.(\S+)\)\z/', $key, $matches): //Ranges
-            return range((int) $matches[1], (int) $matches[2]);
+            return range((int) $this->resolve($matches[1]), (int) $this->resolve($matches[2]));
         case preg_match('/\A(-?\d[\d\.]+)\z/', $key, $matches): //Floats
             return (float) $matches[1];
-
         default:
             return $this->variable($key);
         }
@@ -269,6 +268,7 @@ class Context implements \ArrayAccess {
 
     public function find_variable($key) {
         $scope = null;
+        $variable = null;
 
         foreach($this->scopes as $s) {
             if (!isset($s[$key])){
@@ -278,8 +278,6 @@ class Context implements \ArrayAccess {
             $scope = $s;
             break;
         }
-
-        $variable = null;
 
         if ($scope == null) {
             foreach($this->environments as $e) {
@@ -297,10 +295,6 @@ class Context implements \ArrayAccess {
             } else {
                 $scope = $this->scopes->last();
             }
-        }
-
-        if (!isset($scope[$key])) {
-            $this->handle_not_found($key);
         }
 
         $variable = $variable ?: $this->lookup_and_evaluate($scope, $key);
@@ -387,12 +381,12 @@ class Context implements \ArrayAccess {
         if (!isset($obj[$key])) {
             return null;
         }
-        
+
         $value = $obj[$key];
-        
+
         if (($value instanceof \Closure || is_callable($value))
             && (is_array($obj) || $obj instanceof \ArrayAccess)) {
-
+            
             /**
             $reflection = new \ReflectionFunction($value);
             if ($reflection->getNumberOfParameters() == 0) {
@@ -401,9 +395,10 @@ class Context implements \ArrayAccess {
                 $obj[$key] = $value($this);
             }*/
             /**
-                * PHP doesn't really care if we pass more arguments.
-                */
+             * PHP doesn't really care if we pass more arguments.
+             */
             $obj[$key] = $value($this);
+            return $obj[$key];
         } else {
             return $value;
         }

@@ -7,8 +7,10 @@ use \Liquid\Strainer;
 
 use \Liquid\Tests\Lib\ContextFilter;
 use \Liquid\Tests\Lib\CentsDrop;
+use \Liquid\Tests\Lib\CounterDrop;
 use \Liquid\Tests\Lib\ContextSensitiveDrop;
 use \Liquid\Tests\Lib\HundredCentes;
+use \Liquid\Tests\Lib\ProcAsVariable;
 
 class ContextTest extends \Liquid\Tests\TestCase {
 
@@ -219,7 +221,7 @@ class ContextTest extends \Liquid\Tests\TestCase {
 
         $this->context['var'] = 'tags';
         $this->context['nested'] = array('var' => 'tags');
-        $this->context['products'] = array('count' => 5, 'tags' => ['deepsnow', 'freestyle']);
+        $this->context['products'] = array('count' => 5, 'tags' => array('deepsnow', 'freestyle'));
 
         $this->assertEquals('deepsnow', $this->context['products[var].first']);
         $this->assertEquals('freestyle', $this->context['products[nested.var].last']);
@@ -280,4 +282,59 @@ class ContextTest extends \Liquid\Tests\TestCase {
         $this->context->merge(array("test" => '123', "vars" => array("local" => new ContextSensitiveDrop())));
         $this->assertEquals('123', $this->context['vars.local.test']);
     }
+
+    public function test_ranges() {
+        $this->context->merge(array("test" => '5'));
+        $this->assertEquals(range(1,5), $this->context['(1..5)']);
+        $this->assertEquals(range(1,5), $this->context['(1..test)']);
+        $this->assertEquals(range(5,5), $this->context['(test..test)']);
+    }
+
+    public function test_cents_through_drop_nestedly() {
+        $this->context->merge(array("cents" => array("cents" => new CentsDrop())));
+        $this->assertEquals(100, $this->context['cents.cents.amount']);
+
+        $this->context->merge(array("cents" => array("cents" => array("cents" => new CentsDrop()))));
+        $this->assertEquals(100, $this->context['cents.cents.cents.amount']);
+    }
+
+    public function test_drop_with_variable_called_only_once() {
+        $this->context['counter'] = new CounterDrop();
+
+        $this->assertEquals(1, $this->context['counter.count']);
+        $this->assertEquals(2, $this->context['counter.count']);
+        $this->assertEquals(3, $this->context['counter.count']);
+    }
+
+    public function test_drop_with_key_called_only_once() {
+        $this->context['counter'] = new CounterDrop();
+
+        $this->assertEquals(1, $this->context['counter["count"]']);
+        $this->assertEquals(2, $this->context['counter["count"]']);
+        $this->assertEquals(3, $this->context['counter["count"]']);
+    }
+
+    public function test_proc_as_variable() {
+        $this->context['dynamic'] = new ProcAsVariable();
+
+        $this->assertEquals('Hello', $this->context['dynamic']);
+    }
+
+  public function test_lambda_as_variable() {
+    $this->context['dynamic'] = function() { return 'Hello'; };
+
+    $this->assertEquals('Hello', $this->context['dynamic']);
+  }
+
+  public function test_nested_lambda_as_variable() {
+    $this->context['dynamic'] = array("lambda" => function() { return 'Hello'; });
+
+    $this->assertEquals('Hello', $this->context['dynamic.lambda']);
+  }
+
+  public function test_array_containing_lambda_as_variable() {
+    $this->context['dynamic'] = array(1,2, function() { return 'Hello'; } ,4,5);
+
+    $this->assertEquals('Hello', $this->context['dynamic[2]']);
+  }
 }
