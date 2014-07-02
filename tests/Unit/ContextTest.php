@@ -3,6 +3,7 @@
 namespace Liquid\Tests\Unit;
 
 use \Liquid\Context;
+use \Liquid\Tests\Lib\ContextFilter;
 
 class ContextTest extends \Liquid\Tests\TestCase {
 
@@ -67,5 +68,18 @@ class ContextTest extends \Liquid\Tests\TestCase {
     public function test_length_query() {
         $this->context['numbers'] = array(1,2,3,4);
         $this->assertEquals(4, $this->context['numbers.size']);
+    }
+
+    public function test_hyphenated_variable() {
+        $this->context['oh-my'] = 'godz';
+        $this->assertEquals('godz', $this->context['oh-my']);
+    }
+
+    public function test_add_filter() {
+        $filter = new ContextFilter();
+
+        $context = new Context();
+        $context->add_filters($filter);
+        $this->assertEquals('hi? hi!', $context->invoke('hi', 'hi?'));
     }
 }

@@ -4,10 +4,11 @@ namespace Liquid\Utils;
 
 class Arrays {
     /**
-     * @see http://stackoverflow.com/a/1320259/1014879
+     * http://stackoverflow.com/a/1320156/1014879
      */
     public static function flatten(array $array) {
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($array));
-        return iterator_to_array($iterator, true);
+        $return = array();
+        array_walk_recursive($array, function($a) use (&$return) { $return[] = $a; });
+        return $return;
     }
 }

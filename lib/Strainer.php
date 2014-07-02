@@ -5,9 +5,11 @@ namespace Liquid;
 class Strainer {
 
     protected static $filters = array();
-    protected static $known_filters = array();
-    protected static $known_methods = array();
-    protected static $strainer_class_cache = array();
+    protected static $global_filters = array();
+    protected static $global_methods = array();
+
+    protected $instance_filters = array();
+    protected $instance_methods = array();
 
     /** @var \Liquid\Context $context */
     protected $context;
@@ -23,10 +25,33 @@ class Strainer {
     }
 
     public static function add_known_filter($filter) {
+        static::add_filter(static::$global_filters, static::$global_methods, $filter);
+    }
 
+    public static function strainer_class_cache() {
+        return static::$strainer_class_cache;
+    }
+
+    public static function create($context, array $filters = array())
+    {
+        $filters = array_merge(static::$filters, $filters);
+        $instance = new static($context);
+
+        foreach($filters as $filter) {
+            $instance->add_filter($instance->instance_filters, $instance->instance_methods, $filter);
+        }
+        return $instance;
+    }
+
+    /**
+     *  hash[filters] = Class.new(Strainer) do
+     *   filters.each { |f| include f }
+     *  end
+     */
+    protected static function add_filter(&$known_filters, &$known_methods, $filter) {
         $class = get_class($filter);
 
-        if (isset(static::$known_filters[$class])) {
+        if (isset($known_filters[$class])) {
             // Filter already loaded.
             return;
         }
@@ -38,31 +63,14 @@ class Strainer {
                 continue;
             }
 
-            if (isset(static::$known_methods[$method])) {
+            if (isset($known_methods[$method])) {
                 continue;
             }
 
-            static::$known_methods[$method] = $class;
+            $known_methods[$method] = $class;
         }
 
-        static::$known_filters[$class] = $filter;
-    }
-
-    public static function strainer_class_cache() {
-        return static::$strainer_class_cache;
-    }
-
-    public static function create($context, array $filters = array())
-    {
-        $filters = static::$filters + $filters;
-        $instance = new static($context);
-
-        /**
-         * TODO figure a way to serialize the filters
-         */
-        //static::$strainer_class_cache[$filters] = $instance;
-
-        return $instance;
+        $known_filters[$class] = $filter;
     }
 
     public function invoke($method) {
@@ -72,12 +80,12 @@ class Strainer {
 
         if ($this->is_invokable($method)) {
 
-            $class = static::$known_methods[$method];
-            $instance = static::$known_filters[$class];
+            $class = $this->instance_methods[$method];
+            $instance = $this->instance_filters[$class];
 
             /**
             * Optimize calling the method with less than 5 arguments 
-            */
+             */
             switch(count($args)) {
                 case 0:
                     return $instance->{$method}();
@@ -96,18 +104,22 @@ class Strainer {
                 break;
             }
         } else {
+            if ($method == 'hi'){
+            var_dump($this->instance_filters);
+            var_dump($this->instance_methods);
+            }
             return array_shift($args);
         }
     }
 
     public function is_invokable($method) {
 
-        if (!isset(static::$known_methods[$method])) {
+        if (!isset($this->instance_methods[$method])) {
             return false;
         }
 
-        $class = static::$known_methods[$method];
-        $instance = static::$known_filters[$class];
+        $class = $this->instance_methods[$method];
+        $instance = $this->instance_filters[$class];
         return is_callable( array( $instance, $method ) );
     }
 }

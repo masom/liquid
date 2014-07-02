@@ -35,6 +35,9 @@ class Context implements \ArrayAccess {
     /** @var \Liquid\Strainer */
     protected $strainer;
 
+    /** @var \ReflectionMethod */
+    protected $strainerMethodInvoker;
+
     private static $LITERALS = array(
         null => null, 'nil' => null, 'null' => null, '' => null,
         'true' => true,
@@ -54,6 +57,11 @@ class Context implements \ArrayAccess {
         $this->resource_limits = $resource_limits + array('render_score_current' => 0, 'assign_score_current' => 0);
 
         $this->squash_instance_assigns_with_environments();
+
+        /**
+         * Faster than call_user_func_array
+         */
+        $this->strainerMethodInvoker = new \ReflectionMethod('\Liquid\Strainer', 'invoke');
     }
 
     /**
@@ -112,14 +120,14 @@ class Context implements \ArrayAccess {
      */
     public function strainer() {
         if (!$this->strainer) {
-            $this->strainer = new Strainer($this, $this->filters);
+            $this->strainer = Strainer::create($this, $this->filters);
         }
 
         return $this->strainer;
     }
 
-    public function add_filters(array $filters) {
-        $filters = array_filter(Arrays::flatten($filters));
+    public function add_filters($filters) {
+        $filters = array_filter(Arrays::flatten(array($filters)));
 
         foreach($filters as $f) {
             if (!is_object($f)) {
@@ -136,7 +144,7 @@ class Context implements \ArrayAccess {
                 //strainer.extend(f)
             }
         } else {
-            array_push($this->filters, $filters);
+            $this->filters = array_merge($this->filters, $filters);
         }
     }
 
@@ -167,8 +175,9 @@ class Context implements \ArrayAccess {
         }
     }
 
-    public function invoke( $method, array $args = array()) {
-        return $this->strainer()->invoke($method, $args);
+    public function invoke($method) {
+        $args = func_get_args();
+        return $this->strainerMethodInvoker->invokeArgs( $this->strainer(), $args);
     }
 
     public function push(array $new_scope = array()) {
@@ -346,10 +355,13 @@ class Context implements \ArrayAccess {
                         switch($part) {
                         case 'size':
                             $res = count($object);
+                            break;
                         case 'first':
                             $res = reset($object);
+                            break;
                         case 'last':
                             $res = end($object);
+                            break;
                         }
                     }
                     if (is_object($res) && method_exists($res, 'to_liquid')) {
