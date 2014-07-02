@@ -1,6 +1,6 @@
 <?php
 
-namespace Liquid\FileSystem;
+namespace Liquid\FileSystems;
 
 class LocalFileSystem {
 
@@ -37,9 +37,9 @@ class LocalFileSystem {
 
 
         if (strpos($template_path, '/') !== false) {
-            $full_path = implode('/', array($this->root, dirname($this->template_path), sprintf($this->pattern, basename($this->template_path))));
+            $full_path = implode('/', array($this->root, dirname($template_path), sprintf($this->pattern, basename($template_path))));
         } else {
-            $full_path = implode('/', array($this->root, sprintf($this->pattern, $this->template_path)));
+            $full_path = implode('/', array($this->root, sprintf($this->pattern, $template_path)));
         }
 
         if (!preg_match( '/\A' . realpath($this->root) .'/', realpath($full_path))) {

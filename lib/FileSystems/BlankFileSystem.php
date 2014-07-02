@@ -1,6 +1,6 @@
 <?php
 
-namespace Liquid\FileSystem;
+namespace Liquid\FileSystems;
 
 class BlankFileSystem {
 
