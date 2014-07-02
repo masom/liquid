@@ -293,9 +293,9 @@ class Context implements \ArrayAccess {
 
         if (!$scope) {
             if ($this->environments) {
-                $scope = end($this->environments);
+                $scope = $this->environments->last();
             } else {
-                $scope = end($this->scopes);
+                $scope = $this->scopes->last();
             }
         }
 

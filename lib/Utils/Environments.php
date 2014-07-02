@@ -10,6 +10,10 @@ class Environments implements \ArrayAccess {
         $this->environments = $environments;
     }
 
+    public function last() {
+        return end($this->environments);
+    }
+
     public function offsetGet($offset) {
         if (!isset($this->environments[$offset])) {
             $this->environments[$offset] = array();

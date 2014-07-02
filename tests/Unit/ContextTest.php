@@ -95,4 +95,8 @@ class ContextTest extends \Liquid\Tests\TestCase {
         $context->add_filters($filter);
         $this->assertEquals('Wookie hi!', $context->invoke('hi', 'Wookie'));
     }
+
+    public function test_add_item_in_outer_scope() {
+
+    }
 }

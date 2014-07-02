@@ -11,6 +11,10 @@ class Registers implements \ArrayAccess {
         $this->registers = $registers;
     }
 
+    public function last() {
+        return end($this->environments);
+    }
+
     public function offsetGet($offset) {
         if (!isset($this->registers[$offset])) {
             $this->registers[$offset] = array();
