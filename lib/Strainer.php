@@ -67,7 +67,7 @@ class Strainer {
 
     public function invoke($method) {
 
-        $args = func_get_args($method);
+        $args = func_get_args();
         array_shift($args);
 
         if ($this->is_invokable($method)) {
