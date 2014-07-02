@@ -12,7 +12,7 @@ class Registers implements \ArrayAccess {
     }
 
     public function last() {
-        return end($this->environments);
+        return end($this->registers);
     }
 
     public function offsetGet($offset) {
