@@ -5,6 +5,8 @@ namespace Liquid\Tests\Unit;
 use \Liquid\Context;
 use \Liquid\Strainer;
 
+use \Liquid\Tests\Lib\Category;
+use \Liquid\Tests\Lib\CategoryDrop;
 use \Liquid\Tests\Lib\ContextFilter;
 use \Liquid\Tests\Lib\CentsDrop;
 use \Liquid\Tests\Lib\CounterDrop;
@@ -320,21 +322,83 @@ class ContextTest extends \Liquid\Tests\TestCase {
         $this->assertEquals('Hello', $this->context['dynamic']);
     }
 
-  public function test_lambda_as_variable() {
-    $this->context['dynamic'] = function() { return 'Hello'; };
+    public function test_lambda_as_variable() {
+        $this->context['dynamic'] = function() { return 'Hello'; };
 
-    $this->assertEquals('Hello', $this->context['dynamic']);
-  }
+        $this->assertEquals('Hello', $this->context['dynamic']);
+    }
 
-  public function test_nested_lambda_as_variable() {
-    $this->context['dynamic'] = array("lambda" => function() { return 'Hello'; });
+    public function test_nested_lambda_as_variable() {
+        $this->context['dynamic'] = array("lambda" => function() { return 'Hello'; });
 
-    $this->assertEquals('Hello', $this->context['dynamic.lambda']);
-  }
+        $this->assertEquals('Hello', $this->context['dynamic.lambda']);
+    }
 
-  public function test_array_containing_lambda_as_variable() {
-    $this->context['dynamic'] = array(1,2, function() { return 'Hello'; } ,4,5);
+    public function test_array_containing_lambda_as_variable() {
+        $this->context['dynamic'] = array(1,2, function() { return 'Hello'; } ,4,5);
 
-    $this->assertEquals('Hello', $this->context['dynamic[2]']);
-  }
+        $this->assertEquals('Hello', $this->context['dynamic[2]']);
+    }
+    public function test_lambda_is_called_once() {
+        $global = 0;
+        $this->context['callcount'] = function() use (&$global) { $global += 1; return (string) $global; };
+
+        $this->assertEquals('1', $this->context['callcount']);
+        $this->assertEquals('1', $this->context['callcount']);
+        $this->assertEquals('1', $this->context['callcount']);
+    }
+
+    public function test_nested_lambda_is_called_once() {
+        $global = 0;
+        $this->context['callcount'] = array("lambda" => function() use (&$global) { $global += 1; return (string) $global; });
+
+        $this->assertEquals('1', $this->context['callcount.lambda']);
+        $this->assertEquals('1', $this->context['callcount.lambda']);
+        $this->assertEquals('1', $this->context['callcount.lambda']);
+    }
+
+    public function test_lambda_in_array_is_called_once() {
+        $global = 0;
+        $this->context['callcount'] = array(
+            1,2, function() use (&$global) { $global += 1; return (string) $global; } ,4,5
+        );
+
+        $this->assertEquals('1', $this->context['callcount[2]']);
+        $this->assertEquals('1', $this->context['callcount[2]']);
+        $this->assertEquals('1', $this->context['callcount[2]']);
+    }
+
+    public function test_access_to_context_from_proc() {
+        $registers = $this->context->registers();
+        $registers['magic'] = 345392;
+
+        $this->context['magic'] = function($context) { $registers = $context->registers(); return $registers['magic']; };
+
+        $this->assertEquals(345392, $this->context['magic']);
+    }
+
+    public function test_to_liquid_and_context_at_first_level() {
+        $this->context['category'] = new Category("foobar");
+
+        $this->assertInstanceOf('\Liquid\Tests\Lib\CategoryDrop',$this->context['category']);
+        $this->assertEquals($this->context, $this->context['category']->context());
+    }
+
+    public function test_strict_variables_not_found() {
+        $this->context['does_not_exists'];
+        $this->assertEquals(1, count($this->context->errors()));
+        $errors = $this->context->errors();
+        $this->assertEquals('Variable {{does_not_exists}} not found', $errors[0]);
+    }
+
+    public function test_strict_nested_variables_not_found() {
+        
+        $this->context['hash'] = array('this' => 'exists');
+        $this->context['hash.does_not_exist'];
+
+        $this->assertEquals(1, count($this->context->errors()));
+        $errors = $this->context->errors();
+        $this->assertEquals('Variable {{hash.does_not_exist}} not found', $errors[0]);
+    }
+
 }

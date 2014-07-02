@@ -174,6 +174,10 @@ class Context implements \ArrayAccess {
         }
     }
 
+    public function errors() {
+        return $this->errors;
+    }
+
     public function invoke($method) {
         $args = func_get_args();
         return $this->strainerMethodInvoker->invokeArgs( $this->strainer(), $args);
@@ -295,6 +299,10 @@ class Context implements \ArrayAccess {
             } else {
                 $scope = $this->scopes->last();
             }
+        }
+
+        if (!isset($scope[$key])) {
+            $this->handle_not_found($key);
         }
 
         $variable = $variable ?: $this->lookup_and_evaluate($scope, $key);
