@@ -290,9 +290,11 @@ class Context implements \ArrayAccess {
 
         $variable = $variable ?: $this->lookup_and_evaluate($scope, $key);
 
-        $variable = $variable.to_liquid();
+        if (is_object($variable)) {
+            $variable = $variable->to_liquid();
+        }
         if (method_exists($variable, 'context')) {
-            $variable.context($self);
+            $variable->context($self);
         }
 
         return $variable;
