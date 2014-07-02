@@ -31,10 +31,10 @@ class Block extends \Liquid\Tag {
     protected $children;
 
     public static function init() {
-        static::$IsTag = '/\A' . \Liquid\Liquid::TagStart . '/o';
-        static::$IsVariable = '/\A' . \Liquid\Liquid::VariableStart . '/o';
-        static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/om';
-        static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/om';
+        static::$IsTag = '/\A' . \Liquid\Liquid::TagStart . '/';
+        static::$IsVariable = '/\A' . \Liquid\Liquid::VariableStart . '/';
+        static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/m';
+        static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/m';
     }
 
     /**
@@ -44,7 +44,16 @@ class Block extends \Liquid\Tag {
         $this->blank || false;
     }
 
-    public function parse($tokens) {
+    public function __call($method, $arguments){
+        if ($method === 'parse') {
+            return $this->_parse($arguments[0]);
+        }
+
+        throw \BadMethodCallException();
+    }
+
+    public function _parse($tokens) {
+
         $this->blank = true;
 
         $this->nodelist = array();

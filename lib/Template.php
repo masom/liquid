@@ -17,6 +17,8 @@ class Template {
 
     protected $warnings;
 
+    protected $root;
+
     /** @var array */
     protected $registers = array();
     /** @var array */
@@ -65,16 +67,31 @@ class Template {
         Strainer::global_filter($filter);
     }
 
-    public static function parse($source, array $options = array()) {
-        if (isset($this) && $this instanceof Template) {
+    public static function __callStatic($method, $args) {
+        if ($method === 'parse') {
+            $template = new static();
 
-            // non-static context
-            $this->root = Document::parse($this->tokenize($source), $options);
-            return;
+            $tokens =& $args[0];
+            $options = isset($args[1]) ? $args[1] : array();
+            return $template->parse($args[0], $options);
         }
 
-        $template = new static();
-        return $template->parse($source, $options);
+        throw new \BadMethodCallException("Method `" . __CLASS__ . "::{$method}` is undefined.");
+    }
+
+    public function __call($method, $args) {
+        if ($method === 'parse') {
+            $tokens = $args[0];
+            $options = isset($args[1]) ? $args[1] : array();
+            $this->root = Document::parse($this->tokenize($tokens), $options);
+            return $this;
+        }
+
+        throw new \BadMethodCallException("Method `" . __CLASS__ ."->{$method}` is undefined.");
+    }
+
+    public function root() {
+        return $this->root;
     }
 
     public function warnings() {

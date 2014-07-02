@@ -15,7 +15,7 @@ class Tag {
     protected $warnings;
 
     public static function __callStatic($method, $args) {
-        if ($method === 'parse') {
+        if ($method == 'parse') {
             $tag = new static($args[0], $args[1], $args[3]);
             $tag->parse($args[2]);
             return $tag;
@@ -25,7 +25,7 @@ class Tag {
     }
 
     public function __call($method, $arguments) {
-        if ($method === 'parse') {
+        if ($method == 'parse') {
             return;
         }
 
