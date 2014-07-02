@@ -312,11 +312,11 @@ class Context implements \ArrayAccess {
 
     public function variable($markup) {
         $parts = null;
-        preg_match(\Liquid\Liquid::$VariableParser, $markup, $parts);
+        preg_match_all(\Liquid\Liquid::$VariableParser, $markup, $parts);
 
         $square_braketed = '/\A\[(.*)\]\z/m';
 
-        $first_part = array_shift($parts);
+        $first_part = array_shift($parts[0]);
 
         $matches = null;
         if (preg_match($square_braketed, $first_part, $matches)) {
@@ -324,20 +324,40 @@ class Context implements \ArrayAccess {
         }
 
         if ($object = $this->find_variable($first_part)) {
-            foreach($parts as $part) {
+            foreach($parts[0] as $part) {
                 $matches = null;
                 $part_resolved = preg_match($square_braketed, $part, $matches);
                 if ($part_resolved) {
                     $part = $this->resolve($matches[1]);
                 }
 
-                if (is_array($object) || $object instanceof \ArrayAccess) {
+                if ((is_array($object) || $object instanceof \ArrayAccess) && isset($object[$part])) {
                     $res = $this->lookup_and_evaluate($object, $part);
-                    $object = $res->to_liquid();
-                } elseif (!$part_resolved && method_exists($object, $part) && in_array($part, array('size', 'first', 'last'))) {
-                    //TODO interpret the commands to php methods... going to be messy...
-                    $res = $object->{$part}();
-                    $object = $res->to_liquid();
+
+                    if (is_object($res) && method_exists($res, 'to_liquid')) {
+                        $object = $res->to_liquid();
+                    } else {
+                        $object = $res;
+                    }
+                } elseif (!$part_resolved && in_array($part, array('size', 'first', 'last'))) {
+                    if (method_exists($object, $part)) { 
+                        $res = $object->{$part}();
+                    } else {
+                        switch($part) {
+                        case 'size':
+                            $res = count($object);
+                        case 'first':
+                            $res = reset($object);
+                        case 'last':
+                            $res = end($object);
+                        }
+                    }
+                    if (is_object($res) && method_exists($res, 'to_liquid')) {
+                        $object = $res->to_liquid();
+                    } else {
+                        //TODO Maybe throw an exception if the object does not support to_liquid?
+                        $object = $res;
+                    }
                 } else {
                     $this->handle_not_found($markup);
                     return null;
