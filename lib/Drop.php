@@ -5,16 +5,31 @@ namespace Liquid;
 class Drop implements \ArrayAccess {
     const EMPTY_STRING = '';
 
+    protected $context;
+    /**
+     * @var array
+     */
+    protected $invokable_methods;
+
     public function before_method($method) {
         return null;
     }
 
     public function invoke_drop($method_or_key) {
-        if ($method_or_key && $method_or_key != static::EMPTY_STRING && $this->isInvokable($method_or_key)) {
+        if ($method_or_key && $method_or_key != static::EMPTY_STRING && $this->is_invokable($method_or_key)) {
             return $this->{$method_or_key}();
         } else {
             return $this->before_method($method_or_key);
         }
+    }
+
+    public function context($context = null) {
+        if ($context) {
+            $this->context = $context;
+            return;
+        }
+
+        return $this->context();
     }
 
     public function has_key() {
@@ -36,7 +51,7 @@ class Drop implements \ArrayAccess {
     /**
      * ArrayAccess
      */
-    public function offsetExists() {
+    public function offsetExists($offset) {
         return true;
     }
     /**
@@ -49,11 +64,19 @@ class Drop implements \ArrayAccess {
     /**
      * ArrayAccess
      */
+    public function offsetUnset($key) {
+        return;
+    }
+
+    /**
+     * alias :[] :invoke_drop
+     * ArrayAccess
+     */
     public function offsetGet($key) {
         return $this->invoke_drop($key);
     }
 
-    public function isInvokable($method_name) {
+    private function is_invokable($method_name) {
         if (!$this->invokable_methods) {
             $reflection = new \ReflectionClass('\Liquid\Drop');
             $blacklist = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -64,6 +87,6 @@ class Drop implements \ArrayAccess {
             $this->invokable_methods = array_diff($public, $blacklist);
         }
 
-        return in_array($this->invokable_methods, $method_name) && method_exists($this, $method_or_key) || is_callable(array($this, $method_or_key));
+        return in_array($method_name, $this->invokable_methods ) && method_exists($this, $method_name) || is_callable(array($this, $method_name));
     }
 }

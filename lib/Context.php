@@ -312,7 +312,7 @@ class Context implements \ArrayAccess {
             //TODO Should an exception be raised / warning logged? This is potentially unsafe.
         }
         if (method_exists($variable, 'context')) {
-            $variable->context($self);
+            $variable->context($this);
         }
 
         return $variable;
@@ -375,7 +375,7 @@ class Context implements \ArrayAccess {
                 }
 
                 if (method_exists($object, 'context')) {
-                    $object->context = $this;
+                    $object->context($this);
                 }
             }
         }

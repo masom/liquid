@@ -6,6 +6,9 @@ use \Liquid\Context;
 use \Liquid\Strainer;
 
 use \Liquid\Tests\Lib\ContextFilter;
+use \Liquid\Tests\Lib\CentsDrop;
+use \Liquid\Tests\Lib\ContextSensitiveDrop;
+use \Liquid\Tests\Lib\HundredCentes;
 
 class ContextTest extends \Liquid\Tests\TestCase {
 
@@ -97,6 +100,184 @@ class ContextTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_add_item_in_outer_scope() {
+        $this->context['test'] = 'test';
+        $this->context->push();
+        $this->assertEquals('test', $this->context['test']);
 
+        $this->context->pop();
+        $this->assertEquals('test', $this->context['test']);
+    }
+
+    public function test_add_item_in_inner_scope() {
+        $this->context->push();
+        $this->context['test'] = 'test';
+
+        $this->assertEquals('test', $this->context['test']);
+
+        $this->context->pop();
+
+        $this->assertNull($this->context['test']);
+    }
+
+    public function test_hierachical_data() {
+        $this->context['hash'] = array('name' => 'tobi');
+
+        $this->assertEquals('tobi', $this->context['hash.name']);
+        $this->assertEquals('tobi', $this->context["hash['name']"]);
+    }
+
+    public function test_keywords() {
+        $this->assertTrue($this->context['true']);
+        $this->assertFalse($this->context['false']);
+    }
+
+    public function test_digits() {
+        $this->assertEquals(100, $this->context['100']);
+        $this->assertEquals(100.00, $this->context['100.00']);
+    }
+
+    public function test_strings() {
+        $this->assertEquals('hello!', $this->context['"hello!"']);
+        $this->assertEquals('hello!', $this->context["'hello!'"]);
+    }
+
+    public function test_merge() {
+        $this->context->merge(array('test' => 'test'));
+        $this->assertEquals('test', $this->context['test']);
+
+        $this->context->merge(array('test' => 'newvalue', 'foo' => 'bar'));
+        $this->assertEquals('newvalue', $this->context['test']);
+        $this->assertEquals('bar', $this->context['foo']);
+    }
+
+    public function test_array_notation() {
+        $this->context['test'] = array(1,2,3,4,5);
+        $this->assertEquals(1, $this->context['test[0]']);
+        $this->assertEquals(2, $this->context['test[1]']);
+        $this->assertEquals(3, $this->context['test[2]']);
+        $this->assertEquals(4, $this->context['test[3]']);
+        $this->assertEquals(5, $this->context['test[4]']);
+    }
+
+    public function test_recoursive_array_notation() {
+        $this->context['test'] = array('test' => array(1,2,3,4,5));
+        $this->assertEquals(1, $this->context['test.test[0]']);
+
+        $this->context['test'] = array(array('test' => 'worked'));
+        $this->assertEquals('worked', $this->context['test[0].test']);
+    }
+
+    public function test_hash_to_array_transition() {
+        $this->context['colors'] = array(
+            'Blue' => array('003366','336699', '6699CC', '99CCFF'),
+            'Green' => array('003300','336633', '669966', '99CC99'),
+            'Yellow' => array('CC9900','FFCC00', 'FFFF99', 'FFFFCC'),
+            'Red' => array('660000','993333', 'CC6666', 'FF9999')
+        );
+
+        $this->assertEquals('003366', $this->context['colors.Blue[0]']);
+        $this->assertEquals('FF9999', $this->context['colors.Red[3]']);
+    }
+
+    public function test_try_first() {
+        $this->context['test'] = array(1,2,3,4,5);
+
+        $this->assertEquals(1, $this->context['test.first']);
+        $this->assertEquals(5, $this->context['test.last']);
+
+        $this->context['test'] = array('test' => array(1,2,3,4,5));
+        $this->assertEquals(1, $this->context['test.test.first']);
+        $this->assertEquals(5, $this->context['test.test.last']);
+
+        $this->context['test'] = array(1);
+        $this->assertEquals(1, $this->context['test.first']);
+        $this->assertEquals(1, $this->context['test.last']);
+    }
+    
+    public function test_access_hashes_with_hash_notation() {
+        $this->context['products'] = array('count' => 5, 'tags' => array('deepsnow', 'freestyle'));
+        $this->context['product'] = array('variants' => array(array('title' => 'draft151cm'), array('title' => 'element151cm')));
+
+        $this->assertEquals(5, $this->context['products["count"]']);
+        $this->assertEquals('deepsnow', $this->context['products["tags"][0]']);
+        $this->assertEquals('deepsnow', $this->context['products["tags"].first']);
+        $this->assertEquals('draft151cm', $this->context['product["variants"][0]["title"]']);
+        $this->assertEquals('element151cm', $this->context['product["variants"][1]["title"]']);
+        $this->assertEquals('draft151cm', $this->context['product["variants"][0]["title"]']);
+        $this->assertEquals('element151cm', $this->context['product["variants"].last["title"]']);
+    }
+
+    public function test_access_variable_with_hash_notation() {
+        $this->context['foo'] = 'baz';
+        $this->context['bar'] = 'foo';
+
+        $this->assertEquals('baz', $this->context['["foo"]']);
+        $this->assertEquals('baz', $this->context['[bar]']);
+    }
+
+    public function test_access_hashes_with_hash_access_variables() {
+
+        $this->context['var'] = 'tags';
+        $this->context['nested'] = array('var' => 'tags');
+        $this->context['products'] = array('count' => 5, 'tags' => ['deepsnow', 'freestyle']);
+
+        $this->assertEquals('deepsnow', $this->context['products[var].first']);
+        $this->assertEquals('freestyle', $this->context['products[nested.var].last']);
+    }
+
+    public function test_hash_notation_only_for_hash_access() {
+        $this->context['array'] = array(1,2,3,4,5);
+        $this->context['hash'] = array('first' => 'Hello');
+
+        $this->assertEquals(1, $this->context['array.first']);
+        $this->assertEquals(null, $this->context['array["first"]']);
+        $this->assertEquals('Hello', $this->context['hash["first"]']);
+    }
+
+    public function test_first_can_appear_in_middle_of_callchain() {
+        $this->context['product'] = array('variants' => array(array('title' => 'draft151cm'), array('title' => 'element151cm')));
+
+        $this->assertEquals('draft151cm', $this->context['product.variants[0].title']);
+        $this->assertEquals('element151cm', $this->context['product.variants[1].title']);
+        $this->assertEquals('draft151cm', $this->context['product.variants.first.title']);
+        $this->assertEquals('element151cm', $this->context['product.variants.last.title']);
+    }
+
+    public function test_cents() {
+        $this->context->merge(array("cents" => new HundredCentes()));
+        $this->assertEquals(100, $this->context['cents']);
+    }
+
+    public function test_nested_cents() {
+        $this->context->merge(array("cents" => array('amount' => new HundredCentes())));
+        $this->assertEquals(100, $this->context['cents.amount']);
+
+        $this->context->merge(array("cents" => array('cents' => array('amount' => new HundredCentes()))));
+        $this->assertEquals(100, $this->context['cents.cents.amount']);
+    }
+
+    public function test_cents_through_drop() {
+        $this->context->merge(array("cents" => new CentsDrop()));
+        $this->assertEquals(100, $this->context['cents.amount']);
+    }
+
+    public function test_nested_cents_through_drop() {
+        $this->context->merge(array("vars" => array("cents" => new CentsDrop())));
+        $this->assertEquals(100, $this->context['vars.cents.amount']);
+    }
+
+    public function test_drop_methods_with_question_marks() {
+        $this->context->merge(array("cents" => new CentsDrop()));
+        $this->assertTrue($this->context['cents.non_zero?']);
+    }
+
+    public function test_context_from_within_drop() {
+        $this->context->merge(array("test" => '123', "vars" => new ContextSensitiveDrop()));
+        $this->assertEquals('123', $this->context['vars.test']);
+    }
+
+    public function test_nested_context_from_within_drop() {
+        $this->context->merge(array("test" => '123', "vars" => array("local" => new ContextSensitiveDrop())));
+        $this->assertEquals('123', $this->context['vars.local.test']);
     }
 }
