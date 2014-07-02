@@ -14,6 +14,15 @@ class Strainer {
     /** @var \Liquid\Context $context */
     protected $context;
 
+    /**
+     * Re-initialize the Strainer.
+     */
+    public static function init() {
+        static::$filters = array();
+        static::$global_filters = array();
+        static::$global_methods = array();
+    }
+
     public function __construct( $context ) {
         $this->context = $context;
     }
@@ -41,6 +50,13 @@ class Strainer {
             $instance->add_filter($instance->instance_filters, $instance->instance_methods, $filter);
         }
         return $instance;
+    }
+
+    /**
+     * Mimicks the Hash.extend method.
+     */
+    public function extend($filter) {
+        static::add_filter($this->instance_filters, $this->instance_methods, $filter);
     }
 
     /**
@@ -104,10 +120,6 @@ class Strainer {
                 break;
             }
         } else {
-            if ($method == 'hi'){
-            var_dump($this->instance_filters);
-            var_dump($this->instance_methods);
-            }
             return array_shift($args);
         }
     }

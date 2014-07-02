@@ -140,8 +140,7 @@ class Context implements \ArrayAccess {
 
         if ($this->strainer) {
             foreach($filters as $f) {
-                //TODO figure out what to do instead of extend.
-                //strainer.extend(f)
+                $this->strainer->extend($f);
             }
         } else {
             $this->filters = array_merge($this->filters, $filters);

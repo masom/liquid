@@ -3,6 +3,8 @@
 namespace Liquid\Tests\Unit;
 
 use \Liquid\Context;
+use \Liquid\Strainer;
+
 use \Liquid\Tests\Lib\ContextFilter;
 
 class ContextTest extends \Liquid\Tests\TestCase {
@@ -10,6 +12,7 @@ class ContextTest extends \Liquid\Tests\TestCase {
     protected $context;
 
     protected function setUp() {
+        Strainer::init();
         $this->context = new Context();
     }
 
@@ -81,5 +84,15 @@ class ContextTest extends \Liquid\Tests\TestCase {
         $context = new Context();
         $context->add_filters($filter);
         $this->assertEquals('hi? hi!', $context->invoke('hi', 'hi?'));
+    }
+
+    public function test_only_intended_filters_make_it_here() {
+        $filter = new ContextFilter();
+
+        $context = new Context();
+        $this->assertEquals('Wookie', $context->invoke('hi', 'Wookie'));
+
+        $context->add_filters($filter);
+        $this->assertEquals('Wookie hi!', $context->invoke('hi', 'Wookie'));
     }
 }
