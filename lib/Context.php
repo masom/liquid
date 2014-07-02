@@ -274,20 +274,21 @@ class Context implements \ArrayAccess {
         $scope = null;
         $variable = null;
 
-        foreach($this->scopes as $s) {
+        foreach($this->scopes as &$s) {
             if (!isset($s[$key])){
                 continue;
             }
 
-            $scope = $s;
+            $scope =& $s;
             break;
         }
 
         if ($scope == null) {
             foreach($this->environments as $e) {
                 $variable = $this->lookup_and_evaluate($e, $key);
+
                 if ($variable !== null) {
-                    $scope = $e;
+                    $scope =& $e;
                     break;
                 }
             }
@@ -337,6 +338,7 @@ class Context implements \ArrayAccess {
             foreach($parts[0] as $part) {
                 $matches = null;
                 $part_resolved = preg_match($square_braketed, $part, $matches);
+
                 if ($part_resolved) {
                     $part = $this->resolve($matches[1]);
                 }
@@ -385,7 +387,7 @@ class Context implements \ArrayAccess {
         return $object;
     }
 
-    public function lookup_and_evaluate($obj, $key) {
+    public function lookup_and_evaluate(&$obj, $key) {
         if (!isset($obj[$key])) {
             return null;
         }
