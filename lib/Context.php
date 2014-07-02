@@ -10,7 +10,7 @@ use \Liquid\Utils\Environments;
 class Context implements \ArrayAccess {
 
     /** @var array */
-    protected $environment;
+    protected $environments;
 
     /** @var array */
     protected $scopes;
@@ -44,7 +44,7 @@ class Context implements \ArrayAccess {
     );
 
     public function __construct(array $environments = array(), array $outer_scope = array(), array $registers = array(), $rethrow_errors = false, array $resource_limits = array()) {
-        $this->environment = new Environments(Arrays::flatten($environments));
+        $this->environments = new Environments(Arrays::flatten($environments));
 
         $this->scopes = array($outer_scope);
 
@@ -283,7 +283,14 @@ class Context implements \ArrayAccess {
             }
         }
 
-        $scope = $scope ?: ( end($this->environments) || end($this->scopes));
+        if (!$scope) {
+            if ($this->environments) {
+                $scope = end($this->environments);
+            } else {
+                $scope = end($this->scopes);
+            }
+        }
+
         if (!isset($scope[$key])) {
             $this->handle_not_found($key);
         }
@@ -291,7 +298,10 @@ class Context implements \ArrayAccess {
         $variable = $variable ?: $this->lookup_and_evaluate($scope, $key);
 
         if (is_object($variable)) {
-            $variable = $variable->to_liquid();
+            if (method_exists($variable, 'to_liquid')){
+                $variable = $variable->to_liquid();
+            }
+            //TODO Should an exception be raised / warning logged? This is potentially unsafe.
         }
         if (method_exists($variable, 'context')) {
             $variable->context($self);
