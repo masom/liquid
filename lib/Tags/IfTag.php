@@ -1,7 +1,9 @@
 <?php
 
-namespace Liquid;
+namespace Liquid\Tags;
 
+use \Liquid\Condition;
+use \Liquid\ElseCondition;
 use \Liquid\Liquid;
 use \Liquid\Parser;
 use \Liquid\Utils\Arrays;
@@ -9,13 +11,13 @@ use \Liquid\Utils\Arrays;
 class IfTag extends \Liquid\Block {
     protected static $Syntax;
     protected static $ExpressionsAndOperators;
-    protected static $BOOLEAN_OPERATORS = array('and', 'or');
+    protected static $BOOLEAN_OPERATORS = array('and'=>'and', 'or'=>'or');
 
     protected $blocks = array();
 
     public static function init() {
-        static::$Syntax = '/(' . Liquid::QuotedFragment .')\s*([=!<>a-z_]+)?\s*(' . Liquid::QuotedFragment . ')?/o';
-        static::$ExpressionsAndOperators = '/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:' . Liquid::QuotedFragment . '|\S+)\s*)+)/o';
+        static::$Syntax = '/(' . Liquid::$PART_QuotedFragment .')\s*([=!<>a-z_]+)?\s*(' . Liquid::$PART_QuotedFragment . ')?/';
+        static::$ExpressionsAndOperators = '/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:' . Liquid::$PART_QuotedFragment . '|\S+)\s*)+)/';
     }
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
@@ -69,6 +71,37 @@ class IfTag extends \Liquid\Block {
         $this->nodelist = $block->attach(array());
     }
 
+    public function lax_parse($markup) {
+        preg_match_all(static::$ExpressionsAndOperators, $markup, $matches);
+
+        $expressions = array_reverse($matches[0]);
+
+        if (!preg_match(static::$Syntax, array_shift($expressions), $matches)) {
+            throw new \Liquid\Exceptions\SyntaxError("Syntax Error in tag 'if' - Valid syntax: if [expression]");
+        }
+
+        $condition = new Condition($matches[1], isset($matches[2]) ? $matches[2] : null, isset($matches[3]) ? $matches[3] : null);
+
+        while($expressions) {
+            $operator = trim((string) array_shift($expressions));
+
+            if (!preg_match(static::$Syntax, trim((string) array_shift($expressions)), $matches)) {
+                throw new \Liquid\Exceptions\SyntaxError("Syntax Error in tag 'if' - Valid syntax: if [expression]");
+            }
+
+            $new_condition = new Condition($matches[1], isset($matches[2]) ? $matches[2] : null, isset($matches[3]) ? $matches[3] : null);
+
+            if(!isset(static::$BOOLEAN_OPERATORS[$operator])) {
+                throw new \Liquid\Exceptions\SyntaxError("Syntax Error in tag 'if' - Valid syntax: if [expression]");
+            }
+
+            $new_condition->{$operator}($condition);
+            $condition = $new_condition;
+        }
+
+        return $condition;
+    }
+
     public function strict_parse($markup) {
         $p = new Parser($markup);
 
@@ -85,7 +118,7 @@ class IfTag extends \Liquid\Block {
         return $condition;
     }
 
-    public function parse_comparison($p) {
+    private function parse_comparison($p) {
         $a = $p->expression();
 
         if ($op = $p->try_consume('comparison')) {
@@ -96,3 +129,4 @@ class IfTag extends \Liquid\Block {
         }
     }
 }
+IfTag::init();
