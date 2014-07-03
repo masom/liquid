@@ -75,6 +75,10 @@ class Condition {
         return array($this->child_relation, $this->child_condition = 'and', $condition);
     }
 
+    public function attachment() {
+        return $this->attachment;
+    }
+
     public function attach($attachment) {
         $this->attachment = $attachment;
     }

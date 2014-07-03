@@ -5,7 +5,8 @@ namespace Liquid\Tags;
 use \Liquid\Liquid;
 use \Liquid\Condition;
 use \Liquid\ElseCondition;
-use \Liquid\Utis\Arrays;
+use \Liquid\Utils\Arrays;
+use \Liquid\Utils\Nodes;
 
 class CaseTag extends \Liquid\Block {
 
@@ -39,14 +40,16 @@ class CaseTag extends \Liquid\Block {
         $blocks = array();
 
         foreach($this->blocks as $block) {
-            $blocks[] = $block->attachment();
+            if ($attachment = $block->attachment()) {
+                $blocks[] = $attachment->nodes();
+            }
         }
 
         return Arrays::flatten($blocks);
     }
 
     public function unknown_tag($tag, $markup, $tokens) {
-        $this->nodelist = array();
+        $this->nodelist = new Nodes();
 
         switch($tag) {
         case 'when':
@@ -64,7 +67,6 @@ class CaseTag extends \Liquid\Block {
         $blocks =& $this->blocks;
         $context->stack(function($context) use (&$blocks, &$output) {
             $execute_else_block = true;
-
 
             foreach($blocks as $block) {
                 if ($block->isElse()) {
@@ -94,12 +96,12 @@ class CaseTag extends \Liquid\Block {
             $this->blocks[] = $block;
         }
     }
+
     private function record_else_condition($markup) {
         $markup = trim($markup);
         if (!empty($markup)) {
             throw new \Liquid\Exceptions\SyntaxError("Syntax Error in tag 'case' - Valid else condition: {% else %} (no parameters) ");
         }
-
 
         $block = new ElseCondition();
         $block->attach($this->nodelist);

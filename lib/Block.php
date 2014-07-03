@@ -30,6 +30,8 @@ class Block extends \Liquid\Tag {
     /** @var array */
     protected $children;
 
+    protected $warnings;
+
     public static function init() {
         static::$IsTag = '/\A' . \Liquid\Liquid::TagStart . '/';
         static::$IsVariable = '/\A' . \Liquid\Liquid::VariableStart . '/';
@@ -60,12 +62,7 @@ class Block extends \Liquid\Tag {
 
         $this->children = array();
 
-        if (!is_array($tokens)) {
-            $e = new \Exception();
-            echo $e->getTraceAsString();
-        }
-
-        while( $token = array_shift($tokens) ) {
+        while( $token = $tokens->shift() ) {
 
             $matches = null;
             switch(true) {
@@ -121,6 +118,22 @@ class Block extends \Liquid\Tag {
     }
 
     public function end_tag() {
+    }
+
+    public function warnings() {
+        $all_warnings = $this->warnings ?: array();
+
+        if ($this->children) {
+            foreach($this->children as $node) {
+                if (!method_exists($node, 'warnings')) {
+                    continue;
+                }
+
+                $all_warnings = array_merge($all_warnings, $node->warnings());
+            }
+        }
+
+        return $all_warnings;
     }
 
     public function unknown_tag($tag, $params, $tokens) {
