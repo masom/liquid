@@ -14,7 +14,7 @@ class Condition {
     protected $child_condition = null;
     protected $attachment = null;
 
-    protected static function init() {
+    public static function init() {
         static::$init = true;
         static::$OPERATORS = array(
             '==' => function($cond, $left, $right) { return $cond->equal_variables($left, $right); },
@@ -39,10 +39,6 @@ class Condition {
     }
 
     public static function operators() {
-        if (!static::$init) {
-            static::init();
-        }
-
         return static::$OPERATORS;
     }
 
@@ -118,3 +114,5 @@ class Condition {
         }
     }
 }
+
+Condition::init();

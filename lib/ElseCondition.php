@@ -9,7 +9,7 @@ class ElseCondition extends Condition {
         return true;
     }
 
-    public function evaluate($context) {
+    public function evaluate($context = null) {
         return true;
     }
 }

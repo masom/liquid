@@ -14,6 +14,8 @@ class Tag {
     protected $nodelist;
     protected $warnings;
 
+    protected $blank;
+
     public static function __callStatic($method, $args) {
         if ($method == 'parse') {
             $tag = new static($args[0], $args[1], $args[3]);
@@ -61,7 +63,7 @@ class Tag {
         return '';
     }
 
-    public function isBlank() {
+    public function is_blank() {
         return $this->blank ?: false;
     }
 

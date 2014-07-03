@@ -3,9 +3,11 @@
 namespace Liquid\Tags;
 
 use \Liquid\Liquid;
+use \Liquid\Condition;
+use \Liquid\ElseCondition;
 use \Liquid\Utis\Arrays;
 
-class CaseTag extends \Liquid\Tag {
+class CaseTag extends \Liquid\Block {
 
     protected static $init = false;
     protected static $Syntax;
@@ -18,8 +20,8 @@ class CaseTag extends \Liquid\Tag {
     public static function init() {
         static::$init = true;
 
-        static::$Syntax = '/(' . Liquid::QuotedFragment . ')/o';
-        static::$WhenSyntax = '/(' . Liquid::QuotedFragment . ')(?:(?:\s+or\s+|\s*\,\s*)(' . Liquid::QuotedFragment . '.*))?/om';
+        static::$Syntax = '/(' . Liquid::$PART_QuotedFragment . ')/';
+        static::$WhenSyntax = '/(' . Liquid::$PART_QuotedFragment . ')(?:(?:\s+or\s+|\s*\,\s*)(' . Liquid::$PART_QuotedFragment . '.*))?/m';
     }
 
     public function __construct($tag_name, $markup, $options) {
@@ -85,7 +87,7 @@ class CaseTag extends \Liquid\Tag {
                 throw new \Liquid\Exceptions\SyntaxError("Syntax Error in tag 'case' - Valid when condition: {% when [condition] [or condition2...] %}");
             }
 
-            $markup = $matches[2];
+            $markup = isset($matches[2]) ? $matches[2] : null;
 
             $block = new Condition($this->left, '==', $matches[1]);
             $block->attach($this->nodelist);

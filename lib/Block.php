@@ -49,7 +49,7 @@ class Block extends \Liquid\Tag {
             return $this->_parse($arguments[0]);
         }
 
-        throw \BadMethodCallException();
+        throw new \BadMethodCallException("Method `" . __CLASS__ . "::{$method}` is undefined.");
     }
 
     public function _parse($tokens) {
@@ -118,6 +118,9 @@ class Block extends \Liquid\Tag {
         }
 
         $this->assert_missing_delimitation();
+    }
+
+    public function end_tag() {
     }
 
     public function unknown_tag($tag, $params, $tokens) {
