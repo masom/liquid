@@ -7,6 +7,8 @@ class ArrayObject implements \ArrayAccess, \Iterator {
     /** @var \ArrayObject */
     protected $array;
 
+    protected $position = 0;
+
     public function __construct(array $array = array()) {
         $this->array = new \ArrayObject();
 
@@ -16,27 +18,23 @@ class ArrayObject implements \ArrayAccess, \Iterator {
     }
 
     public function &current() {
-        return $this->array[key($this->array)];
+        return $this->array[$this->position];
     }
 
     public function next() {
-        next($this->array);
+        $this->position++;
     }
 
     public function key() {
-        return key($this->array());
+        return $this->position;
     }
 
     public function valid() {
-        $key = key($this->array);
-        if (!$key) {
-            return false;
-        }
-        return isset($this->array[$key]);
+        return isset($this->array[$this->position]);
     }
 
     public function rewind() {
-        reset($this->array);
+        $this->position = 0;
     }
 
     public function &last() {
@@ -45,8 +43,7 @@ class ArrayObject implements \ArrayAccess, \Iterator {
             return $e;
         }
 
-        foreach($this->array as &$env) {
-        }
+        $env =& $this->array[$this->array->count() - 1];
 
         return $env;
     }
