@@ -5,6 +5,7 @@ namespace Liquid;
 use \Liquid\Liquid;
 use \Liquid\Tags\ContinueTag;
 use \Liquid\Tags\BreakTag;
+use \Liquid\Utils\Nodes;
 use \Liquid\Variable;
 
 class Block extends \Liquid\Tag {

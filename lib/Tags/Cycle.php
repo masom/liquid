@@ -13,8 +13,8 @@ class Cycle extends \Liquid\Tag {
     protected $name;
     
     public static function init(){ 
-        static::$SimpleSyntax = '/\A' . Liquid::QuotedFragment . '+/o';
-        static::$NamedSyntax = '/\A(' . Liquid::QuotedFragment . ')\s*\:\s*(.*)/om';
+        static::$SimpleSyntax = '/\A' . Liquid::$PART_QuotedFragment . '+/';
+        static::$NamedSyntax = '/\A(' . Liquid::$PART_QuotedFragment . ')\s*\:\s*(.*)/m';
     }
 
     public function __construct($tag_name, $markup, $options) {
@@ -66,7 +66,7 @@ class Cycle extends \Liquid\Tag {
         return false;
     }
 
-    private function variables_from_string($markup) {
+    private function variables_from_string(&$markup) {
         $variables = explode(',', $markup);
 
         foreach($variables as &$var) {

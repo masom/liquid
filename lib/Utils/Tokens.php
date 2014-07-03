@@ -23,7 +23,11 @@ class Tokens extends \ArrayObject {
     }
 
     public function offsetSet($offset, $value) {
-        $this->array[$offset] = $value;
+        if ($offset) {
+            $this->array[$offset] = $value;
+        } else {
+            $this->array[] = $value;
+        }
     }
 
     public function offsetExists($offset) {

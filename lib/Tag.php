@@ -37,7 +37,7 @@ class Tag {
     public function __construct($tag_name, $markup, array $options) {
         $this->tag_name = $tag_name;
         $this->markup = $markup;
-        $this->options = $options;
+        $this->options = $options + array('error_mode' => Template::error_mode());
     }
 
     public function options() {
@@ -67,7 +67,24 @@ class Tag {
         return $this->blank ?: false;
     }
 
-    public function parse_with_selected_parser($markup) {
+    public function parse_with_selected_parser(&$markup) {
+        switch($this->options['error_mode']) {
+        case Liquid::ERROR_MODE_STRICT:
+            return $this->strict_parse_with_error_context($markup);
+        case Liquid::ERROR_MODE_LAX:
+            return $this->lax_parse($markup);
+        case Liquid::ERROR_MODE_WARN:
+            try {
+                return $this->strict_parse_with_error_context($markup);
+            } catch(\Liquid\Exceptions\SyntaxError $e) {
+                $this->warnings[] = $e;
+                return $this->lax_parse($markup);
+            }
+            break;
+        }
+    }
+
+    private function strict_parse_with_error_context(&$markup) {
         try {
             return $this->strict_parse($markup);
         } catch(\Liquid\Exceptions\SyntaxError $e) {

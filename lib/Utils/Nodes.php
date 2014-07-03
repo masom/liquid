@@ -19,7 +19,11 @@ class Nodes implements \ArrayAccess {
     }
 
     public function offsetSet($offset, $value) {
-        $this->nodes[$offset] = $value;
+        if ($offset) {
+            $this->nodes[$offset] = $value;
+        } else {
+            $this->nodes[] = $value;
+        }
     }
 
     public function offsetExists($offset) {

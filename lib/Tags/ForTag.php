@@ -2,8 +2,9 @@
 
 namespace Liquid\Tags;
 
+use \Liquid\Parser;
 use \Liquid\Liquid;
-use \Liquid\Utils;
+use \Liquid\Utils\Nodes;
 
 class ForTag extends \Liquid\Block {
 
@@ -22,23 +23,22 @@ class ForTag extends \Liquid\Block {
     protected $reversed;
 
     public static function init() {
-        static::$Syntax = '/\A(' . Liquid::VariableSegment .'+)\s+in\s+(' . Liquid::QuotedFragment .'+)\s*(reversed)?/o';
+        static::$Syntax = '/\A(' . Liquid::VariableSegment .'+)\s+in\s+(' . Liquid::$PART_QuotedFragment .'+)\s*(reversed)?/';
     }
 
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
         $this->parse_with_selected_parser($markup);
-
-        $this->nodelist = array();
-        $this->for_block = array();
+        $this->for_block = new Nodes(); 
+        $this->nodelist =& $this->for_block;
     }
 
     public function nodelist() {
         if ($this->else_block) {
             return array_merge($this->for_block, $this->else_block);
         } else {
-            return $for_block;
+            return $this->for_block;
         }
     }
 
@@ -46,15 +46,12 @@ class ForTag extends \Liquid\Block {
         if ($tag == 'else') {
             return parent::unknown_tag($tag, $markup, $tokens);
         }
-
-        $this->nodelist = array();
-        $this->else_block = array();
+        $this->else_block = new Nodes();
+        $this->nodelist =& $this->else_block;
     }
 
     public function render($context) {
         $registers = $context->registers();
-
-        $registers['for'] = $registers['for'] ?: array();
 
         $collection = $context[$this->collection_name];
 
@@ -124,25 +121,44 @@ class ForTag extends \Liquid\Block {
         return $result;
     }
 
-    public function strict_parse($markup) {
+    public function lax_parse(&$markup) {
+        if (preg_match(static::$Syntax, $markup, $matches)) {
+            $this->variable_name = $matches[1];
+            $this->collection_name = $matches[2];
+            $this->name = $matches[1] . '-' . $matches[2];
+
+            $this->reversed = isset($matches[3]);
+
+            $this->attributes = array();
+
+            if(preg_match_all(Liquid::$TagAttributes, $markup, $matches)) {
+                foreach($matches as $key => $value) {
+                    $this->attributes[$key] = $value;
+                }
+            }
+        } else {
+            throw new \Liquid\Exceptions\SyntaxError("Syntax Error in 'for loop' - Valid syntax: for [item] in [collection]");
+        }
+    }
+    public function strict_parse(&$markup) {
         $p = new Parser($markup);
 
         $this->variable_name = $p->consume('id');
-        if (!$p->has_id('in')) {
+        if (!$p->try_id('in')) {
             throw new \Liquid\Exceptions\SyntaxError("For loops require an 'in' clause");
         }
 
         $this->collection_name = $p->expression();
 
         $this->name = "{$this->variable_name}-{$this->collection_name}";
-        $this->reversed = $p->has_id('reversed');
+        $this->reversed = $p->try_id('reversed');
 
         $this->attributes = array();
 
         while($p->look('id') && $p->look('colon', 1)) {
-            $attribute = $p->has_id('limit');
+            $attribute = $p->try_id('limit');
 
-            if (!$attribute || $p->has_id('offset')) {
+            if (!$attribute || $p->try_id('offset')) {
                 throw new \Liquid\Exceptions\SyntaxError("Invalid attribute in for loop. Valid attributes are limit and offset");
             }
 
