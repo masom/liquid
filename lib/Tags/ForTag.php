@@ -36,14 +36,14 @@ class ForTag extends \Liquid\Block {
 
     public function nodelist() {
         if ($this->else_block) {
-            return array_merge($this->for_block, $this->else_block);
+            return array_merge($this->for_block, $this->else_block->nodes());
         } else {
             return $this->for_block;
         }
     }
 
     public function unknown_tag($tag, $markup, $tokens) {
-        if ($tag == 'else') {
+        if ($tag !== 'else') {
             return parent::unknown_tag($tag, $markup, $tokens);
         }
         $this->else_block = new Nodes();
@@ -89,6 +89,7 @@ class ForTag extends \Liquid\Block {
         $variable_name = &$this->variable_name;
         $name =& $this->name;
         $for_block =& $this->for_block;
+
 
         $context->stack(function($context) use ($self, &$for_block, &$segment, &$variable_name, &$name, $length, $index) {
             foreach($segment as $key => $item) {
@@ -172,11 +173,11 @@ class ForTag extends \Liquid\Block {
         $p->consume('end_of_string');
     }
 
-    private function render_else($context) {
+    private function render_else(&$context) {
         return $this->else_block ? array($this->render_all($this->else_block, $context)) : '';
     }
 
-    private function is_iterable($collection) {
+    private function is_iterable(&$collection) {
         return (is_array($collection) || $collection instanceof \ArrayAccess) || Utils::is_non_blank_string($collection);
     }
 }
