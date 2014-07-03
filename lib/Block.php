@@ -60,14 +60,18 @@ class Block extends \Liquid\Tag {
 
         $this->children = array();
 
+        if (!is_array($tokens)) {
+            $e = new \Exception();
+            echo $e->getTraceAsString();
+        }
+
         while( $token = array_shift($tokens) ) {
 
             $matches = null;
             switch(true) {
             case preg_match(static::$IsTag, $token, $matches):
 
-                echo 'is tag';
-                if (preg_match(static::$Fulltoken, $token, $matches)) {
+                if (preg_match(static::$FullToken, $token, $matches)) {
 
                     # if we found the proper block delimiter just end parsing here and let the outer block
                     # proceed
@@ -81,11 +85,13 @@ class Block extends \Liquid\Tag {
 
                     if (isset($tags[$matches[1]])) {
                         $tag = $tags[$matches[1]];
-                        $new_tag = $tag->parse($matches[1], $matches[2], $tokens, $this->options);
+
+                        $new_tag = $tag::parse($matches[1], $matches[2], $tokens, $this->options);
 
                         if ($new_tag->is_blank()) {
                             $this->blank = true;
                         }
+
                         $this->nodelist[] = $new_tag;
                         $this->children[] = $new_tag;
                     } else {
