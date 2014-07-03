@@ -21,7 +21,7 @@ class Liquid {
     const VariableStart               = '\{\{';
     const VariableEnd                 = '\}\}';
     const VariableIncompleteEnd       = '\}\}?';
-    const QuotedString                = '"[^"]*"|\'[^\']*\'';
+    const QuotedString                = '(?:"(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')';
 
 
     const ERROR_MODE_LAX = 'lax';
@@ -41,9 +41,7 @@ class Liquid {
         /**
          * PHP does not support evaluating statements when setting constants / class variables.
          */
-
-
-        $partialTemplateParser               = static::TagStart . '.*?' . static::TagEnd . '|'. static::VariableStart . '.*?' . static::VariableIncompleteEnd;
+        $partialTemplateParser = static::TagStart . '(?:' . static::QuotedString . '|.*?)*' . static::TagEnd . '|' . static::VariableStart . '(?:' . static::QuotedString . '|.*?)*' . static::VariableEnd;
         $anyStartingTag                      = '\{\{|\{\%';
 
         static::$PART_QuotedFragment         = static::QuotedString . '|(?:[^\s,\|\'"]|' . static::QuotedString . ')+';
