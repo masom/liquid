@@ -66,6 +66,7 @@ class Block extends \Liquid\Tag {
             switch(true) {
             case preg_match(static::$IsTag, $token, $matches):
 
+                echo 'is tag';
                 if (preg_match(static::$Fulltoken, $token, $matches)) {
 
                     # if we found the proper block delimiter just end parsing here and let the outer block

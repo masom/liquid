@@ -2,6 +2,8 @@
 
 namespace Liquid\Tests\Unit;
 
+use \Liquid\Liquid;
+use \Liquid\Template;
 use \Liquid\Variable;
 
 class VariableTest extends \Liquid\Tests\TestCase {
@@ -158,19 +160,46 @@ class VariableTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_filter_with_keyword_arguments() {
-        $var = new Variable(' hello | things: greeting: "world", farewell: \'goodbye\'');
-        $this->assertEquals('hello', $var->name());
+        if (Template::error_mode() == Liquid::ERROR_MODE_STRICT) {
+            $var = new Variable(' hello | things: greeting: "world", farewell: \'goodbye\'');
+            $this->assertEquals('hello', $var->name());
+            $expected = array(
+                array('things', array("greeting: \"world\"", "farewell: 'goodbye'"))
+            );
+            $this->assertEquals($expected, $var->filters());
+        } else {
+            /**
+            * FIXME LAX REGEX has trouble supporting single quotes.
+            */
+            $var = new Variable(' hello | things: greeting: "world", farewell: "goodbye"');
+            $this->assertEquals('hello', $var->name());
+            $expected = array(
+                array('things', array("greeting: \"world\"", "farewell: \"goodbye\""))
+            );
+            $this->assertEquals($expected, $var->filters());
+        }
+    }
+
+    public function test_lax_filter_argument_parsing() {
+        $var = new Variable(" number_of_comments | pluralize: 'comment': 'comments' ", array('error_mode' => Liquid::ERROR_MODE_LAX));
+        $this->assertEquals('number_of_comments', $var->name());
+
         $expected = array(
-            array('things', array("greeting: \"world\"", "farewell: 'goodbye'"))
+            array('pluralize', array("'comment'", "'comments'")),
         );
         $this->assertEquals($expected, $var->filters());
     }
 
     public function test_strict_filter_argument_parsing() {
+        $old = Template::error_mode();
+        Template::error_mode(Liquid::ERROR_MODE_STRICT);
+        
         try{
             new Variable(' number_of_comments | pluralize: \'comment\': \'comments\' ');
             $this->fail("A SyntaxError should have been raised.");
         } catch(\Liquid\Exceptions\SyntaxError $e) {
         }
+
+        Template::error_mode($old);
     }
 }

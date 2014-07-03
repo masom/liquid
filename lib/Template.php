@@ -6,6 +6,7 @@ use \Liquid\Strainer;
 
 class Template {
 
+    protected static $error_mode;
 
     protected static $filesystem;
     
@@ -18,6 +19,7 @@ class Template {
     protected $warnings;
 
     protected $root;
+
 
     /** @var array */
     protected $registers = array();
@@ -67,6 +69,14 @@ class Template {
         Strainer::global_filter($filter);
     }
 
+    public static function error_mode($error_mode = null) {
+        if ($error_mode) {
+            static::$error_mode = $error_mode;
+            return;
+        }
+        return static::$error_mode ?: Liquid::ERROR_MODE_LAX;
+    }
+
     public static function __callStatic($method, $args) {
         if ($method === 'parse') {
             $template = new static();
@@ -81,9 +91,11 @@ class Template {
 
     public function __call($method, $args) {
         if ($method === 'parse') {
-            $tokens = $args[0];
+            $source = $args[0];
             $options = isset($args[1]) ? $args[1] : array();
-            $this->root = Document::parse($this->tokenize($tokens), $options);
+            $this->root = Document::parse($this->tokenize($source), $options);
+            $this->warnings = null;
+
             return $this;
         }
 
@@ -181,7 +193,7 @@ class Template {
 
         $tokens = preg_split(\Liquid\Liquid::$TemplateParser, $source, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
-        if (empty($tokens[0])) {
+        if (isset($tokens[0]) && empty($tokens[0])) {
             array_shift($tokens);
         }
 
