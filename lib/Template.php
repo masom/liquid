@@ -3,6 +3,7 @@
 namespace Liquid;
 
 use \Liquid\Strainer;
+use \Liquid\Utils\Registers;
 
 class Template {
 
@@ -21,7 +22,7 @@ class Template {
     protected $root;
 
 
-    /** @var array */
+    /** @var Registers */
     protected $registers = array();
     /** @var array */
     protected $assigns = array();
@@ -31,6 +32,10 @@ class Template {
     protected $errors = array();
     /** @var boolean */
     protected $rethrow_errors = true;
+
+    public function __construct() {
+        $this->registers = new Registers();
+    }
 
     /**
      * Get or set the filesystem.
@@ -141,7 +146,7 @@ class Template {
             $context->context(new Context(array($context, $this->assigns), $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits));
             break;
         case is_array($context):
-            $context = new Context(array(array_shift($args), $this->assigns), $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
+            $context = new Context(array(new \ArrayObject(array_shift($args)), $this->assigns), $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
         case $context == null:
             $context = new Context( $this->assigns, $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
             break;
@@ -160,7 +165,7 @@ class Template {
             }
 
             if (isset($last['registers']) && is_array($last['registers'])) {
-                static::$registers = array_merge(static::registers, $last['registers']);
+                static::$registers = new \ArrayObject(array_merge(static::registers, $last['registers']));
             }
 
             if (isset($last['filters'])) {

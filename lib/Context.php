@@ -48,12 +48,12 @@ class Context implements \ArrayAccess {
         'empty' => 'empty?'
     );
 
-    public function __construct(array $environments = array(), array $outer_scope = array(), array $registers = array(), $rethrow_errors = false, array $resource_limits = array()) {
+    public function __construct(array $environments = array(), array $outer_scope = array(), $registers = array(), $rethrow_errors = false, array $resource_limits = array()) {
         $this->environments = new Environments(Arrays::flatten($environments));
 
         $this->scopes = array($outer_scope);
 
-        $this->registers = new Registers($registers);
+        $this->registers =  ($registers instanceof Registers) ? $registers : new Registers($registers);
 
         $this->rethrow_errors = $rethrow_errors;
         $this->resource_limits = new ArrayObject($resource_limits + array('render_score_current' => 0, 'assign_score_current' => 0));
@@ -422,10 +422,11 @@ class Context implements \ArrayAccess {
 
     public function squash_instance_assigns_with_environments() {
         $scope = end($this->scopes);
+
+        $last = &$this->scopes[key($this->scopes)];
         foreach($scope as $k => &$v) {
             foreach($this->environments as $env) {
                 if (isset($env[$k])) {
-                    $last = end($this->scopes());
                     $last[$k] = $this->lookup_and_evaluate($env, $k);
                     break;
                 }
