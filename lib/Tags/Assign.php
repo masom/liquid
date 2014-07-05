@@ -12,7 +12,7 @@ class Assign extends \Liquid\Tag {
     public static function init() {
         static::$init = true;
 
-        static::$Syntax = '/(' . Liquid::VariableSignature .'+)\s*=\s*(.*)\s*/m';
+        static::$Syntax = '/(' . Liquid::VariableSignature .')\s*=\s*(.*)\s*/m';
     }
 
     public function __construct($tag_name, $markup, $options) {

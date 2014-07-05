@@ -75,30 +75,33 @@ class Variable {
 
     public function lax_parse($markup) {
         $this->filters = array();
+
         $matches = null;
-        if (preg_match(static::$LAX_Parse, $markup, $matches)) {
-            $this->name = $matches[1];
+        if (!preg_match(static::$LAX_Parse, $markup, $matches)) {
+            return;
+        }
+        
+        $this->name = $matches[1];
 
-            $secondMatches = null;
-            if (preg_match(static::$LAX_FilterParser, $matches[2], $secondMatches)) {
+        $secondMatches = null;
+        if (!preg_match(static::$LAX_FilterParser, $matches[2], $secondMatches)) {
+            return;
+        }
 
-                $filters = null;
-                preg_match_all(static::$FilterParser, $secondMatches[1], $filters);
+        $filters = null;
+        preg_match_all(static::$FilterParser, $secondMatches[1], $filters);
 
-                foreach($filters[0] as $f) {
-                    $filterMatch = null;
+        foreach($filters[0] as $f) {
+            $filterMatch = null;
 
-                    if (preg_match('/\s*(\w+)/', $f, $filterMatch)) {
-                        $filtername = $filterMatch[1];
+            if (preg_match('/\s*(\w+)/', $f, $filterMatch)) {
+                $filtername = $filterMatch[1];
 
-                        preg_match_all(static::$LAX_FilterArgsParser, $f, $filterargs);
+                preg_match_all(static::$LAX_FilterArgsParser, $f, $filterargs);
 
-                        $filterargs = Arrays::flatten($filterargs[1]);
-                        $this->filters[] = array($filtername, $filterargs);
-                    }
-                }
+                $filterargs = Arrays::flatten($filterargs[1]);
+                $this->filters[] = array($filtername, $filterargs);
             }
-
         }
     }
 
@@ -142,6 +145,7 @@ class Variable {
     }
 
     public function render($context) {
+
         if ($this->name == null) {
             return '';
         }

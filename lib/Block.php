@@ -75,7 +75,6 @@ class Block extends \Liquid\Tag {
                     # proceed
                     #
                     if ($this->block_delimiter() == $matches[1]) {
-                        var_dump($this->nodelist);
                         $this->end_tag();
                         return;
                     }
@@ -161,9 +160,11 @@ class Block extends \Liquid\Tag {
 
     public function create_variable($token) {
         $matches = null;
+
         preg_match_all(static::$ContentOfVariable, $token, $matches);
-        foreach($matches as $match) {
-            return new Variable(reset($match), $this->options); 
+
+        foreach($matches[1] as $match) {
+            return new Variable($match, $this->options); 
         }
 
         $tag_end = Liquid::VariableEnd;
@@ -223,8 +224,6 @@ class Block extends \Liquid\Tag {
             }
         }
 
-        $e = new \Exception();
-        echo $e->getTraceAsString();
         return implode(null, $output);
     }
 }
