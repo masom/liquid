@@ -12,7 +12,7 @@ class Assign extends \Liquid\Tag {
     public static function init() {
         static::$init = true;
 
-        static::$Syntax = '/(' . Liquid::VariableSignature .'+)\s*=\s*(.*)\s*/om';
+        static::$Syntax = '/(' . Liquid::VariableSignature .'+)\s*=\s*(.*)\s*/m';
     }
 
     public function __construct($tag_name, $markup, $options) {
@@ -20,10 +20,10 @@ class Assign extends \Liquid\Tag {
 
         $matches = null;
         try{
-        if (preg_match(static::$Syntax, $markup, $matches)) {
-            $this->to = $matches[1];
-            $this->from = new Variable($matches[2]);
-        }
+            if (preg_match(static::$Syntax, $markup, $matches)) {
+                $this->to = $matches[1];
+                $this->from = new Variable($matches[2]);
+            }
         } catch(\Liquid\Exceptions\SyntaxError $e) {
             throw new SyntaxError("Syntax Error in 'assign' - Valid syntax: assign [var] = [source]");
         }
@@ -32,7 +32,7 @@ class Assign extends \Liquid\Tag {
     public function render($context) {
         $val = $this->from->render($context);
 
-        $context->scope_last_set($this->to, $val);
+        $context->scopes_last_set($this->to, $val);
         $context->increment_used_resources('assign_score_current', $val);
 
         return '';

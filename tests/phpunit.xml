@@ -2,8 +2,11 @@
 <phpunit bootstrap="bootstrap.php" convertErrorsToExceptions="false" convertNoticesToExceptions="false" convertWarningstoExceptions="false">
 
     <testsuites>
-        <testsuite name="Liquid test suite">
+        <testsuite name="Unit">
             <directory>Unit</directory>
+        </testsuite>
+        <testsuite name="Integration">
+            <directory>Integration</directory>
         </testsuite>
     </testsuites>
 

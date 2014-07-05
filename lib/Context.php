@@ -6,16 +6,18 @@ use \Liquid\Strainer;
 use \Liquid\Utils\Arrays;
 use \Liquid\Utils\Registers;
 use \Liquid\Utils\Environments;
+use \Liquid\Utils\ArrayObject;
+
 
 class Context implements \ArrayAccess {
 
-    /** @var array */
+    /** @var Environments */
     protected $environments;
 
     /** @var array */
     protected $scopes;
 
-    /** @var array */
+    /** @var Registers */
     protected $registers;
 
     /** @var array */
@@ -24,7 +26,7 @@ class Context implements \ArrayAccess {
     /** @var boolean */
     protected $rethrow_errors;
 
-    /** @var array */
+    /** @var ArrayObject */
     protected $resource_limits;
 
     /** @var array */
@@ -54,7 +56,7 @@ class Context implements \ArrayAccess {
         $this->registers = new Registers($registers);
 
         $this->rethrow_errors = $rethrow_errors;
-        $this->resource_limits = $resource_limits + array('render_score_current' => 0, 'assign_score_current' => 0);
+        $this->resource_limits = new ArrayObject($resource_limits + array('render_score_current' => 0, 'assign_score_current' => 0));
 
         $this->squash_instance_assigns_with_environments();
 
@@ -62,6 +64,10 @@ class Context implements \ArrayAccess {
          * Faster than call_user_func_array
          */
         $this->strainerMethodInvoker = new \ReflectionMethod('\Liquid\Strainer', 'invoke');
+    }
+
+    public function resource_limits() {
+        return $this->resource_limits;
     }
 
     /**

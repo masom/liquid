@@ -75,6 +75,7 @@ class Block extends \Liquid\Tag {
                     # proceed
                     #
                     if ($this->block_delimiter() == $matches[1]) {
+                        var_dump($this->nodelist);
                         $this->end_tag();
                         return;
                     }
@@ -170,7 +171,7 @@ class Block extends \Liquid\Tag {
     }
 
     public function render($context) {
-        $this->render_all($this->nodelist, $context);
+        return $this->render_all($this->nodelist, $context);
     }
 
     protected function assert_missing_delimitation() {
@@ -180,8 +181,9 @@ class Block extends \Liquid\Tag {
     protected function render_all($items, $context) {
         $output = array();
 
-        $context->resource_limits['render_length_current'] = 0;
-        $context->resource_limits['render_score_current'] += count($items);
+        $limits = $context->resource_limits();
+        $limits['render_length_current'] = 0;
+        $limits['render_score_current'] += count($items);
 
         foreach($items as $token) {
             if ($context->has_interrupt()) {
@@ -195,25 +197,34 @@ class Block extends \Liquid\Tag {
                 }
 
                 $token_output = method_exists($token, 'render') ? $token->render($context) : $token;
-
                 $context->increment_used_resources('render_length_current', $token_output);
 
-                if ($context->has_resource_limits_reached())
+                if ($context->is_resource_limits_reached())
                 {
-                    $context->resource_limits['reached'] = true;
+                    $limits['reached'] = true;
                     throw new \Liquid\Exceptions\MemoryError("Memory limit exceeded.");
                 }
 
-                if ( !($token instanceof Block) && !$token->is_blank()) {
+                if (is_object($token)) {
+                    if (!($token instanceof Block) && method_exists($token, 'is_blank')) {
+                        if (!$token->is_blank()) {
+                            $output[] = $token_output;
+                        }
+                    } else {
+                        $output[] = $token_output;
+                    }
+                } else {
                     $output[] = $token_output;
                 }
-
             } catch(\Liquid\Exceptions\MemoryError $e) {
                 throw $e;
             } catch(\Liquid\Exceptions\LiquidException $e) {
                 $output[] = $context->handle_error($e);
             }
         }
+
+        $e = new \Exception();
+        echo $e->getTraceAsString();
         return implode(null, $output);
     }
 }

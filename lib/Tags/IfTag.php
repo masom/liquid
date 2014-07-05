@@ -19,7 +19,7 @@ class IfTag extends \Liquid\Block {
         static::$Syntax = '/(' . Liquid::$PART_QuotedFragment .')\s*([=!<>a-z_]+)?\s*(' . Liquid::$PART_QuotedFragment . ')?/';
         static::$ExpressionsAndOperators = '/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:' . Liquid::$PART_QuotedFragment . '|\S+)\s*)+)/';
     }
-    public function __construct($tag_name, $markup, $options) {
+    public function __construct($tag_name, &$markup, &$options) {
         parent::__construct($tag_name, $markup, $options);
 
         $this->push_block('if', $markup);
@@ -37,9 +37,9 @@ class IfTag extends \Liquid\Block {
 
     public function unknown_tag($tag, $markup, $tokens) {
         if ($tag === 'elseif' || $tag === 'else') {
-            $this->push_block($tag, $markup);
+            return $this->push_block($tag, $markup);
         } else {
-            parent::unknown_tag($tag, $markup, $tokens);
+            return parent::unknown_tag($tag, $markup, $tokens);
         }
     }
 
@@ -59,7 +59,7 @@ class IfTag extends \Liquid\Block {
         return $result;
     }
 
-    private function push_block($tag, $markup) {
+    private function push_block($tag, &$markup) {
         if ($tag === 'else') {
             $block = new ElseCondition();
         } else {
@@ -69,9 +69,11 @@ class IfTag extends \Liquid\Block {
         $this->blocks[] = $block;
 
         $this->nodelist = $block->attach(array());
+
+        return $this->nodelist;
     }
 
-    public function lax_parse($markup) {
+    public function lax_parse(&$markup) {
         preg_match_all(static::$ExpressionsAndOperators, $markup, $matches);
 
         $expressions = array_reverse($matches[0]);

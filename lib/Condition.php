@@ -81,6 +81,7 @@ class Condition {
 
     public function attach($attachment) {
         $this->attachment = $attachment;
+        return $this->attachment;
     }
 
     public function isElse() {

@@ -8,13 +8,9 @@ class ArrayObject implements \ArrayAccess, \Iterator {
     protected $array;
 
     protected $position = 0;
-
+    
     public function __construct(array $array = array()) {
-        $this->array = new \ArrayObject();
-
-        foreach($array as $item) {
-            $this->array[] = new \ArrayObject($item);
-        }
+        $this->array = $array;
     }
 
     public function &current() {

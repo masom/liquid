@@ -197,9 +197,6 @@ class Template {
             array_shift($tokens);
         }
 
-        if (!is_array($tokens)) {
-            var_dump($tokens);
-        }
         return new \Liquid\Utils\Tokens($tokens);
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="liquid" default="help" basedir=".">
     <target name="tests" description="PHPUnit tests.">
-        <exec command="vendor/bin/phpunit --configuration tests/phpunit.xml tests/Unit" passthru="true" checkreturn="true" />
+        <exec command="vendor/bin/phpunit --configuration tests/phpunit.xml tests" passthru="true" checkreturn="true" />
     </target>
 </project>
