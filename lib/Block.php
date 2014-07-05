@@ -198,6 +198,7 @@ class Block extends \Liquid\Tag {
                 }
 
                 $token_output = method_exists($token, 'render') ? $token->render($context) : $token;
+                var_dump($token_output);
                 $context->increment_used_resources('render_length_current', $token_output);
 
                 if ($context->is_resource_limits_reached())

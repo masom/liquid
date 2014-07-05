@@ -147,10 +147,11 @@ class Variable {
     public function render($context) {
 
         if ($this->name == null) {
-            return '';
+            return null;
         }
 
-        return array_reduce($this->filters, function($output, $filter) use ($context) {
+        $output = $context[$this->name];
+        foreach($this->filters as $filter) {
             $filterargs = array();
             $keyword_args = array();
             foreach($filter[1] as $a) {
@@ -172,7 +173,9 @@ class Variable {
                 $markup = trim($markup);
                 throw new FilterNotFound("Error - filter '{$filter[0]}' in '{$markup}' could not be found.");
             }
-        }, $context[$this->name]);
+        }
+
+        return $output;
     }
 }
 Variable::init();

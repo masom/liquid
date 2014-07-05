@@ -35,7 +35,7 @@ class Assign extends \Liquid\Tag {
         $context->scopes_last_set($this->to, $val);
         $context->increment_used_resources('assign_score_current', $val);
 
-        return '';
+        return null;
     }
 
     public function is_blank() {

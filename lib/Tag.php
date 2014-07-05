@@ -60,7 +60,7 @@ class Tag {
     }
 
     public function render($context) {
-        return '';
+        return null;
     }
 
     public function is_blank() {
