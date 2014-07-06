@@ -36,7 +36,9 @@ class Liquid {
     public static $PartialTemplateParser;
     public static $TemplateParser;
     public static $VariableParser;
+
     public static $PART_QuotedFragment;
+    public static $PART_TagAttributes;
 
     public static function init()
     {
@@ -47,9 +49,10 @@ class Liquid {
         $anyStartingTag                      = '\{\{|\{\%';
 
         static::$PART_QuotedFragment         = static::QuotedString . '|(?:[^\s,\|\'"]|' . static::QuotedString . ')+';
+        static::$PART_TagAttributes          = '(\w+)\s*\:\s*(' . static::$PART_QuotedFragment . ')';
 
         static::$QuotedFragment              = '/' . static::$PART_QuotedFragment . '/S';
-        static::$TagAttributes               = '/(\w+)\s*\:\s*(' . static::$PART_QuotedFragment . ')/S';
+        static::$TagAttributes               = '/' . static::$PART_TagAttributes . '/S';
         static::$AnyStartingTag              = '/'. $anyStartingTag . '/S';
         static::$PartialTemplateParser       = '/' . $partialTemplateParser . '/Sm';
         static::$TemplateParser              = '/(' . $partialTemplateParser . '|' . $anyStartingTag . ')/Sm';

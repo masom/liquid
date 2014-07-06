@@ -157,7 +157,7 @@ class Variable {
             $keyword_args = array();
             foreach($filter[1] as $a) {
                 $matches = null;
-                if (preg_match('/\A' . Liquid::TagAttributes . '\z/o', $a, $matches)) {
+                if (preg_match('/\A' . Liquid::$PART_TagAttributes . '\z/', $a, $matches)) {
                     $keyword_args[$matches[1]] = $context[$matches[2]];
                 } else {
                     $filterargs[] = $context[$a];

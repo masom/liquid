@@ -397,14 +397,6 @@ class Context implements \ArrayAccess {
 
         if (($value instanceof \Closure || is_callable($value))
             && (is_array($obj) || $obj instanceof \ArrayAccess)) {
-            
-            /**
-            $reflection = new \ReflectionFunction($value);
-            if ($reflection->getNumberOfParameters() == 0) {
-                $obj[$key] = $value();
-            } else {
-                $obj[$key] = $value($this);
-            }*/
             /**
              * PHP doesn't really care if we pass more arguments.
              */

@@ -59,7 +59,16 @@ class ArrayObject implements \ArrayAccess, \Iterator, \Countable {
             return $e;
         }
 
-        return $this->array[$this->array->count() - 1];
+        if (is_object($this->array)) {
+            return $this->array[$this->array->count() - 1];
+        }
+
+        if (is_array($this->array)) {
+            end($this->array);
+            $return =& $this->array[key($this->array)];
+            reset($this->array);
+            return $return;
+        }
     }
 
     public function offsetGet($offset) {

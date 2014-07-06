@@ -19,13 +19,11 @@ class Assign extends \Liquid\Tag {
         parent::__construct($tag_name, $markup, $options);
 
         $matches = null;
-        try{
-            if (preg_match(static::$Syntax, $markup, $matches)) {
-                $this->to = $matches[1];
-                $this->from = new Variable($matches[2]);
-            }
-        } catch(\Liquid\Exceptions\SyntaxError $e) {
-            throw new SyntaxError("Syntax Error in 'assign' - Valid syntax: assign [var] = [source]");
+        if (preg_match(static::$Syntax, $markup, $matches)) {
+            $this->to = $matches[1];
+            $this->from = new Variable($matches[2]);
+        } else {
+            throw new \Liquid\Exceptions\SyntaxError("Syntax Error in 'assign' - Valid syntax: assign [var] = [source]");
         }
     }
 
