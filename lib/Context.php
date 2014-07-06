@@ -4,9 +4,10 @@ namespace Liquid;
 
 use \Liquid\Strainer;
 use \Liquid\Utils\Arrays;
-use \Liquid\Utils\Registers;
-use \Liquid\Utils\Environments;
 use \Liquid\Utils\ArrayObject;
+use \Liquid\Utils\Environments;
+use \Liquid\Utils\Registers;
+use \Liquid\Utils\Scopes;
 
 
 class Context implements \ArrayAccess {
@@ -14,7 +15,7 @@ class Context implements \ArrayAccess {
     /** @var Environments */
     protected $environments;
 
-    /** @var array */
+    /** @var Scopes */
     protected $scopes;
 
     /** @var Registers */
@@ -51,7 +52,7 @@ class Context implements \ArrayAccess {
     public function __construct(array $environments = array(), array $outer_scope = array(), $registers = array(), $rethrow_errors = false, array $resource_limits = array()) {
         $this->environments = new Environments(Arrays::flatten($environments));
 
-        $this->scopes = array($outer_scope);
+        $this->scopes = new Scopes(array($outer_scope));
 
         $this->registers =  ($registers instanceof Registers) ? $registers : new Registers($registers);
 
@@ -81,13 +82,8 @@ class Context implements \ArrayAccess {
      *  context.scopes.last[@to] = val
      */
     public function scopes_last_set($to, $val) {
-        /**
-         * Iterate the scopes until the last one.
-         * $scope will contain a reference to the last scope afte the loop has finished.
-         */
-        foreach($this->scopes as &$scope) {
-        }
-        $scope[$to] = $val;
+        $last = $this->scopes->last();
+        $last[$to] = $val;
     }
 
     public function increment_used_resources($key, $obj) {
@@ -190,7 +186,7 @@ class Context implements \ArrayAccess {
     }
 
     public function push(array $new_scope = array()) {
-        array_unshift($this->scopes, $new_scope);
+        $this->scopes->push($new_scope);
 
         if (count($this->scopes) > 100) {
             throw new \Liquid\Exceptions\StackLevelError("Nesting too deep.");
@@ -198,15 +194,14 @@ class Context implements \ArrayAccess {
     }
 
     public function merge(array $new_scopes) {
-        $this->scopes[0] = array_merge($this->scopes[0], $new_scopes);
+        $this->scopes->merge($new_scopes);
     }
 
     public function pop() {
         if (count($this->scopes) == 1) {
             throw new \Liquid\Exceptions\ContextError();
         }
-
-        return array_shift($this->scopes);
+        return $this->scopes->pop();
     }
 
     public function stack(\Closure $block, array $new_scope = array()) {
@@ -280,12 +275,12 @@ class Context implements \ArrayAccess {
         $scope = null;
         $variable = null;
 
-        foreach($this->scopes as &$s) {
+        foreach($this->scopes as $s) {
             if (!isset($s[$key])){
                 continue;
             }
 
-            $scope =& $s;
+            $scope = $s;
             break;
         }
 
@@ -421,13 +416,11 @@ class Context implements \ArrayAccess {
     }
 
     public function squash_instance_assigns_with_environments() {
-        $scope = end($this->scopes);
-
-        $last = &$this->scopes[key($this->scopes)];
+        $scope = $this->scopes->last();
         foreach($scope as $k => &$v) {
             foreach($this->environments as $env) {
                 if (isset($env[$k])) {
-                    $last[$k] = $this->lookup_and_evaluate($env, $k);
+                    $scope[$k] = $this->lookup_and_evaluate($env, $k);
                     break;
                 }
             }
