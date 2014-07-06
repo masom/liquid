@@ -13,7 +13,7 @@ class Scopes extends ArrayObject {
         }
     }
 
-    public function merge(array $new_scopes) {
+    public function merge($new_scopes) {
         $scope = $this->array[0];
 
         foreach($new_scopes as $k => $v) {

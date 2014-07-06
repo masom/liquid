@@ -151,6 +151,7 @@ class Variable {
         }
 
         $output = $context[$this->name];
+
         foreach($this->filters as $filter) {
             $filterargs = array();
             $keyword_args = array();

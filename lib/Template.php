@@ -21,15 +21,18 @@ class Template {
 
     protected $root;
 
-
     /** @var Registers */
-    protected $registers = array();
+    protected $registers;
+
     /** @var array */
     protected $assigns = array();
+
     /** @var array */
     protected $instance_assigns = array();
+
     /** @var array */
     protected $errors = array();
+
     /** @var boolean */
     protected $rethrow_errors = true;
 
@@ -147,12 +150,14 @@ class Template {
             break;
         case is_array($context):
             $context = new Context(array(new \ArrayObject(array_shift($args)), $this->assigns), $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
+            break;
         case $context == null:
             $context = new Context( $this->assigns, $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
             break;
         default:
             throw new \ArgumentException("Expected array or \Liquid\Context as parameter");
         }
+
 
         $last = array_pop($args);
         switch(true){
