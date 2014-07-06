@@ -33,6 +33,18 @@ class ArrayObject implements \ArrayAccess, \Iterator, \Countable {
         $this->position = 0;
     }
 
+    public function merge(array $additional) {
+        foreach($additional as $k => $v) {
+            if (is_numeric($k)) {
+                $this->array[] = $v;
+            } else {
+                $this->array[$k] = $v;
+            }
+        }
+
+        return $this->array;
+    }
+
     public function count() {
         if (is_array($this->array)) {
             return count($this->array);

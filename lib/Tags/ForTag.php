@@ -36,7 +36,7 @@ class ForTag extends \Liquid\Block {
 
     public function nodelist() {
         if ($this->else_block) {
-            return array_merge($this->for_block, $this->else_block->nodes());
+            return $this->for_block->merge($this->else_block->nodes());
         } else {
             return $this->for_block;
         }
