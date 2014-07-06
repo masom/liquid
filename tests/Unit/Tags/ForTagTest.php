@@ -10,7 +10,7 @@ class ForTagTest extends \Liquid\Tests\TestCase {
         $template = Template::parse('{% for item in items %}FOR{% endfor %}');
 
         $nodelist = $template->root()->nodelist();
-        $this->assertEquals(array('FOR'), $nodelist[0]->nodelist());
+        $this->assertEquals(array('FOR'), $nodelist[0]->nodelist()->nodes());
     }
 
     public function test_for_else_nodelist() {

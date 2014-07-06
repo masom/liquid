@@ -8,7 +8,7 @@ use \Liquid\Template;
 class BlockTest extends \Liquid\Tests\TestCase {
     public function test_blankspace() {
         $template = Template::parse("  ");
-        $this->assertEquals(array("  "), $template->root()->nodelist());
+        $this->assertEquals(array("  "), $template->root()->nodelist()->nodes());
     }
 
     public function test_variable_beginning() {

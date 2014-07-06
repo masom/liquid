@@ -104,7 +104,7 @@ class Parser {
             return "({$first}..{$last})";
         } else {
             $token = json_encode($token);
-            throw new \Liquid\Exceptions\SyntaxError("`{$token[1]}` is not a valid expression");
+            throw new \Liquid\Exceptions\SyntaxError("`{$token}` is not a valid expression");
         }
     }
 
