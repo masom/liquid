@@ -35,4 +35,8 @@ class Scopes extends ArrayObject {
 
         $this->array = $scopes;
     }
+
+    public function count() {
+        return $this->array->count();
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace Liquid\Utils;
 
-class ArrayObject implements \ArrayAccess, \Iterator {
+class ArrayObject implements \ArrayAccess, \Iterator, \Countable {
 
     /** @var \ArrayObject */
     protected $array;
@@ -34,7 +34,11 @@ class ArrayObject implements \ArrayAccess, \Iterator {
     }
 
     public function count() {
-        return count($this->array);
+        if (is_array($this->array)) {
+            return count($this->array);
+        }
+
+        return $this->array->count();
     }
 
     public function last() {
@@ -71,6 +75,22 @@ class ArrayObject implements \ArrayAccess, \Iterator {
     }
 
     public function pop() {
-        return array_shift($this->array);
+        $array = new \ArrayObject();
+
+        $i = 0;
+        foreach($this->array as $a) {
+
+            if( $i == 0) {
+                $return = $a;
+                $i++;
+                continue;
+            }
+
+            $array[] = $a;
+            $i++;
+        }
+
+        $this->array = $array;
+        return $return;
     }
 }
