@@ -19,18 +19,13 @@ class Block extends \Liquid\Tag {
     /** @var string */
     protected static $ContentOfVariable;
 
-    /** @var boolean */
-    protected static $init = false;
-
-    /** @var boolean */
-    protected $blank;
-
-    /** @var array */
+    /** @var Nodes */
     protected $nodelist;
 
     /** @var array */
     protected $children;
 
+    /** @var array */
     protected $warnings;
 
     public static function init() {
@@ -38,13 +33,6 @@ class Block extends \Liquid\Tag {
         static::$IsVariable = '/\A' . \Liquid\Liquid::VariableStart . '/';
         static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/m';
         static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/m';
-    }
-
-    /**
-     * Was blank?
-     */
-    public function is_blank() {
-        $this->blank || false;
     }
 
     public function __call($method, $arguments){
@@ -59,13 +47,11 @@ class Block extends \Liquid\Tag {
 
         $this->blank = true;
 
-        $this->nodelist = array();
+        $this->nodelist = new Nodes();
 
         $this->children = array();
 
         while( $token = $tokens->shift() ) {
-
-            $matches = null;
             switch(true) {
             case preg_match(static::$IsTag, $token, $matches):
 
@@ -81,9 +67,8 @@ class Block extends \Liquid\Tag {
 
                     $tags = Template::tags();
 
-                    if (isset($tags[$matches[1]])) {
-                        $tag = $tags[$matches[1]];
-
+                    # fetch the tag from registered blocks.
+                    if (isset($tags[$matches[1]]) && $tag = $tags[$matches[1]]) {
                         $new_tag = $tag::parse($matches[1], $matches[2], $tokens, $this->options);
 
                         if ($new_tag->is_blank()) {
@@ -198,7 +183,6 @@ class Block extends \Liquid\Tag {
                 }
 
                 $token_output = method_exists($token, 'render') ? $token->render($context) : $token;
-                var_dump($token_output);
                 $context->increment_used_resources('render_length_current', $token_output);
 
                 if ($context->is_resource_limits_reached())

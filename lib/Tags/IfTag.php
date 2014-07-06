@@ -7,6 +7,7 @@ use \Liquid\ElseCondition;
 use \Liquid\Liquid;
 use \Liquid\Parser;
 use \Liquid\Utils\Arrays;
+use \Liquid\Utils\Nodes;
 
 class IfTag extends \Liquid\Block {
     protected static $Syntax;
@@ -29,7 +30,7 @@ class IfTag extends \Liquid\Block {
         $blocks = array();
 
         foreach($this->blocks as $block) {
-            $blocks[] = $block->attachment();
+            $blocks[] = $block->attachment()->nodes();
         }
 
         return Arrays::flatten($blocks);
@@ -68,7 +69,7 @@ class IfTag extends \Liquid\Block {
 
         $this->blocks[] = $block;
 
-        $this->nodelist = $block->attach(array());
+        $this->nodelist = $block->attach(new Nodes());
 
         return $this->nodelist;
     }

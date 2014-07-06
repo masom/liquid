@@ -2,6 +2,8 @@
 
 namespace Liquid;
 
+use \Liquid\Utils\Nodes;
+
 class Tag {
 
     protected $to;
@@ -11,9 +13,13 @@ class Tag {
     protected $markup;
     protected $options;
 
+    /** @var Nodes */
     protected $nodelist;
+
+    /** @var array */
     protected $warnings;
 
+    /** @var boolean */
     protected $blank;
 
     public static function __callStatic($method, $args) {
