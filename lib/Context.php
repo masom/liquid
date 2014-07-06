@@ -417,7 +417,7 @@ class Context implements \ArrayAccess {
 
     public function squash_instance_assigns_with_environments() {
         $scope = $this->scopes->last();
-        foreach($scope as $k => &$v) {
+        foreach($scope as $k => $v) {
             foreach($this->environments as $env) {
                 if (isset($env[$k])) {
                     $scope[$k] = $this->lookup_and_evaluate($env, $k);
