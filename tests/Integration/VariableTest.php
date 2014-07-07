@@ -3,7 +3,7 @@ namespace Liquid\Tests\Integration;
 
 use \Liquid\Template;
 
-class VariableTest extends \Liquid\Tests\TestCase {
+class VariableTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function test_simple_variable() {
         $template = Template::parse('{{test}}');

@@ -8,7 +8,7 @@ class Utils {
         if (($from !=0 || $to != null) && is_array($collection)) {
             return array_slice($collection, $from, $to);
         } else {
-            return static::slice_collection_using_search($collection, $from, $to);
+            return static::slice_collection_using_each($collection, $from, $to);
         }
     }
 

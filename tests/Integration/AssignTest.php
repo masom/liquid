@@ -2,7 +2,7 @@
 
 namespace Liquid\Tests\Integration;
 
-class AssignTest extends \Liquid\Tests\TestCase {
+class AssignTest extends \Liquid\Tests\IntegrationTestCase {
     public function test_assigned_variable() {
         $this->assert_template_result(
             '.foo.',

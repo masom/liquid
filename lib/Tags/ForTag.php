@@ -4,6 +4,7 @@ namespace Liquid\Tags;
 
 use \Liquid\Parser;
 use \Liquid\Liquid;
+use \Liquid\Utils;
 use \Liquid\Utils\Nodes;
 
 class ForTag extends \Liquid\Block {
@@ -59,13 +60,17 @@ class ForTag extends \Liquid\Block {
             return $this->render_else($context);
         }
 
-        if ($this->attributes['offset'] == 'continue') {
-            $from = (int) $registers['for'][$this->name];
+        if (isset($this->attributes['offset'])) {
+            if ($this->attributes['offset'] == 'continue') {
+                $from = (int) $registers['for'][$this->name];
+            } else {
+                $from = (int) $context[$this->attributes['offset']];
+            }
         } else {
-            $from = (int) $context[$this->attributes['offset']];
+            $from = null;
         }
 
-        $limit = $context[$this->attributes['limit']];
+        $limit = isset($this->attributes['limit']) ? $context[$this->attributes['limit']] : null;
         $to = $limit ? (int) $limit + $from : null;
 
         $segment = Utils::slice_collection($collection, $from, $to);
@@ -91,18 +96,18 @@ class ForTag extends \Liquid\Block {
         $for_block =& $this->for_block;
 
 
-        $context->stack(function($context) use ($self, &$for_block, &$segment, &$variable_name, &$name, $length, $index) {
+        $context->stack(function($context) use ($self, &$result, &$for_block, &$segment, &$variable_name, &$name, $length) {
             foreach($segment as $key => $item) {
                 $context[$variable_name] = $item;
                 $context['forloop'] = array(
                     'name' => $name,
                     'length' => $length,
-                    'index' => $index + 1,
-                    'index0' => $index,
-                    'rindex' => $length - $index,
-                    'rindex0' => $length - $index - 1,
-                    'first' => ($index==0),
-                    'last' => ($index == $length - 1)
+                    'index' => $key + 1,
+                    'index0' => $key,
+                    'rindex' => $length - $key,
+                    'rindex0' => $length - $key - 1,
+                    'first' => ($key==0),
+                    'last' => ($key == $length - 1)
                 );
 
                 $result .= $self->render_all($for_block, $context);
@@ -141,6 +146,7 @@ class ForTag extends \Liquid\Block {
             throw new \Liquid\Exceptions\SyntaxError("Syntax Error in 'for loop' - Valid syntax: for [item] in [collection]");
         }
     }
+
     public function strict_parse(&$markup) {
         $p = new Parser($markup);
 
