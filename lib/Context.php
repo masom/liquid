@@ -49,7 +49,7 @@ class Context implements \ArrayAccess {
         'empty' => 'empty?'
     );
 
-    public function __construct(array $environments = array(), array $outer_scope = array(), $registers = array(), $rethrow_errors = false, array $resource_limits = array()) {
+    public function __construct(array $environments = array(), $outer_scope = array(), $registers = array(), $rethrow_errors = false, array $resource_limits = array()) {
         $this->environments = new Environments(Arrays::flatten($environments));
 
         $this->scopes = new Scopes(array($outer_scope));
@@ -389,6 +389,7 @@ class Context implements \ArrayAccess {
     }
 
     public function lookup_and_evaluate(&$obj, $key) {
+
         if (!isset($obj[$key])) {
             return null;
         }

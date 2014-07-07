@@ -9,7 +9,7 @@ class Scopes extends ArrayObject {
         $this->array = new ArrayObject();
 
         foreach($array as $item) {
-            $this->array[] = new \ArrayObject($item);
+            $this->array[] = is_array($item) ? new \ArrayObject($item) : $item;
         }
     }
 

@@ -24,11 +24,11 @@ class Template {
     /** @var Registers */
     protected $registers;
 
-    /** @var array */
-    protected $assigns = array();
+    /** @var \ArrayObject */
+    protected $assigns;
 
-    /** @var array */
-    protected $instance_assigns = array();
+    /** @var \ArrayObject */
+    protected $instance_assigns;
 
     /** @var array */
     protected $errors = array();
@@ -38,6 +38,8 @@ class Template {
 
     public function __construct() {
         $this->registers = new Registers();
+        $this->assigns = new \ArrayObject();
+        $this->instance_assigns = new \ArrayObject();
     }
 
     /**
@@ -130,7 +132,7 @@ class Template {
         return $this->instance_assigns;
     }
 
-    public function &assigns() {
+    public function assigns() {
         return $this->assigns;
     }
 
@@ -155,11 +157,14 @@ class Template {
         case is_array($context):
             $context = new Context(array(new \ArrayObject(array_shift($args)), $this->assigns), $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
             break;
+        case $context instanceof \ArrayObject:
+            $context = new Context(array(array_shift($args), $this->assigns), $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
+            break;
         case $context == null:
-            $context = new Context( $this->assigns, $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
+            $context = new Context(array($this->assigns), $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
             break;
         default:
-            throw new \ArgumentException("Expected array or \Liquid\Context as parameter");
+            throw new \InvalidArgumentException("Expected array or \Liquid\Context as parameter");
         }
 
 
