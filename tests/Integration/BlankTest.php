@@ -2,6 +2,9 @@
 
 namespace Liquid\Tests\Integration;
 
+/**
+ * TODO more tests have to be implemented.
+ */
 class BlankTest extends \Liquid\Tests\IntegrationTestCase {
 
     const N = 10;

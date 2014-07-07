@@ -3,6 +3,8 @@ namespace Liquid\Tests\Integration;
 
 use \Liquid\Template;
 
+//TODO More tests have to be implemented.
+//
 class VariableTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function test_simple_variable() {

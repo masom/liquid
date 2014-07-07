@@ -1,8 +1,8 @@
 <?php
 
-namespace Liquid\Tag;
+namespace Liquid\Tags;
 
-class Capture extends \Liquid\Tag {
+class Capture extends \Liquid\Block {
     const Syntax = '/(\w+)/';
 
     public function __construct($tag_name, $markup, $options) {
@@ -22,7 +22,7 @@ class Capture extends \Liquid\Tag {
         $context->scopes_last_set($to, $output);
         $context->increment_used_resources('assigns_score_current', $output);
 
-        return '';
+        return null;
     }
 
     public function is_blank() {
