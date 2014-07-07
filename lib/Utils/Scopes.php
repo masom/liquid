@@ -13,6 +13,14 @@ class Scopes extends ArrayObject {
         }
     }
 
+    public function offsetGet($offset) {
+        if (!isset($this->array[$offset])) {
+            $this->array[$offset] = new \ArrayObject();
+        }
+
+        return $this->array[$offset];
+    }
+
     public function merge($new_scopes) {
         $scope = $this->array[0];
 

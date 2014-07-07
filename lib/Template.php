@@ -42,6 +42,10 @@ class Template {
         $this->instance_assigns = new \ArrayObject();
     }
 
+    public function resource_limits() {
+        return $this->resource_limits;
+    }
+
     /**
      * Get or set the filesystem.
      *

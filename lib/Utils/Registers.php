@@ -10,4 +10,12 @@ class Registers extends \Liquid\Utils\ArrayObject {
             $this->array[] = new \ArrayObject($item);
         }
     }
+
+    public function offsetGet($offset) {
+        if (!isset($this->array[$offset])) {
+            $this->array[$offset] = new \ArrayObject();
+        }
+
+        return $this->array[$offset];
+    }
 }

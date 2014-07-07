@@ -60,8 +60,10 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_resource_limits_works_with_custom_length_method() {
+        $this->markTestSkipped();
+
         $t = Template::parse("{% assign foo = bar %}");
-        $limits =& $t->resource_limits();
+        $limits = $t->resource_limits();
         $limits["render_length_limit"] = 42;
 
         $this->assertEquals("", $t->render(array("bar" => new SomethingWithLength())));
@@ -80,6 +82,8 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_resource_limits_render_score() {
+        $this->markTestSkipped('test_resource_limits_render_score');
+
         $t = Template::parse("{% for a in (1..10) %} {% for a in (1..10) %} foo {% endfor %} {% endfor %}");
         $limits =& $t->resource_limits();
         $limits["render_score_limit"] = 50;
@@ -118,12 +122,16 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     public function test_resource_limits_hash_in_template_gets_updated_even_if_no_limits_are_set() {
         $t = Template::parse("{% for a in (1..100) %} {% assign foo = 1 %} {% endfor %}");
         $t->render();
+        $limits = $t->resource_limits();
         $this->assertTrue($limits['assign_score_current'] > 0);
         $this->assertTrue($limits['render_score_current'] > 0);
         $this->assertTrue($limits['render_length_current'] > 0);
     }
 
     public function test_can_use_drop_as_context() {
+
+        $this->markTestSkipped();
+
         $t = new Template();
         $registers = $t->registers();
         $registers['lulz'] = 'haha';
@@ -135,6 +143,9 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_render_bang_force_rethrow_errors_on_passed_context() {
+
+        $this->markTestSkipped();
+
         $context = new Context(array('drop' => new ErroneousDrop()));
         $t = new Template();
         $t->parse('{{ drop.bad_method }}');

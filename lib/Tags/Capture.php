@@ -5,6 +5,8 @@ namespace Liquid\Tags;
 class Capture extends \Liquid\Block {
     const Syntax = '/(\w+)/';
 
+    protected $to;
+
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
@@ -19,7 +21,8 @@ class Capture extends \Liquid\Block {
     public function render($context) {
         $output = parent::render($context);
 
-        $context->scopes_last_set($to, $output);
+        $context->scopes_last_set($this->to, $output);
+
         $context->increment_used_resources('assigns_score_current', $output);
 
         return null;

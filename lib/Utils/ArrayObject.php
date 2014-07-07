@@ -72,11 +72,7 @@ class ArrayObject implements \ArrayAccess, \Iterator, \Countable {
     }
 
     public function offsetGet($offset) {
-        if (!isset($this->array[$offset])) {
-            $this->array[$offset] = new \ArrayObject();
-        }
-
-        return $this->array[$offset];
+        return isset($this->array[$offset]) ? $this->array[$offset] : null;
     }
 
     public function offsetSet($offset, $value) {

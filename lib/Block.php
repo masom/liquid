@@ -37,10 +37,6 @@ class Block extends \Liquid\Tag {
 
     public function __call($method, $arguments){
         if ($method === 'parse') {
-            if (!is_object($arguments[0])) {
-                $e = new \Exception();
-                echo $e->getTraceAsString();die;
-            }
             return $this->_parse($arguments[0]);
         }
 

@@ -96,7 +96,10 @@ class Context implements \ArrayAccess {
             $increment = 1;
         }
 
-        $this->resource_limits[$key] += $increment;
+        $limit =  $this->resource_limits[$key];
+
+        $limit += $increment;
+        $this->resource_limits[$key] = $limit;
     }
 
     public function is_resource_limits_reached() {
