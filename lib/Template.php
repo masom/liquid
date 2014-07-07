@@ -130,6 +130,10 @@ class Template {
         return $this->instance_assigns;
     }
 
+    public function &assigns() {
+        return $this->assigns;
+    }
+
     public function render() {
         if (!$this->root) {
             return '';
