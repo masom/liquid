@@ -20,6 +20,7 @@ class IfTag extends \Liquid\Block {
         static::$Syntax = '/(' . Liquid::$PART_QuotedFragment .')\s*([=!<>a-z_]+)?\s*(' . Liquid::$PART_QuotedFragment . ')?/';
         static::$ExpressionsAndOperators = '/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:' . Liquid::$PART_QuotedFragment . '|\S+)\s*)+)/';
     }
+
     public function __construct($tag_name, &$markup, &$options) {
         parent::__construct($tag_name, $markup, $options);
 
@@ -51,7 +52,7 @@ class IfTag extends \Liquid\Block {
         $context->stack(function($context) use ($self, &$blocks, &$result) {
             foreach($blocks as $block) {
                 if($block->evaluate($context)) {
-                    $result = $self->render_all($block->attachment, $context);
+                    $result = $self->render_all($block->attachment(), $context);
                     return;
                 }
             }

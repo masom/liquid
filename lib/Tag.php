@@ -34,7 +34,7 @@ class Tag {
 
     public function __call($method, $arguments) {
         if ($method == 'parse') {
-            return;
+            return null;
         }
 
         throw new \BadMethodCallException("Method `" . __CLASS__ ."->{$method}` is undefined.");

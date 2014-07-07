@@ -51,6 +51,8 @@ class Condition {
     public function evaluate($context = null) {
         $context = $context ?: new Context();
 
+        $result = $this->interpret_condition($this->left, $this->right, $this->operator, $context);
+
         switch($this->child_relation) {
         case 'or':
             return $result || $this->child_condition->evaluate($context);
