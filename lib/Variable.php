@@ -28,8 +28,8 @@ class Variable {
     public static function init() {
         static::$FilterParser = '/(?:' . Liquid::FilterSeparator . '|(?:\s*(?:' . Liquid::$PART_QuotedFragment . '|' . Liquid::ArgumentSeparator . ')\s*)+)/';
 
-        static::$LAX_Parse = '/\s*(' . Liquid::$PART_QuotedFragment . ')(.*)/m';
-        static::$LAX_FilterParser = '/'. Liquid::FilterSeparator .'\s*(.*)/m';
+        static::$LAX_Parse = '/\s*(' . Liquid::$PART_QuotedFragment . ')(.*)/s';
+        static::$LAX_FilterParser = '/'. Liquid::FilterSeparator .'\s*(.*)/s';
         static::$LAX_FilterArgsParser = '/(?:' . Liquid::FilterArgumentSeparator . '|' . Liquid::ArgumentSeparator . ')\s*((?:\w+\s*\:\s*)?' . Liquid::$PART_QuotedFragment .')/';
     }
 

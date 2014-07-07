@@ -4,6 +4,7 @@ namespace Liquid;
 
 use \Liquid\Strainer;
 use \Liquid\Utils\Registers;
+use \Liquid\Utils\ArrayObject;
 
 class Template {
 
@@ -14,8 +15,8 @@ class Template {
     /** @var array */
     protected static $tags;
 
-    /** @var array */
-    protected $resource_limits = array();
+    /** @var \ArrayObject */
+    protected $resource_limits;
 
     protected $warnings;
 
@@ -40,6 +41,7 @@ class Template {
         $this->registers = new Registers();
         $this->assigns = new \ArrayObject();
         $this->instance_assigns = new \ArrayObject();
+        $this->resource_limits = new ArrayObject();
     }
 
     public function resource_limits() {

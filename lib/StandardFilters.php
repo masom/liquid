@@ -107,10 +107,10 @@ class StandardFilters {
 
     public function strip_html($input) {
         $patterns = array(
-            '/<script.*?<\/script>/m',
-            '/<!--.*?-->/m',
-            '/<style.*?<\/style>/m',
-            '/<.*?>/m'
+            '/<script.*?<\/script>/s',
+            '/<!--.*?-->/s',
+            '/<style.*?<\/style>/s',
+            '/<.*?>/s'
         );
         return preg_replace($patterns, '', $input);
     }

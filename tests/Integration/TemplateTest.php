@@ -71,11 +71,16 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function test_resource_limits_render_length() {
         $t = Template::parse("0123456789");
-        $limits =& $t->resource_limits();
+        $limits = $t->resource_limits();
         $limits["render_length_limit"] = 5;
 
-        $this->assertEquals("Liquid error: Memory limits exceeded", $t->render());
-        $this->assertTrue($t->resource_limits['reached']);
+        try {
+            $t->render();
+        } catch(\Liquid\Exceptions\MemoryError $e) {
+            $this->assertEquals("Memory limits exceeded", $e->getMessage());
+        }
+
+        $this->assertTrue($limits['reached']);
         $limits["render_length_limit"] = 10;
         $this->assertEquals( "0123456789", $t->render());
         $this->assertNotNull($limits['render_length_current']);
@@ -104,7 +109,13 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
         $t = Template::parse("{% assign foo = 42 %}{% assign bar = 23 %}");
         $limits = $t->resource_limits();
         $limits['assign_score_limit'] = 1;
-        $this->assertEquals( "Liquid error: Memory limits exceeded", $t->render());
+
+        try {
+            $t->render();
+        } catch(\Liquid\Exceptions\MemoryError $e) {
+            $this->assertEquals("Memory limits exceeded", $e->getMessage());
+        }
+
         $this->assertTrue($limits['reached']);
         $limits['assign_score_limit'] = 2;
         $this->assertEquals( "", $t->render());
@@ -115,7 +126,13 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
         $t = Template::parse("{% for a in (1..100) %} foo1 {% endfor %} bar {% for a in (1..100) %} foo2 {% endfor %}");
         $limits = $t->resource_limits();
         $limits["render_score_limit"] = 50;
-        $this->assertEquals("Liquid error: Memory limits exceeded", $t->render());
+        try {
+            $t->render();
+            $this->fail('A MemoryError should have been thrown.');
+        } catch(\Liquid\Exceptions\MemoryError $e) {
+            $this->assertEquals('Memory limits exceeded', $e->getMessage());
+        }
+        $this->assertEquals("", $t->render());
         $this->assertTrue($limits['reached']);
     }
 

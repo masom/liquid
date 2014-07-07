@@ -32,6 +32,7 @@ class Context implements \ArrayAccess {
 
     /** @var array */
     protected $interrupts = array();
+
     /** @var array */
     protected $filters = array();
 
@@ -49,7 +50,7 @@ class Context implements \ArrayAccess {
         'empty' => 'empty?'
     );
 
-    public function __construct(array $environments = array(), $outer_scope = array(), $registers = array(), $rethrow_errors = false, array $resource_limits = array()) {
+    public function __construct(array $environments = array(), $outer_scope = array(), $registers = array(), $rethrow_errors = false, $resource_limits = array()) {
         $this->environments = new Environments(Arrays::flatten($environments));
 
         $this->scopes = new Scopes(array($outer_scope));
@@ -57,7 +58,15 @@ class Context implements \ArrayAccess {
         $this->registers =  ($registers instanceof Registers) ? $registers : new Registers($registers);
 
         $this->rethrow_errors = $rethrow_errors;
-        $this->resource_limits = new ArrayObject($resource_limits + array('render_score_current' => 0, 'assign_score_current' => 0));
+
+        $resource_limits_defaults = array('render_score_current' => 0, 'assign_score_current' => 0);
+        if (is_array($resource_limits)) {
+            $this->resource_limits =  new ArrayObject($resource_limits + $resource_limits_defaults); 
+        } elseif($resource_limits instanceof ArrayObject) {
+            $this->resource_limits = $resource_limits->merge($resource_limits_defaults);
+        } else {
+            $this->resource_limits = new ArrayObject($resource_limits_defaults);
+        }
 
         $this->squash_instance_assigns_with_environments();
 
@@ -96,10 +105,11 @@ class Context implements \ArrayAccess {
             $increment = 1;
         }
 
-        $limit =  $this->resource_limits[$key];
+        if (!isset($this->resource_limits[$key])) {
+            $this->resource_limits[$key] = 0;
+        }
 
-        $limit += $increment;
-        $this->resource_limits[$key] = $limit;
+        $this->resource_limits[$key] += $increment;
     }
 
     public function is_resource_limits_reached() {
@@ -259,9 +269,9 @@ class Context implements \ArrayAccess {
 
         $matches = null;
         switch(true) {
-        case preg_match('/\A\'(.*)\'\z/m', $key, $matches): //Single quoted strings
+        case preg_match('/\A\'(.*)\'\z/s', $key, $matches): //Single quoted strings
             return $matches[1];
-        case preg_match('/\A"(.*)"\z/m', $key, $matches): // Double quoted
+        case preg_match('/\A"(.*)"\z/s', $key, $matches): // Double quoted
             return $matches[1];
         case preg_match('/\A(-?\d+)\z/', $key, $matches): // Integer
             return (int) $matches[1];
@@ -329,7 +339,7 @@ class Context implements \ArrayAccess {
         $parts = null;
         preg_match_all(\Liquid\Liquid::$VariableParser, $markup, $parts);
 
-        $square_braketed = '/\A\[(.*)\]\z/m';
+        $square_braketed = '/\A\[(.*)\]\z/s';
 
         $first_part = array_shift($parts[0]);
 

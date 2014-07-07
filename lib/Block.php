@@ -31,8 +31,8 @@ class Block extends \Liquid\Tag {
     public static function init() {
         static::$IsTag = '/\A' . \Liquid\Liquid::TagStart . '/';
         static::$IsVariable = '/\A' . \Liquid\Liquid::VariableStart . '/';
-        static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/m';
-        static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/m';
+        static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/s';
+        static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/s';
     }
 
     public function __call($method, $arguments){
@@ -187,7 +187,7 @@ class Block extends \Liquid\Tag {
                 if ($context->is_resource_limits_reached())
                 {
                     $limits['reached'] = true;
-                    throw new \Liquid\Exceptions\MemoryError("Memory limit exceeded.");
+                    throw new \Liquid\Exceptions\MemoryError("Memory limits exceeded");
                 }
 
                 if (is_object($token)) {

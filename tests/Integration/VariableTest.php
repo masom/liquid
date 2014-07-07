@@ -35,14 +35,14 @@ class VariableTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function test_preset_assigns() {
         $template = Template::parse('{{ test }}');
-        $assigns =& $template->assigns();
+        $assigns = $template->assigns();
         $assigns['test'] = 'worked';
         $this->assertEquals('worked', $template->render());
     }
 
     public function test_reuse_parsed_template() {
         $template = Template::parse('{{ greeting }} {{ name }}');
-        $assigns =& $template->assigns();
+        $assigns = $template->assigns();
         $assigns['greeting'] = 'Goodbye';
 
         $this->assertEquals(array('greeting' => 'Goodbye'), $template->assigns());
@@ -54,7 +54,7 @@ class VariableTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function test_assigns_not_polluted_from_template() {
         $template = Template::parse("{{ test }}{% assign test = 'bar' %}{{ test }}");
-        $assigns =& $template->assigns();
+        $assigns = $template->assigns();
         $assigns['test'] = 'baz';
 
         $this->assertEquals('bazbar', $template->render());
