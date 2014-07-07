@@ -79,10 +79,6 @@ class Strainer {
                 continue;
             }
 
-            if (isset($known_methods[$method])) {
-                continue;
-            }
-
             $known_methods[$method] = $class;
         }
 
