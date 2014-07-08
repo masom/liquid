@@ -23,18 +23,36 @@ class ForTag extends \Liquid\Block {
     /** @var boolean */
     protected $reversed;
 
+    /** @var string */
+    protected $name;
+
+    /** @var string */
+    protected $variable_name;
+    /**
+     * @var array
+     */
+    protected $attributes = array();
+
     public static function init() {
         static::$Syntax = '/\A(' . Liquid::VariableSegment .'+)\s+in\s+(' . Liquid::$PART_QuotedFragment .'+)\s*(reversed)?/';
     }
 
+    /**
+     * @param string $tag_name
+     * @param string $markup
+     * @param array  $options
+     */
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
         $this->parse_with_selected_parser($markup);
-        $this->for_block = new Nodes(); 
+        $this->for_block = new Nodes();
         $this->nodelist =& $this->for_block;
     }
 
+    /**
+     * @return array|\ArrayObject|Nodes
+     */
     public function nodelist() {
         if ($this->else_block) {
             return $this->for_block->merge($this->else_block);
@@ -43,6 +61,11 @@ class ForTag extends \Liquid\Block {
         }
     }
 
+    /**
+     * @param $tag
+     * @param $markup
+     * @param $tokens
+     */
     public function unknown_tag($tag, $markup, $tokens) {
         if ($tag !== 'else') {
             return parent::unknown_tag($tag, $markup, $tokens);
@@ -51,6 +74,11 @@ class ForTag extends \Liquid\Block {
         $this->nodelist =& $this->else_block;
     }
 
+    /**
+     * @param \Liquid\Context $context
+     *
+     * @return array|null|string
+     */
     public function render($context) {
         $registers = $context->registers();
 
@@ -83,8 +111,6 @@ class ForTag extends \Liquid\Block {
             array_flip($segment);
         }
 
-        $result = '';
-
         $length = count($segment);
 
         $registers['for'][$this->name] = $from + $length;
@@ -114,10 +140,10 @@ class ForTag extends \Liquid\Block {
 
                 if ($context->has_interrupt()) {
                     $interrupt = $context->pop_interrupt();
-                    if ($interrupt instanceof BreakInterrupt) {
+                    if ($interrupt instanceof \Liquid\Interrupts\BreakInterrupt) {
                         break;
                     }
-                    if ($interrupt instanceof ContinueInterrupt) {
+                    if ($interrupt instanceof \Liquid\Interrupts\ContinueInterrupt) {
                         continue;
                     }
                 }
@@ -127,6 +153,11 @@ class ForTag extends \Liquid\Block {
         return $result;
     }
 
+    /**
+     * @param string $markup
+     *
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     public function lax_parse(&$markup) {
         if (preg_match(static::$Syntax, $markup, $matches)) {
             $this->variable_name = $matches[1];
@@ -138,7 +169,7 @@ class ForTag extends \Liquid\Block {
             $this->attributes = array();
 
             if(preg_match_all(Liquid::$TagAttributes, $markup, $matches)) {
-                foreach($matches as $key => $value) {
+                foreach($matches[1] as $key => $value) {
                     $this->attributes[$key] = $value;
                 }
             }

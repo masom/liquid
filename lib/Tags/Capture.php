@@ -7,6 +7,13 @@ class Capture extends \Liquid\Block {
 
     protected $to;
 
+    /**
+     * @param string $tag_name
+     * @param string $markup
+     * @param array  $options
+     *
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
@@ -18,6 +25,11 @@ class Capture extends \Liquid\Block {
         }
     }
 
+    /**
+     * @param \Liquid\Context $context
+     *
+     * @return null
+     */
     public function render($context) {
         $output = parent::render($context);
 
@@ -28,6 +40,9 @@ class Capture extends \Liquid\Block {
         return null;
     }
 
+    /**
+     * @return bool
+     */
     public function is_blank() {
         return true;
     }

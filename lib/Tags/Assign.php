@@ -15,6 +15,13 @@ class Assign extends \Liquid\Tag {
         static::$Syntax = '/(' . Liquid::VariableSignature .')\s*=\s*(.*)\s*/Ss';
     }
 
+    /**
+     * @param string $tag_name
+     * @param string $markup
+     * @param array  $options
+     *
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
@@ -27,6 +34,11 @@ class Assign extends \Liquid\Tag {
         }
     }
 
+    /**
+     * @param \Liquid\Context $context
+     *
+     * @return null
+     */
     public function render($context) {
         $val = $this->from->render($context);
 
@@ -36,6 +48,9 @@ class Assign extends \Liquid\Tag {
         return null;
     }
 
+    /**
+     * @return bool
+     */
     public function is_blank() {
         return true;
     }

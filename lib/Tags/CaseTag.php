@@ -22,9 +22,16 @@ class CaseTag extends \Liquid\Block {
         static::$init = true;
 
         static::$Syntax = '/(' . Liquid::$PART_QuotedFragment . ')/';
-        static::$WhenSyntax = '/(' . Liquid::$PART_QuotedFragment . ')(?:(?:\s+or\s+|\s*\,\s*)(' . Liquid::$PART_QuotedFragment . '.*))?/m';
+        static::$WhenSyntax = '/(' . Liquid::$PART_QuotedFragment . ')(?:(?:\s+or\s+|\s*\,\s*)(' . Liquid::$PART_QuotedFragment . '.*))?/Ss';
     }
 
+    /**
+     * @param string $tag_name
+     * @param string $markup
+     * @param array  $options
+     *
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
@@ -36,10 +43,13 @@ class CaseTag extends \Liquid\Block {
         }
     }
 
+    /**
+     * @return array
+     */
     public function nodelist() {
         $blocks = array();
 
-        foreach($this->blocks as $block) {
+        foreach($this->blocks as $block) { /** @var \Liquid\Condition $block */
             if ($attachment = $block->attachment()) {
                 $blocks[] = $attachment->nodes();
             }
@@ -48,6 +58,11 @@ class CaseTag extends \Liquid\Block {
         return Arrays::flatten($blocks);
     }
 
+    /**
+     * @param $tag
+     * @param string $markup
+     * @param \Liquid\Utils\Tokens $tokens
+     */
     public function unknown_tag($tag, $markup, $tokens) {
         $this->nodelist = new Nodes();
 
@@ -61,27 +76,37 @@ class CaseTag extends \Liquid\Block {
         }
     }
 
+    /**
+     * @param \Liquid\Context $context
+     * @return string
+     */
     public function render($context) {
 
         $output = '';
         $blocks =& $this->blocks;
-        $context->stack(function($context) use (&$blocks, &$output) {
+        $self = $this;
+        $context->stack(function($context) use ($self, &$blocks, &$output) {
             $execute_else_block = true;
 
-            foreach($blocks as $block) {
+            foreach($blocks as $block) { /** @var \Liquid\Condition $block */
                 if ($block->isElse()) {
                     if ($execute_else_block) {
-                        return $block->render_all($block->attachment(), $context);
+                        return $self->render_all($block->attachment(), $context);
                     }
                 } elseif ($block->evaluate($context)) {
                     $execute_else_block = false;
-                    $output .= $block->render_all($block->attachment(), $context);
+                    $output .= $self->render_all($block->attachment(), $context);
                 }
             }
         });
         return $output;
     }
 
+    /**
+     * @param $markup
+     *
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     private function record_when_condition($markup) {
         while($markup) {
             $matches = null;
@@ -97,6 +122,11 @@ class CaseTag extends \Liquid\Block {
         }
     }
 
+    /**
+     * @param $markup
+     *
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     private function record_else_condition($markup) {
         $markup = trim($markup);
         if (!empty($markup)) {

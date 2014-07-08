@@ -76,6 +76,16 @@ class Context implements \ArrayAccess {
         $this->strainerMethodInvoker = new \ReflectionMethod('\Liquid\Strainer', 'invoke');
     }
 
+    /**
+     * @return Environments
+     */
+    public function environments() {
+        return $this->environments;
+    }
+
+    /**
+     * @return ArrayObject
+     */
     public function resource_limits() {
         return $this->resource_limits;
     }
