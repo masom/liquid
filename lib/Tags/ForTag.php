@@ -178,6 +178,11 @@ class ForTag extends \Liquid\Block {
         }
     }
 
+    /**
+     * @param string $markup
+     *
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     public function strict_parse(&$markup) {
         $p = new Parser($markup);
 
@@ -210,10 +215,20 @@ class ForTag extends \Liquid\Block {
         $p->consume('end_of_string');
     }
 
+    /**
+     * @param $context
+     *
+     * @return array|string
+     */
     private function render_else(&$context) {
         return $this->else_block ? array($this->render_all($this->else_block, $context)) : '';
     }
 
+    /**
+     * @param $collection
+     *
+     * @return bool
+     */
     private function is_iterable(&$collection) {
         return (is_array($collection) || $collection instanceof \ArrayAccess) || Utils::is_non_blank_string($collection);
     }

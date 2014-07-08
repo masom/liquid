@@ -5,6 +5,11 @@ namespace Liquid\Tags;
 
 class Unless extends \Liquid\Tags\IfTag {
 
+    /**
+     * @param \Liquid\Context $context
+     *
+     * @return string
+     */
     public function render($context) {
         $self = $this;
         $blocks =& $this->blocks;
@@ -18,7 +23,7 @@ class Unless extends \Liquid\Tags\IfTag {
             }
 
             //TODO check other array_slice to have -2 instead of -1
-            foreach(array_slice($blocks, 1, count($blocks) - 2 ) as $block) {
+            foreach(array_slice($blocks, 1, count($blocks) - 2 ) as $block) { /** @var \Liquid\Condition $block */)
                 if ($block->evaluate($context)) {
                     $return = $self->render_all($block->attachment(), $context);
                     return;

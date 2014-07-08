@@ -10,9 +10,12 @@ class Raw extends \Liquid\Block {
     protected static $FullTokenPossiblyInvalid;
 
     public static function init() {
-        static::$FullTokenPossiblyInvalid = '/\A(.*)' . Liquid::TagStart . '\s*(\w+)\s*(.*)?' . Liquid::TagEnd .'\z/om';
+        static::$FullTokenPossiblyInvalid = '/\A(.*)' . Liquid::TagStart . '\s*(\w+)\s*(.*)?' . Liquid::TagEnd .'\z/Ss';
     }
 
+    /**
+     * @param $tokens
+     */
     public function parse($tokens) {
         $this->nodelist = array();
 

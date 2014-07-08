@@ -4,6 +4,11 @@ namespace Liquid\Tags;
 
 class IfChanged extends \Liquid\Block {
 
+    /**
+     * @param \Liquid\Context $context
+     *
+     * @return null|string
+     */
     public function render($context) {
         $nodelist =& $this->nodelist;
         $output = null;

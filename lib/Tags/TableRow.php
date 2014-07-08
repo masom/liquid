@@ -10,9 +10,16 @@ class TableRow extends \Liquid\Block {
     protected static $Syntax;
 
     public static function init() {
-        static::$Syntax = '/(\w+)\s+in\s+(' . Liquid::QuotedFragment . '+)/o';
+        static::$Syntax = '/(\w+)\s+in\s+(' . Liquid::$PART_QuotedFragment . '+)/';
     }
 
+    /**
+     * @param string $tag_name
+     * @param string $markup
+     * @param array  $options
+     *
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
@@ -22,7 +29,7 @@ class TableRow extends \Liquid\Block {
             $this->collection_name = $matches[2];
             $this->attributes = array();
 
-            preg_match_all(Liquid::TagAttributes, $markup, $matches);
+            preg_match_all(Liquid::$TagAttributes, $markup, $matches);
             foreach($matches as $key => $value) {
                 $this->attributes[$key] = $value;
             }
@@ -31,6 +38,11 @@ class TableRow extends \Liquid\Block {
         }
     }
 
+    /**
+     * @param \Liquid\Context $context
+     *
+     * @return string
+     */
     public function render($context) {
         if (!isset($context[$this->collection_name])) {
             return '';
@@ -38,7 +50,7 @@ class TableRow extends \Liquid\Block {
 
         $collection = $context[$this->collection_name];
         $from = isset($this->attributes['offset']) && $this->attributes['offset'] ? (int) $context[$this->attributes['offset']] : 0;
-        $from = isset($this->attributes['limit']) && $this->attributes['limit'] ? $from - (int) $context[$this->attributes['limit']] : null;
+        $to = isset($this->attributes['limit']) && $this->attributes['limit'] ? $from - (int) $context[$this->attributes['limit']] : null;
 
         $collection = Utils::slice_collection($collection, $from, $to);
 
@@ -55,11 +67,11 @@ class TableRow extends \Liquid\Block {
 
         $nodelist =& $this->nodelist;
         $self = $this;
-        $context->stack(function($context) use ($self, &$nodelist, &$collection, &$variable_name, &$result, &$length, &$col) {
+        $context->stack(function($context) use ($self, &$nodelist, &$collection, &$variable_name, &$result, &$length, &$row, &$col, &$cols) {
             foreach($collection as $index => $item) {
                 $context[$variable_name] = $item;
                 $context['tablerowloop'] = array(
-                    'length' => $length, 
+                    'length' => $length,
                     'index' => $index + 1,
                     'index0' => $index,
                     'col' => $col + 1,
@@ -74,7 +86,7 @@ class TableRow extends \Liquid\Block {
 
                 $col++;
 
-                $resut .= "<td class=\"col{$col}\">" . $self->render_all($nodelist, $context) . '</td>';
+                $result .= "<td class=\"col{$col}\">" . $self->render_all($nodelist, $context) . '</td>';
 
                 if (($col == $cols) && ($index != $length - 1)) {
                     $col = 0;

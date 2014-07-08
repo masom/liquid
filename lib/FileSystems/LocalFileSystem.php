@@ -6,7 +6,7 @@ class LocalFileSystem {
 
     /** @var string */
     protected $root;
-    /** @var pattern */
+    /** @var string pattern */
     protected $pattern;
 
     const ALLOWED_PATH_PATTERN = '/\A[^.\/][a-zA-Z0-9_\/]+\z/';
@@ -20,6 +20,13 @@ class LocalFileSystem {
         $this->pattern = $pattern;
     }
 
+    /**
+     * @param $template_path
+     * @param $context
+     *
+     * @return string
+     * @throws \Liquid\Exceptions\FileSystemError
+     */
     public function read_template_file($template_path, $context) {
         $full_path = $this->full_path($template_path);
 
@@ -30,6 +37,12 @@ class LocalFileSystem {
         return file_get_contents($full_path);
     }
 
+    /**
+     * @param $template_path
+     *
+     * @return string
+     * @throws \Liquid\Exceptions\FileSystemError
+     */
     public function full_path($template_path) {
         if (!preg_match(static::ALLOWED_PATH_PATTERN, $template_path)) {
             throw new \Liquid\Exceptions\FileSystemError("Illegal template name `{$template_path}`");

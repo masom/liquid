@@ -6,6 +6,8 @@
  */
 namespace Liquid\Vendor\StringScanner;
 
+use \Exception;
+
 define('FLAG_MATCHED', 1 << 0);
 class StringScanner implements \ArrayAccess
 {
@@ -16,14 +18,14 @@ class StringScanner implements \ArrayAccess
 		$curr = 0,
 		$prev = 0,
 		$matches = array();
- 
- 
+
+
 	public function __construct($str)
 	{
 		$this->set_string($str);
 	}
- 
- 
+
+
 	/*
 	 * Reset the scan pointer (index 0) and clear matching data.
 	 */
@@ -33,7 +35,7 @@ class StringScanner implements \ArrayAccess
 		$this->flags &= ~FLAG_MATCHED;
 		return $this;
 	}
- 
+
 	/*
 	 * Set the scan pointer to the end of the string and clear matching data.
 	 */
@@ -43,7 +45,7 @@ class StringScanner implements \ArrayAccess
 		$this->flags &= ~FLAG_MATCHED;
 		return $this;
 	}
- 
+
 	/*
 	 * Returns the string being scanned.
 	 */
@@ -51,7 +53,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->str;
 	}
- 
+
 	/*
 	 * Changes the string being scanned to +str+ and resets the scanner.
 	 * Returns +str+.
@@ -63,7 +65,7 @@ class StringScanner implements \ArrayAccess
 		$this->reset();
 		return $this->str;
 	}
- 
+
 	/*
 	 * Appends +str+ to the string being scanned.
 	 * This method does not affect scan pointer.
@@ -80,7 +82,7 @@ class StringScanner implements \ArrayAccess
 		$this->len = strlen($this->str);
 		return $this;
 	}
- 
+
 	/*
 	 * Returns the position of the scan pointer.  In the 'reset' position, this
 	 * value is zero.  In the 'terminated' position (i.e. the string is exhausted),
@@ -99,7 +101,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->curr;
 	}
- 
+
 	/*
 	 * Modify the scan pointer.
 	 *
@@ -120,47 +122,47 @@ class StringScanner implements \ArrayAccess
 		}
 		return $this->curr = $value;
 	}
- 
- 
+
+
 	protected function do_scan($regex, $advance_pointer, $return_string, $headonly)
 	{
 		# Clear match status
 		$this->flags &= ~FLAG_MATCHED;
- 
+
 		# Don't search pasted the end of the string
 		if ($this->len - $this->curr < 0) {
 			return null;
 		}
- 
+
 		$ret = preg_match($headonly ? "{$regex}A" : $regex, $this->str, $this->matches, PREG_OFFSET_CAPTURE, $this->curr);
- 
+
 		# There was an error during the preg_match operation
 		if ($ret === FALSE) {
 			throw new Exception("Unknown PCRE error");
 		}
- 
+
 		# Not matched
 		if ($ret === 0) {
 			return null;
 		}
- 
+
 		# Set the matched flag
 		$this->flags |= FLAG_MATCHED;
- 
+
 		# Set the length of the match
 		$this->matches[0][2] = strlen($this->matches[0][0]);
- 
+
 		# Handle advancing the pointer
 		$this->prev = $this->curr;
 		if ($advance_pointer) {
 			$this->curr = $this->matches[0][1] + $this->matches[0][2];
 		}
- 
+
 		# Return the relevant match data
 		return $return_string ? ($headonly ? $this->matched : $this->pre_match . $this->matched) : $this->matches[0][2];
 	}
- 
- 
+
+
 	/*
 	 * Tries to match with +pattern+ at the current position. If there's a match,
 	 * the scanner advances the "scan pointer" and returns the matched string.
@@ -178,7 +180,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, 1, 1, 1);
 	}
- 
+
 	/*
 	 * Tests whether the given +pattern+ is matched from the current scan pointer.
 	 * Returns the length of the match, or +nil+.  The scan pointer is not advanced.
@@ -192,7 +194,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, 0, 0, 1);
 	}
- 
+
 	/*
 	 * Attempts to skip over the given +pattern+ beginning with the scan pointer.
 	 * If it matches, the scan pointer is advanced to the end of the match, and the
@@ -212,7 +214,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, 1, 0, 1);
 	}
- 
+
 	/*
 	 * This returns the value that #scan would return, without advancing the scan
 	 * pointer.  The match register is affected, though.
@@ -230,7 +232,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, 0, 1, 1);
 	}
- 
+
 	/*
 	 * Tests whether the given +pattern+ is matched from the current scan pointer.
 	 * Returns the matched string if +return_string_p+ is true.
@@ -243,7 +245,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, $advance_pointer, $return_string, 1);
 	}
- 
+
 	/*
 	 * Scans the string _until_ the +pattern+ is matched.  Returns the substring up
 	 * to and including the end of the match, advancing the scan pointer to that
@@ -258,7 +260,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, 1, 1, 0);
 	}
- 
+
 	/*
 	 * Looks _ahead_ to see if the +pattern+ exists _anywhere_ in the string,
 	 * without advancing the scan pointer.  This predicates whether a #scan_until
@@ -274,7 +276,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, 0, 0, 0);
 	}
- 
+
 	/*
 	 * Advances the scan pointer until +pattern+ is matched and consumed.  Returns
 	 * the number of bytes advanced, or +nil+ if no match was found.
@@ -293,7 +295,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, 1, 0, 0);
 	}
- 
+
 	/*
 	 * This returns the value that #scan_until would return, without advancing the
 	 * scan pointer.  The match register is affected, though.
@@ -309,7 +311,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, 0, 1, 0);
 	}
- 
+
 	/*
 	 * Scans the string _until_ the +pattern+ is matched.
 	 * Returns the matched string if +return_string_p+ is true, otherwise
@@ -321,7 +323,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->do_scan($re, $advance_pointer, $return_string, 0);
 	}
- 
+
 	/*
 	 * Scans one character and returns it.
 	 * This method is multi-byte character sensitive.
@@ -343,7 +345,7 @@ class StringScanner implements \ArrayAccess
 		{
 			return null;
 		}
- 
+
 		$len = 1;
 		if ($this->curr + $len > $this->len)
 		{
@@ -351,16 +353,16 @@ class StringScanner implements \ArrayAccess
 		}
 		$this->prev = $this->curr;
 		$this->curr += $len;
- 
+
 		$this->matches[0] = array(
 			0 => mb_substr($this->str, $this->prev, $len),
 			1 => $this->prev,
 			2 => $len);
- 
+
 		$this->flags |= FLAG_MATCHED;
 		return $this->matched;
 	}
- 
+
 	/*
 	 * Scans one byte and returns it.
 	 * This method is NOT multi-byte character sensitive.
@@ -383,7 +385,7 @@ class StringScanner implements \ArrayAccess
 		{
 			return null;
 		}
- 
+
 		$len = 1;
 		if ($this->curr + $len > $this->len)
 		{
@@ -391,16 +393,16 @@ class StringScanner implements \ArrayAccess
 		}
 		$this->prev = $this->curr;
 		$this->curr += $len;
- 
+
 		$this->matches[0] = array(
 			0 => substr($this->str, $this->prev, $len),
 			1 => $this->prev,
 			2 => $len);
- 
+
 		$this->flags |= FLAG_MATCHED;
 		return $this->matched;
 	}
- 
+
 	/*
 	 * Extracts a string corresponding to <tt>string[pos,len]</tt>, without
 	 * advancing the scan pointer.
@@ -422,7 +424,7 @@ class StringScanner implements \ArrayAccess
 		}
 		return substr($this->str, $this->curr, $len);
 	}
- 
+
 	/*
 	 * Set the scan pointer to the previous position.  Only one previous position is
 	 * remembered, and it changes with each scanning operation.
@@ -444,7 +446,7 @@ class StringScanner implements \ArrayAccess
 		$this->flags &= ~FLAG_MATCHED;
 		return $this;
 	}
- 
+
 	/*
 	 * Returns +true+ iff the scan pointer is at the beginning of the line.
 	 *
@@ -461,7 +463,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return ($this->curr === 0 || $this->str[$this->curr - 1] === "\n");
 	}
- 
+
 	/*
 	 * Returns +true+ if the scan pointer is at the end of the string.
 	 *
@@ -476,7 +478,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return ($this->curr >= $this->len);
 	}
- 
+
 	/*
 	 * Returns +true+ iff the last match was successful.
 	 *
@@ -490,7 +492,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return (bool) ($this->flags & FLAG_MATCHED);
 	}
- 
+
 	/*
 	 * Returns the last matched string.
 	 *
@@ -506,7 +508,7 @@ class StringScanner implements \ArrayAccess
 		}
 		return substr($this->str, $this->matches[0][1], $this->matches[0][2]);
 	}
- 
+
 	/*
 	 * Returns the size of the most recent match (see #matched), or +nil+ if there
 	 * was no recent match.
@@ -521,7 +523,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->matched_p ? $this->matches[0][2] : null;
 	}
- 
+
 	/*
 	 * Return the n-th subgroup in the most recent match.
 	 *
@@ -540,7 +542,7 @@ class StringScanner implements \ArrayAccess
 	public function offsetUnset($index) {}
 	public function offsetExists($index) {}
 	public function offsetSet($index, $value) {}
- 
+
 	/*
 	 * Return the pre-match (in the regular expression sense) of the last scan.
 	 *
@@ -558,7 +560,7 @@ class StringScanner implements \ArrayAccess
 		}
 		return substr($this->str, 0, $this->matches[0][1]);
 	}
- 
+
 	/*
 	 * Return the post-match (in the regular expression sense) of the last scan.
 	 *
@@ -576,7 +578,7 @@ class StringScanner implements \ArrayAccess
 		}
 		return substr($this->str, $this->matches[0][2], $this->len);
 	}
- 
+
 	/*
 	 * Returns the "rest" of the string (i.e. everything after the scan pointer).
 	 * If there is no more data (eos = true), it returns "".
@@ -589,7 +591,7 @@ class StringScanner implements \ArrayAccess
 		}
 		return substr($this->str, $this->curr, $this->len);
 	}
- 
+
 	/*
 	 * Equivalent to strlen(s->rest).
 	 */
@@ -597,7 +599,7 @@ class StringScanner implements \ArrayAccess
 	{
 		return $this->eos ? 0 : $this->len - $this->curr;
 	}
- 
+
 	/*
 	 * Returns a string that represents the StringScanner object, showing:
 	 * - the current position
@@ -637,13 +639,13 @@ class StringScanner implements \ArrayAccess
 		}
 		return sprintf("#<%s %d/%d %s @ %s>", __CLASS__, $this->curr, $this->len, "\"$a\"", "\"$b\"");
 	}
- 
- 
+
+
 	public function __toString()
 	{
 		return $this->inspect();
 	}
- 
+
 	public function __get($name)
 	{
 		if (method_exists($this, "get_$name"))
@@ -652,7 +654,7 @@ class StringScanner implements \ArrayAccess
 			return $this->$name();
 		}
 	}
- 
+
 	public function __set($name, $value)
 	{
 		if (method_exists($this,"set_$name"))
@@ -661,5 +663,5 @@ class StringScanner implements \ArrayAccess
 			return $this->$name($value);
 		}
 	}
- 
+
 }

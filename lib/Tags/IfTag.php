@@ -14,29 +14,47 @@ class IfTag extends \Liquid\Block {
     protected static $ExpressionsAndOperators;
     protected static $BOOLEAN_OPERATORS = array('and'=>'and', 'or'=>'or');
 
-    protected $blocks = array();
+    /** @var \ArrayObject */
+    protected $blocks;
 
     public static function init() {
         static::$Syntax = '/(' . Liquid::$PART_QuotedFragment .')\s*([=!<>a-z_]+)?\s*(' . Liquid::$PART_QuotedFragment . ')?/';
         static::$ExpressionsAndOperators = '/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:' . Liquid::$PART_QuotedFragment . '|\S+)\s*)+)/';
     }
 
+    /**
+     * @param string $tag_name
+     * @param string $markup
+     * @param array  $options
+     */
     public function __construct($tag_name, &$markup, &$options) {
         parent::__construct($tag_name, $markup, $options);
+
+        $this->blocks = new \ArrayObject();
 
         $this->push_block('if', $markup);
     }
 
+    /**
+     * @return array|Nodes
+     */
     public function nodelist() {
         $blocks = array();
 
-        foreach($this->blocks as $block) {
+        foreach($this->blocks as $block) { /** @var \Liquid\Condition $block */
             $blocks[] = $block->attachment()->nodes();
         }
 
         return Arrays::flatten($blocks);
     }
 
+    /**
+     * @param $tag
+     * @param $markup
+     * @param $tokens
+     *
+     * @return null|void
+     */
     public function unknown_tag($tag, $markup, $tokens) {
         if ($tag === 'elseif' || $tag === 'else') {
             return $this->push_block($tag, $markup);
@@ -45,6 +63,11 @@ class IfTag extends \Liquid\Block {
         }
     }
 
+    /**
+     * @param \Liquid\Context $context
+     *
+     * @return string
+     */
     public function render($context) {
         $blocks =& $this->blocks;
         $result = '';
@@ -61,6 +84,12 @@ class IfTag extends \Liquid\Block {
         return $result;
     }
 
+    /**
+     * @param $tag
+     * @param $markup
+     *
+     * @return Nodes
+     */
     private function push_block($tag, &$markup) {
         if ($tag === 'else') {
             $block = new ElseCondition();
@@ -75,6 +104,12 @@ class IfTag extends \Liquid\Block {
         return $this->nodelist;
     }
 
+    /**
+     * @param $markup
+     *
+     * @return Condition
+     * @throws \Liquid\Exceptions\SyntaxError
+     */
     public function lax_parse(&$markup) {
         preg_match_all(static::$ExpressionsAndOperators, $markup, $matches);
 
@@ -106,6 +141,11 @@ class IfTag extends \Liquid\Block {
         return $condition;
     }
 
+    /**
+     * @param string $markup
+     *
+     * @return Condition
+     */
     public function strict_parse($markup) {
         $p = new Parser($markup);
 
@@ -122,6 +162,11 @@ class IfTag extends \Liquid\Block {
         return $condition;
     }
 
+    /**
+     * @param Parser $p
+     *
+     * @return Condition
+     */
     private function parse_comparison($p) {
         $a = $p->expression();
 

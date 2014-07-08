@@ -69,6 +69,7 @@ class Block extends \Liquid\Tag {
 
                     # fetch the tag from registered blocks.
                     if (isset($tags[$matches[1]]) && $tag = $tags[$matches[1]]) {
+                        /** @var \Liquid\Tag $new_tag */
                         $new_tag = $tag::parse($matches[1], $matches[2], $tokens, $this->options);
 
                         if ($new_tag->is_blank()) {
@@ -81,7 +82,8 @@ class Block extends \Liquid\Tag {
                         $this->unknown_tag($matches[1], $matches[2], $tokens);
                     }
                 } else {
-                    throw new \Liquid\Exceptions\SyntaxError("Tag '{$token}' was not properly terminated with regexp: {$tag_end}");
+                    $end_tag = Liquid::VariableEnd;
+                    throw new \Liquid\Exceptions\SyntaxError("Tag '{$token}' was not properly terminated with regexp: {$end_tag}");
                 }
                 break;
             case preg_match(static::$IsVariable, $token, $matches):
@@ -103,9 +105,15 @@ class Block extends \Liquid\Tag {
         $this->assert_missing_delimitation();
     }
 
+    /**
+     * @return string
+     */
     public function end_tag() {
     }
 
+    /**
+     * @return array
+     */
     public function warnings() {
         $all_warnings = $this->warnings ?: array();
 
@@ -122,6 +130,13 @@ class Block extends \Liquid\Tag {
         return $all_warnings;
     }
 
+    /**
+     * @param $tag
+     * @param $params
+     * @param $tokens
+     *
+     * @throws Exceptions\SyntaxError
+     */
     public function unknown_tag($tag, $params, $tokens) {
         $block_name = $this->block_name();
         if ($tag === 'else') {
@@ -135,14 +150,26 @@ class Block extends \Liquid\Tag {
         throw new \Liquid\Exceptions\SyntaxError($msg);
     }
 
+    /**
+     * @return string
+     */
     public function block_delimiter() {
         return 'end' . $this->block_name();
     }
 
+    /**
+     * @return string
+     */
     public function block_name() {
         return $this->tag_name;
     }
 
+    /**
+     * @param $token
+     *
+     * @return Variable
+     * @throws Exceptions\SyntaxError
+     */
     public function create_variable($token) {
         $matches = null;
 
@@ -156,14 +183,30 @@ class Block extends \Liquid\Tag {
         throw new \Liquid\Exceptions\SyntaxError("Variable '{$token}' was not properly terminated with regexp: {$tag_end}");
     }
 
+    /**
+     * @param Context $context
+     *
+     * @return string
+     */
     public function render($context) {
         return $this->render_all($this->nodelist, $context);
     }
 
+    /**
+     * @throws Exceptions\SyntaxError
+     */
     protected function assert_missing_delimitation() {
         throw new \Liquid\Exceptions\SyntaxError("`{$this->block_name()}` tag was never closed.");
     }
 
+    /**
+     * @param $items
+     * @param Context $context
+     *
+     * @return string
+     * @throws \Exception
+     * @throws Exceptions\MemoryError
+     */
     protected function render_all($items, $context) {
         $output = array();
 
