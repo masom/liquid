@@ -10,8 +10,9 @@ class Condition {
     /** @var boolean */
     protected static $init = false;
 
-    protected $child_relation = null;
-    protected $child_condition = null;
+    protected $child_relation;
+    /** @var Condition */
+    protected $child_condition;
     protected $attachment = null;
 
     public static function init() {
@@ -48,6 +49,11 @@ class Condition {
         $this->operator = $operator;
     }
 
+    /**
+     * @param Context $context
+     *
+     * @return bool
+     */
     public function evaluate($context = null) {
         $context = $context ?: new Context();
 
@@ -86,6 +92,9 @@ class Condition {
         return $this->attachment;
     }
 
+    /**
+     * @return bool
+     */
     public function isElse() {
         return false;
     }
@@ -94,10 +103,19 @@ class Condition {
         return '#<Condition ' . implode(' ', array_filter(array($this->left, $this->operator, $this->right))) .'>';
     }
 
-    private function equal_variables($left, $right) {
+    public function equal_variables($left, $right) {
         return $left == $right;
     }
 
+    /**
+     * @param $left
+     * @param $right
+     * @param $op
+     * @param $context
+     *
+     * @return null
+     * @throws Exceptions\ArgumentError
+     */
     public function interpret_condition($left, $right, $op, $context) {
         if ($op == null) {
             return $context[$left];

@@ -2,16 +2,18 @@
 
 namespace Liquid;
 
+use \Liquid\Liquid;
 use \Liquid\Strainer;
-use \Liquid\Utils\Registers;
 use \Liquid\Utils\ArrayObject;
+use \Liquid\Utils\Registers;
+use \Liquid\Utils\Tokens;
 
 class Template {
 
     protected static $error_mode;
 
     protected static $filesystem;
-    
+
     /** @var array */
     protected static $tags;
 
@@ -56,7 +58,7 @@ class Template {
      */
     public static function filesystem( $obj = null) {
         if (!$obj) {
-            return $this->filesystem;
+            return static::$filesystem;
         }
 
         static::$filesystem = $obj;
@@ -81,10 +83,18 @@ class Template {
         return static::$tags;
     }
 
+    /**
+     * @param $filter
+     */
     public static function register_filter( $filter ) {
         Strainer::global_filter($filter);
     }
 
+    /**
+     * @param string $error_mode
+     *
+     * @return string
+     */
     public static function error_mode($error_mode = null) {
         if ($error_mode) {
             static::$error_mode = $error_mode;
@@ -93,11 +103,17 @@ class Template {
         return static::$error_mode ?: Liquid::ERROR_MODE_LAX;
     }
 
+    /**
+     * @param $method
+     * @param $args
+     *
+     * @return mixed
+     * @throws \BadMethodCallException
+     */
     public static function __callStatic($method, $args) {
         if ($method === 'parse') {
-            $template = new static();
+            $template = new static(); /** @var Template $template */
 
-            $tokens =& $args[0];
             $options = isset($args[1]) ? $args[1] : array();
             return $template->parse($args[0], $options);
         }
@@ -105,6 +121,13 @@ class Template {
         throw new \BadMethodCallException("Method `" . __CLASS__ . "::{$method}` is undefined.");
     }
 
+    /**
+     * @param string $method
+     * @param array $args
+     *
+     * @return $this
+     * @throws \BadMethodCallException
+     */
     public function __call($method, $args) {
         if ($method === 'parse') {
             $source = $args[0];
@@ -122,6 +145,9 @@ class Template {
         return $this->root;
     }
 
+    /**
+     * @return array
+     */
     public function warnings() {
         if(!$this->root) {
             return array();
@@ -130,18 +156,31 @@ class Template {
         return $this->warnings ?: $this->root->warnings();
     }
 
+    /**
+     * @return Registers
+     */
     public function registers() {
         return $this->registers;
     }
 
+    /**
+     * @return \ArrayObject
+     */
     public function instance_assigns() {
         return $this->instance_assigns;
     }
 
+    /**
+     * @return \ArrayObject
+     */
     public function assigns() {
         return $this->assigns;
     }
 
+    /**
+     * @return string
+     * @throws \InvalidArgumentException
+     */
     public function render() {
         if (!$this->root) {
             return '';
@@ -170,7 +209,7 @@ class Template {
             $context = new Context(array($this->assigns), $this->instance_assigns, $this->registers, $this->rethrow_errors, $this->resource_limits);
             break;
         default:
-            throw new \InvalidArgumentException("Expected array or \Liquid\Context as parameter");
+            throw new \InvalidArgumentException('Expected array or \Liquid\Context as parameter');
         }
 
 
@@ -185,7 +224,7 @@ class Template {
             }
 
             if (isset($last['registers']) && is_array($last['registers'])) {
-                static::$registers = new \ArrayObject(array_merge(static::registers, $last['registers']));
+                $this->registers->merge($last['registers']);
             }
 
             if (isset($last['filters'])) {
@@ -203,25 +242,30 @@ class Template {
             $this->errors = $context->errors();
 
             return is_array($result) ? implode('\n', $result) : $result;
-        } catch(\Liquid\MemoryError $e) {
+        } catch(\Liquid\Exceptions\MemoryError $e) {
             $context->handle_error($e);
             $this->errors = $context->errors();
         }
     }
 
+    /**
+     * @param mixed $source
+     *
+     * @return Utils\Tokens
+     */
     private function tokenize($source) {
         $source = method_exists($source, 'source') ? $source->source() : $source;
 
         if (empty($source)) {
-            return array();
+            return new Tokens();
         }
 
-        $tokens = preg_split(\Liquid\Liquid::$TemplateParser, $source, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $tokens = preg_split(Liquid::$TemplateParser, $source, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         if (isset($tokens[0]) && empty($tokens[0])) {
             array_shift($tokens);
         }
 
-        return new \Liquid\Utils\Tokens($tokens);
+        return new Tokens($tokens);
     }
 }

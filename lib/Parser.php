@@ -9,15 +9,27 @@ class Parser {
     protected $tokens;
     protected $p = 0;
 
+    /**
+     * @param string $input
+     */
     public function __construct($input) {
         $l = new Lexer($input);
         $this->tokens = $l->tokenize();
     }
 
+    /**
+     * @param integer $point
+     */
     public function jump($point) {
         $this->p = $point;
     }
 
+    /**
+     * @param string $type
+     *
+     * @return mixed|null
+     * @throws Exceptions\SyntaxError
+     */
     public function consume($type = null) {
         if (!isset($this->tokens[$this->p])) {
             throw new \Liquid\Exceptions\SyntaxError("Expected `{$type}` but was out of bound");
@@ -41,6 +53,9 @@ class Parser {
      * or false otherwise.
      *
      * Was consume?
+     *
+     * @param string $type
+     * @return string
      */
     public function try_consume($type) {
         if (!isset($this->tokens[$this->p])) {
@@ -77,6 +92,12 @@ class Parser {
         return $token[1];
     }
 
+    /**
+     * @param string $type
+     * @param integer $ahead
+     *
+     * @return bool
+     */
     public function look($type, $ahead = 0)
     {
         if (!isset($this->tokens[$this->p + $ahead])) {

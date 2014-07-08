@@ -48,7 +48,7 @@ class StandardFilters {
     }
 
     public function escape_once($input) {
-        return preg_replace(static::HTML_ESCAPE_ONCE_REGEXP, static::HTML_ESCAPE, $input);
+        return preg_replace(static::HTML_ESCAPE_ONCE_REGEXP, static::$HTML_ESCAPE, $input);
     }
 
     /**
@@ -78,12 +78,12 @@ class StandardFilters {
             return null;
         }
 
-        $wordlist = mb_split("\s", $input);
+        $wordlist = mb_split('\s', $input);
         $l = ((int) $words) - 1;
         $l = $l < 0 ? 0 : $l;
 
         if (count($wordlist) > $l) {
-            return implode(' ', array_slice($wordlist, 0, $l))  . $trucate_string;
+            return implode(' ', array_slice($wordlist, 0, $l))  . $truncate_string;
         } else {
             return $input;
         }
@@ -131,7 +131,7 @@ class StandardFilters {
         } else {
             $first = reset($array);
 
-            if (is_array($first) || $first instanceof ArrayAccess) {
+            if (is_array($first) || $first instanceof \ArrayAccess) {
                 usort($array, function($a, $b) use ($property) {
                     if ($a[$property] == $b[$property]) {
                         return 0;
@@ -184,7 +184,7 @@ class StandardFilters {
     }
 
     public function map($input, $property) {
-        $this->flatten_if_necessary($input, function($e) {
+        $this->flatten_if_necessary($input, function($e) use ($property) {
             if($e instanceof \Closure || is_callable($e)) {
                 $e = $e();
             }
@@ -333,6 +333,7 @@ class StandardFilters {
     }
 
     /**
+     * @param mixed $obj
      * @return \DateTime
      */
     private function to_date($obj) {

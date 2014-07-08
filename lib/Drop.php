@@ -71,11 +71,19 @@ class Drop implements \ArrayAccess {
     /**
      * alias :[] :invoke_drop
      * ArrayAccess
+     *
+     * @param string $key
+     * @return mixed
      */
     public function offsetGet($key) {
         return $this->invoke_drop($key);
     }
 
+    /**
+     * @param $method_name
+     *
+     * @return bool
+     */
     private function is_invokable($method_name) {
         if (!$this->invokable_methods) {
             $reflection = new \ReflectionClass('\Liquid\Drop');

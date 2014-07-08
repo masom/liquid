@@ -5,6 +5,13 @@ namespace Liquid;
 
 class Document extends \Liquid\Block {
 
+    /**
+     * @param string $method
+     * @param array $args
+     *
+     * @return static
+     * @throws \BadMethodCallException
+     */
     public static function __callStatic($method, $args) {
         if ($method == 'parse') {
             $tokens = $args[0];

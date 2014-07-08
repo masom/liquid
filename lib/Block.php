@@ -8,6 +8,7 @@ use \Liquid\Tags\BreakTag;
 use \Liquid\Utils\Nodes;
 use \Liquid\Variable;
 
+
 class Block extends \Liquid\Tag {
 
     /** @var string */
@@ -148,7 +149,7 @@ class Block extends \Liquid\Tag {
         preg_match_all(static::$ContentOfVariable, $token, $matches);
 
         foreach($matches[1] as $match) {
-            return new Variable($match, $this->options); 
+            return new Variable($match, $this->options);
         }
 
         $tag_end = Liquid::VariableEnd;

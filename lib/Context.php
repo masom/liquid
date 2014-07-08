@@ -61,7 +61,7 @@ class Context implements \ArrayAccess {
 
         $resource_limits_defaults = array('render_score_current' => 0, 'assign_score_current' => 0);
         if (is_array($resource_limits)) {
-            $this->resource_limits =  new ArrayObject($resource_limits + $resource_limits_defaults); 
+            $this->resource_limits =  new ArrayObject($resource_limits + $resource_limits_defaults);
         } elseif($resource_limits instanceof ArrayObject) {
             $this->resource_limits = $resource_limits->merge($resource_limits_defaults);
         } else {
@@ -238,7 +238,7 @@ class Context implements \ArrayAccess {
      * ArrayAccess
      */
     public function offsetExists($offset) {
-        return $this->resolve($offset) ? true : false; 
+        return $this->resolve($offset) ? true : false;
     }
 
     /**
@@ -262,6 +262,11 @@ class Context implements \ArrayAccess {
         unset($this->scopes[0][$offset]);
     }
 
+    /**
+     * @param string $key
+     *
+     * @return array|float|int|mixed
+     */
     public function resolve($key) {
         if (isset(static::$LITERALS[$key])) {
             return static::$LITERALS[$key];
@@ -284,6 +289,11 @@ class Context implements \ArrayAccess {
         }
     }
 
+    /**
+     * @param string $key
+     *
+     * @return Variable
+     */
     public function find_variable($key) {
         $scope = null;
         $variable = null;
@@ -335,6 +345,11 @@ class Context implements \ArrayAccess {
         return $variable;
     }
 
+    /**
+     * @param string $markup
+     *
+     * @return mixed
+     */
     public function variable($markup) {
         $parts = null;
         preg_match_all(\Liquid\Liquid::$VariableParser, $markup, $parts);
@@ -366,7 +381,7 @@ class Context implements \ArrayAccess {
                         $object = $res;
                     }
                 } elseif (!$part_resolved && in_array($part, array('size', 'first', 'last'))) {
-                    if (method_exists($object, $part)) { 
+                    if (method_exists($object, $part)) {
                         $res = $object->{$part}();
                     } else {
                         switch($part) {
@@ -401,6 +416,12 @@ class Context implements \ArrayAccess {
         return $object;
     }
 
+    /**
+     * @param mixed $obj
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function lookup_and_evaluate(&$obj, $key) {
 
         if (!isset($obj[$key])) {

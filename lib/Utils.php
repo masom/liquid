@@ -4,6 +4,13 @@ namespace Liquid;
 
 class Utils {
 
+    /**
+     * @param $collection
+     * @param $from
+     * @param $to
+     *
+     * @return array
+     */
     public static function slice_collection($collection, $from, $to) {
         if (($from !=0 || $to != null) && is_array($collection)) {
             return array_slice($collection, $from, $to);
@@ -12,10 +19,22 @@ class Utils {
         }
     }
 
+    /**
+     * @param $collection
+     *
+     * @return bool
+     */
     public static function is_non_blank_string($collection) {
         return (is_string($collection) && $collection != '');
     }
 
+    /**
+     * @param $collection
+     * @param $from
+     * @param $to
+     *
+     * @return array
+     */
     public static function slice_collection_using_each($collection, $from, $to) {
         $segments = array();
         $index = 0;

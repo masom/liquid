@@ -2,6 +2,7 @@
 
 namespace Liquid;
 
+use Liquid\Exceptions\FilterNotFound;
 use \Liquid\Lexer;
 use \Liquid\Liquid;
 use \Liquid\Parser;
@@ -10,11 +11,25 @@ use \Liquid\Template;
 
 
 class Variable {
-
+    /**
+     * @var array
+     */
     protected $warnings;
+    /**
+     * @var string
+     */
     protected $markup;
+    /**
+     * @var string
+     */
     protected $name;
+    /**
+     * @var array
+     */
     protected $options;
+    /**
+     * @var array
+     */
     protected $filters;
 
     protected static $FilterParser;
@@ -33,6 +48,10 @@ class Variable {
         static::$LAX_FilterArgsParser = '/(?:' . Liquid::FilterArgumentSeparator . '|' . Liquid::ArgumentSeparator . ')\s*((?:\w+\s*\:\s*)?' . Liquid::$PART_QuotedFragment .')/';
     }
 
+    /**
+     * @param string $markup
+     * @param array $options
+     */
     public function __construct($markup, array $options = array()) {
         $this->markup = $markup;
         $this->options = $options + array('error_mode' => Template::error_mode());
@@ -57,22 +76,37 @@ class Variable {
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function warnings() {
         return $this->warnings;
     }
 
+    /**
+     * @return mixed
+     */
     public function name() {
         return $this->name;
     }
 
-    public function options(){ 
+    /**
+     * @return array
+     */
+    public function options(){
         return $this->options();
     }
 
+    /**
+     * @return array
+     */
     public function filters() {
         return $this->filters;
     }
 
+    /**
+     * @param string $markup
+     */
     public function lax_parse($markup) {
         $this->filters = array();
 
@@ -80,7 +114,7 @@ class Variable {
         if (!preg_match(static::$LAX_Parse, $markup, $matches)) {
             return;
         }
-        
+
         $this->name = $matches[1];
 
         $secondMatches = null;
@@ -105,6 +139,12 @@ class Variable {
         }
     }
 
+    /**
+     * @param string $markup
+     *
+     * @throws \Exception
+     * @throws Exceptions\SyntaxError
+     */
     public function strict_parse($markup) {
 
         $this->filters = array();
@@ -134,6 +174,11 @@ class Variable {
         }
     }
 
+    /**
+     * @param Parser $p
+     *
+     * @return array
+     */
     public function parse_filterargs($p) {
         // first argument
         $filterargs = array($p->argument());
@@ -144,6 +189,12 @@ class Variable {
         return $filterargs;
     }
 
+    /**
+     * @param Context $context
+     *
+     * @return string
+     * @throws FilterNotFound
+     */
     public function render($context) {
 
         if ($this->name == null) {
@@ -170,8 +221,8 @@ class Variable {
 
             try {
                 $output = $context->invoke($filter[0], $output, $filterargs);
-            } catch(\Liquid\FilterNotFound $e) {
-                $markup = trim($markup);
+            } catch(FilterNotFound $e) {
+                $markup = trim($this->$markup);
                 throw new FilterNotFound("Error - filter '{$filter[0]}' in '{$markup}' could not be found.");
             }
         }
