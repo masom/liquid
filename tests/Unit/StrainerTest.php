@@ -7,10 +7,10 @@ use \Liquid\Strainer;
 use \Liquid\Tests\Lib\AccessScopeFilters;
 
 class StrainerTest extends \Liquid\Tests\TestCase {
+    protected function setUp()
+    {
+        parent::setUp();
 
-    protected function setUp() {
-        Strainer::init();
-        Strainer::global_filter(new StandardFilters());
         Strainer::global_filter(new AccessScopeFilters());
     }
 

@@ -90,7 +90,9 @@ class StandardFilters {
     }
 
     public function split($input, $pattern) {
-        return preg_split($pattern, $input);
+
+        //TODO Figure out why pattern comes in as an array
+        return explode($pattern[0], $input);
     }
 
     public function strip($input) {

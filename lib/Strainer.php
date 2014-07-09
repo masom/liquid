@@ -88,6 +88,7 @@ class Strainer {
     public function invoke($method) {
 
         $args = func_get_args();
+
         array_shift($args);
 
         if ($this->is_invokable($method)) {
@@ -96,7 +97,7 @@ class Strainer {
             $instance = $this->instance_filters[$class];
 
             /**
-            * Optimize calling the method with less than 5 arguments 
+            * Optimize calling the method with less than 5 arguments
              */
             switch(count($args)) {
                 case 0:
@@ -121,7 +122,6 @@ class Strainer {
     }
 
     public function is_invokable($method) {
-
         if (!isset($this->instance_methods[$method])) {
             return false;
         }

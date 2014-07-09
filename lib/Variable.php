@@ -195,7 +195,7 @@ class Variable {
      * @return string
      * @throws FilterNotFound
      */
-    public function render($context) {
+    public function render(&$context) {
 
         if ($this->name == null) {
             return null;
@@ -206,6 +206,7 @@ class Variable {
         foreach($this->filters as $filter) {
             $filterargs = array();
             $keyword_args = array();
+
             foreach($filter[1] as $a) {
                 $matches = null;
                 if (preg_match('/\A' . Liquid::$PART_TagAttributes . '\z/', $a, $matches)) {

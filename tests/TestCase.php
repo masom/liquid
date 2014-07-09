@@ -2,9 +2,16 @@
 
 namespace Liquid\Tests;
 
+use Liquid\StandardFilters;
+use Liquid\Strainer;
 use \Liquid\Template;
 
 class TestCase extends \PHPUnit_Framework_TestCase {
+
+    protected function setUp() {
+        Strainer::init();
+        Strainer::global_filter(new StandardFilters());
+    }
 
     protected function fixture($name) {
         return __DIR__ . '/fixtures/' . $name;

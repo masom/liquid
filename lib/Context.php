@@ -210,15 +210,27 @@ class Context implements \ArrayAccess {
         }
     }
 
+    /**
+     * @return array
+     */
     public function errors() {
         return $this->errors;
     }
 
-    public function invoke($method) {
+    /**
+     * @return mixed
+     */
+    public function invoke() {
         $args = func_get_args();
+
         return $this->strainerMethodInvoker->invokeArgs( $this->strainer(), $args);
     }
 
+    /**
+     * @param array $new_scope
+     *
+     * @throws Exceptions\StackLevelError
+     */
     public function push(array $new_scope = array()) {
         $this->scopes->push($new_scope);
 
@@ -227,10 +239,17 @@ class Context implements \ArrayAccess {
         }
     }
 
+    /**
+     * @param array $new_scopes
+     */
     public function merge(array $new_scopes) {
         $this->scopes->merge($new_scopes);
     }
 
+    /**
+     * @return array
+     * @throws Exceptions\ContextError
+     */
     public function pop() {
         if (count($this->scopes) == 1) {
             throw new \Liquid\Exceptions\ContextError();
@@ -238,6 +257,12 @@ class Context implements \ArrayAccess {
         return $this->scopes->pop();
     }
 
+    /**
+     * @param callable $block
+     * @param array    $new_scope
+     *
+     * @throws \Exception
+     */
     public function stack(\Closure $block, array $new_scope = array()) {
         $this->push($new_scope);
 
@@ -251,8 +276,13 @@ class Context implements \ArrayAccess {
         $this->pop();
     }
 
+    /**
+     *
+     */
     public function clear_instance_assigns() {
-        $this->scopes[0] = array();
+        /** @var \ArrayObject $scope */
+        $scope = $this->scopes[0];
+        $scope->exchangeArray(array());
     }
 
     /**
@@ -359,6 +389,7 @@ class Context implements \ArrayAccess {
             }
             //TODO Should an exception be raised / warning logged? This is potentially unsafe.
         }
+
         if (method_exists($variable, 'context')) {
             $variable->context($this);
         }

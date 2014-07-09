@@ -226,6 +226,7 @@ class Block extends \Liquid\Tag {
 
             try {
                 if ($token instanceof ContinueTag || $token instanceof BreakTag) {
+                    /** @var ContinueTag $token */
                     $context->push_interrupt($token->interrupt());
                     break;
                 }

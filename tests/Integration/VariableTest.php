@@ -25,6 +25,7 @@ class VariableTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_hash_scoping() {
+        /** @var Template $template */
         $template = Template::parse('{{ test.test }}');
         $this->assertEquals('worked', $template->render(array('test' => array('test' => 'worked'))));
     }
@@ -34,6 +35,7 @@ class VariableTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_preset_assigns() {
+        /** @var Template $template */
         $template = Template::parse('{{ test }}');
         $assigns = $template->assigns();
         $assigns['test'] = 'worked';
@@ -41,11 +43,12 @@ class VariableTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_reuse_parsed_template() {
+        /** @var Template $template */
         $template = Template::parse('{{ greeting }} {{ name }}');
         $assigns = $template->assigns();
         $assigns['greeting'] = 'Goodbye';
 
-        $this->assertEquals(array('greeting' => 'Goodbye'), $template->assigns());
+        $this->assertEquals(array('greeting' => 'Goodbye'), $template->assigns()->getArrayCopy());
         $this->assertEquals('Hello Tobi', $template->render(array('greeting' => 'Hello', 'name' => 'Tobi')));
         $this->assertEquals('Hello ', $template->render(array('greeting' => 'Hello', 'unknown' => 'Tobi')));
         $this->assertEquals('Hello Brian', $template->render(array('greeting' => 'Hello', 'name' => 'Brian')));
