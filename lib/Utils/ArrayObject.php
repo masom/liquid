@@ -33,6 +33,10 @@ class ArrayObject implements \ArrayAccess, \Iterator, \Countable {
         $this->position = 0;
     }
 
+    public function shift() {
+        return array_shift($this->array);
+    }
+
     public function merge($additional) {
         foreach($additional as $k => $v) {
             if (is_numeric($k)) {
@@ -42,7 +46,7 @@ class ArrayObject implements \ArrayAccess, \Iterator, \Countable {
             }
         }
 
-        return $this->array;
+        return $this;
     }
 
     public function count() {

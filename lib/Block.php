@@ -44,6 +44,11 @@ class Block extends \Liquid\Tag {
         throw new \BadMethodCallException("Method `" . __CLASS__ . "::{$method}` is undefined.");
     }
 
+    /**
+     * @param \Liquid\Utils\Tokens $tokens
+     *
+     * @throws Exceptions\SyntaxError
+     */
     public function _parse($tokens) {
         $this->blank = true;
 
@@ -72,8 +77,8 @@ class Block extends \Liquid\Tag {
                         /** @var \Liquid\Tag $new_tag */
                         $new_tag = $tag::parse($matches[1], $matches[2], $tokens, $this->options);
 
-                        if ($new_tag->is_blank()) {
-                            $this->blank = true;
+                        if (!$new_tag->is_blank()) {
+                            $this->blank = false;
                         }
 
                         $this->nodelist[] = $new_tag;
@@ -200,7 +205,7 @@ class Block extends \Liquid\Tag {
     }
 
     /**
-     * @param $items
+     * @param Nodes $items
      * @param Context $context
      *
      * @return string

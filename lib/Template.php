@@ -22,6 +22,7 @@ class Template {
 
     protected $warnings;
 
+    /** @var Document */
     protected $root;
 
     /** @var Registers */
@@ -37,7 +38,7 @@ class Template {
     protected $errors = array();
 
     /** @var boolean */
-    protected $rethrow_errors = true;
+    protected $rethrow_errors = false;
 
     public function __construct() {
         $this->registers = new Registers();
@@ -135,6 +136,7 @@ class Template {
         if ($method === 'parse') {
             $source = $args[0];
             $options = isset($args[1]) ? $args[1] : array();
+
             $this->root = Document::parse($this->tokenize($source), $options);
             $this->warnings = null;
 
@@ -246,8 +248,8 @@ class Template {
 
             return is_array($result) ? implode('\n', $result) : $result;
         } catch(\Liquid\Exceptions\MemoryError $e) {
-            $context->handle_error($e);
             $this->errors = $context->errors();
+            return $context->handle_error($e);
         }
     }
 

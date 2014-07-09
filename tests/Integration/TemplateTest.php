@@ -74,11 +74,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
         $limits = $t->resource_limits();
         $limits["render_length_limit"] = 5;
 
-        try {
-            $t->render();
-        } catch(\Liquid\Exceptions\MemoryError $e) {
-            $this->assertEquals("Memory limits exceeded", $e->getMessage());
-        }
+        $this->assertEquals("Liquid error: Memory limits exceeded", $t->render());
 
         $this->assertTrue($limits['reached']);
         $limits["render_length_limit"] = 10;
@@ -110,11 +106,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
         $limits = $t->resource_limits();
         $limits['assign_score_limit'] = 1;
 
-        try {
-            $t->render();
-        } catch(\Liquid\Exceptions\MemoryError $e) {
-            $this->assertEquals("Memory limits exceeded", $e->getMessage());
-        }
+        $this->assertEquals("Liquid error: Memory limits exceeded", $t->render());
 
         $this->assertTrue($limits['reached']);
         $limits['assign_score_limit'] = 2;
@@ -126,12 +118,9 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
         $t = Template::parse("{% for a in (1..100) %} foo1 {% endfor %} bar {% for a in (1..100) %} foo2 {% endfor %}");
         $limits = $t->resource_limits();
         $limits["render_score_limit"] = 50;
-        try {
-            $t->render();
-            $this->fail('A MemoryError should have been thrown.');
-        } catch(\Liquid\Exceptions\MemoryError $e) {
-            $this->assertEquals('Memory limits exceeded', $e->getMessage());
-        }
+
+        $this->assertEquals("Liquid error: Memory limits exceeded", $t->render());
+
         $this->assertEquals("", $t->render());
         $this->assertTrue($limits['reached']);
     }
