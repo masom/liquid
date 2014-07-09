@@ -4,9 +4,12 @@ namespace Liquid;
 
 class Strainer {
 
-    protected static $filters = array();
-    protected static $global_filters = array();
-    protected static $global_methods = array();
+    /** @var array */
+    protected static $filters;
+    /** @var array */
+    protected static $global_filters;
+    /** @var array */
+    protected static $global_methods;
 
     protected $instance_filters = array();
     protected $instance_methods = array();
@@ -40,6 +43,7 @@ class Strainer {
     public static function create($context, array $filters = array())
     {
         $filters = array_merge(static::$filters, $filters);
+
         /** @var Strainer $instance */
         $instance = new static($context);
 

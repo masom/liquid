@@ -11,8 +11,8 @@ class ContextTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function setUp()
     {
-        Template::register_filter(new GlobalFilter());
         parent::setUp();
+        Template::register_filter(new GlobalFilter());
     }
 
 
