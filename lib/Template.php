@@ -46,6 +46,9 @@ class Template {
         $this->resource_limits = new ArrayObject();
     }
 
+    /**
+     * @return \ArrayObject|ArrayObject
+     */
     public function resource_limits() {
         return $this->resource_limits;
     }

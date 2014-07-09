@@ -79,7 +79,7 @@ class ForTag extends \Liquid\Block {
      *
      * @return array|null|string
      */
-    public function render($context) {
+    public function render(&$context) {
         $registers = $context->registers();
 
         $collection = $context[$this->collection_name];

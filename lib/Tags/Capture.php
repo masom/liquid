@@ -30,7 +30,7 @@ class Capture extends \Liquid\Block {
      *
      * @return null
      */
-    public function render($context) {
+    public function render(&$context) {
         $output = parent::render($context);
 
         $context->scopes_last_set($this->to, $output);

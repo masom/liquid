@@ -50,6 +50,13 @@ class Context implements \ArrayAccess {
         'empty' => 'empty?'
     );
 
+    /**
+     * @param array $environments
+     * @param array $outer_scope
+     * @param array $registers
+     * @param bool  $rethrow_errors
+     * @param array $resource_limits
+     */
     public function __construct(array $environments = array(), $outer_scope = array(), $registers = array(), $rethrow_errors = false, $resource_limits = array()) {
         $this->environments = new Environments(Arrays::flatten($environments));
 
@@ -105,7 +112,11 @@ class Context implements \ArrayAccess {
         $last[$to] = $val;
     }
 
-    public function increment_used_resources($key, $obj) {
+    /**
+     * @param string $key
+     * @param $obj
+     */
+    public function increment_used_resources($key, &$obj) {
 
         if (is_array($obj)) {
             $increment = count($obj);

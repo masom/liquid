@@ -188,7 +188,7 @@ class Block extends \Liquid\Tag {
      *
      * @return string
      */
-    public function render($context) {
+    public function render(&$context) {
         return $this->render_all($this->nodelist, $context);
     }
 
@@ -207,7 +207,7 @@ class Block extends \Liquid\Tag {
      * @throws \Exception
      * @throws Exceptions\MemoryError
      */
-    protected function render_all($items, $context) {
+    protected function render_all($items, &$context) {
         $output = array();
 
         $limits = $context->resource_limits();

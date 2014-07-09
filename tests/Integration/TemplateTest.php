@@ -34,7 +34,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     public function test_persistent_assigns_squash_instance_assigns() {
         $t = new Template();
         $this->assertEquals('from instance assigns', $t->parse("{% assign foo = 'from instance assigns' %}{{ foo }}")->render());
-        $assigns =& $t->assigns();
+        $assigns = $t->assigns();
         $assigns['foo'] = 'from persistent assigns';
         $this->assertEquals('from persistent assigns', $t->parse("{{ foo }}")->render());
     }

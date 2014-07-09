@@ -5,6 +5,7 @@ namespace Liquid\Tags;
 use \Liquid\Liquid;
 use \Liquid\Variable;
 
+
 class Assign extends \Liquid\Tag {
     protected static $init = false;
     protected static $Syntax;
@@ -12,7 +13,7 @@ class Assign extends \Liquid\Tag {
     public static function init() {
         static::$init = true;
 
-        static::$Syntax = '/(' . Liquid::VariableSignature .')\s*=\s*(.*)\s*/Ss';
+        static::$Syntax = '/(' . Liquid::VariableSignature .')\s*=\s*(.*)\s*/s';
     }
 
     /**
@@ -22,7 +23,7 @@ class Assign extends \Liquid\Tag {
      *
      * @throws \Liquid\Exceptions\SyntaxError
      */
-    public function __construct($tag_name, $markup, $options) {
+    public function __construct($tag_name, &$markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
         $matches = null;
@@ -39,7 +40,7 @@ class Assign extends \Liquid\Tag {
      *
      * @return null
      */
-    public function render($context) {
+    public function render(&$context) {
         $val = $this->from->render($context);
 
         $context->scopes_last_set($this->to, $val);

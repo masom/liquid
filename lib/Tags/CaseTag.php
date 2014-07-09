@@ -80,7 +80,7 @@ class CaseTag extends \Liquid\Block {
      * @param \Liquid\Context $context
      * @return string
      */
-    public function render($context) {
+    public function render(&$context) {
 
         $output = '';
         $blocks =& $this->blocks;

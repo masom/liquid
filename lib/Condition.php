@@ -103,6 +103,12 @@ class Condition {
         return '#<Condition ' . implode(' ', array_filter(array($this->left, $this->operator, $this->right))) .'>';
     }
 
+    /**
+     * @param $left
+     * @param $right
+     *
+     * @return bool
+     */
     public function equal_variables($left, $right) {
         return $left == $right;
     }

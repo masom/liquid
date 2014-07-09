@@ -18,7 +18,7 @@ class Liquid {
     const VariableAttributeSeparator  = '.';
     const TagStart                    = '\{\%';
     const TagEnd                      = '\%\}';
-    const VariableSignature           = '\(?[\w\-\.\[\]]\)?';
+    const VariableSignature           = '\(?[\w\-\.\[\]]+\)?';
     const VariableSegment             = '[\w\-]';
     const VariableStart               = '\{\{';
     const VariableEnd                 = '\}\}';

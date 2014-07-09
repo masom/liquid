@@ -87,7 +87,7 @@ class Tag {
      *
      * @return null
      */
-    public function render($context) {
+    public function render(&$context) {
         return null;
     }
 

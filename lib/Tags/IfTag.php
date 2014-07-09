@@ -68,7 +68,7 @@ class IfTag extends \Liquid\Block {
      *
      * @return string
      */
-    public function render($context) {
+    public function render(&$context) {
         $blocks =& $this->blocks;
         $result = '';
         $self = $this;
