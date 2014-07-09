@@ -123,8 +123,6 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
         $limits["render_score_limit"] = 50;
 
         $this->assertEquals("Liquid error: Memory limits exceeded", $t->render());
-
-        $this->assertEquals("", $t->render());
         $this->assertTrue($limits['reached']);
     }
 
