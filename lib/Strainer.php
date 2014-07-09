@@ -37,13 +37,10 @@ class Strainer {
         static::add_filter(static::$global_filters, static::$global_methods, $filter);
     }
 
-    public static function strainer_class_cache() {
-        return static::$strainer_class_cache;
-    }
-
     public static function create($context, array $filters = array())
     {
         $filters = array_merge(static::$filters, $filters);
+        /** @var Strainer $instance */
         $instance = new static($context);
 
         foreach($filters as $filter) {
