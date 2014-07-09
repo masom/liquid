@@ -112,15 +112,10 @@ class VariableTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_symbol() {
-        /**
-         * TODO implement the lax parser.
-         */
-        $this->markTestSKipped( 'Requires the lax parser.' );
-
         $var = new Variable("http://disney.com/logo.gif | image: 'med' ");
 
         $this->assertEquals('http://disney.com/logo.gif', $var->name());
-        $this->assertEquals(array(array('image', array('med'))), $var->filters());
+        $this->assertEquals(array(array('image', array("'med'"))), $var->filters());
     }
 
     public function test_string_to_filter() {
@@ -193,7 +188,7 @@ class VariableTest extends \Liquid\Tests\TestCase {
     public function test_strict_filter_argument_parsing() {
         $old = Template::error_mode();
         Template::error_mode(Liquid::ERROR_MODE_STRICT);
-        
+
         try{
             new Variable(' number_of_comments | pluralize: \'comment\': \'comments\' ');
             $this->fail("A SyntaxError should have been raised.");

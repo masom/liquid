@@ -303,6 +303,10 @@ class Context implements \ArrayAccess {
      * ArrayAccess
      */
     public function offsetSet($offset, $value) {
+        if (is_array($value)) {
+            $value = new \ArrayObject($value);
+        }
+
         $this->scopes[0][$offset] = $value;
     }
 

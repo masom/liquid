@@ -13,9 +13,12 @@ use \Liquid\Tests\Lib\CounterDrop;
 use \Liquid\Tests\Lib\ContextSensitiveDrop;
 use \Liquid\Tests\Lib\HundredCentes;
 use \Liquid\Tests\Lib\ProcAsVariable;
+use Liquid\Utils\ArrayObject;
+
 
 class ContextTest extends \Liquid\Tests\TestCase {
 
+    /** @var Context */
     protected $context;
 
     protected function setUp() {
@@ -197,7 +200,7 @@ class ContextTest extends \Liquid\Tests\TestCase {
         $this->assertEquals(1, $this->context['test.first']);
         $this->assertEquals(1, $this->context['test.last']);
     }
-    
+
     public function test_access_hashes_with_hash_notation() {
         $this->context['products'] = array('count' => 5, 'tags' => array('deepsnow', 'freestyle'));
         $this->context['product'] = array('variants' => array(array('title' => 'draft151cm'), array('title' => 'element151cm')));
@@ -349,7 +352,6 @@ class ContextTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_nested_lambda_is_called_once() {
-        $this->markTestSkipped('Array references are causing issues.');
         $global = 0;
         $this->context['callcount'] = array("lambda" => function() use (&$global) { $global += 1; return (string) $global; });
 
@@ -359,7 +361,6 @@ class ContextTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_lambda_in_array_is_called_once() {
-        $this->markTestSkipped('Array references are causing issues.');
         $global = 0;
         $this->context['callcount'] = array(
             1,2, function() use (&$global) { $global += 1; return (string) $global; } ,4,5
@@ -394,7 +395,7 @@ class ContextTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_strict_nested_variables_not_found() {
-        
+
         $this->context['hash'] = array('this' => 'exists');
         $this->context['hash.does_not_exist'];
 

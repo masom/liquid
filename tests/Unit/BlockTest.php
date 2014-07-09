@@ -6,12 +6,15 @@ use \Liquid\Block;
 use \Liquid\Template;
 
 class BlockTest extends \Liquid\Tests\TestCase {
+
     public function test_blankspace() {
+        /** @var Template $template */
         $template = Template::parse("  ");
         $this->assertEquals(array("  "), $template->root()->nodelist()->nodes());
     }
 
     public function test_variable_beginning() {
+        /** @var Template $template */
         $template = Template::parse("{{funk}}  ");
 
         $nodelist = $template->root()->nodelist();
@@ -49,8 +52,7 @@ class BlockTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_with_block() {
-        $this->markTestSkipped('Not passing until tags are added.');
-
+        /** @var Template $template */
         $template = Template::parse("  {% comment %} {% endcomment %} ");
         $nodelist = $template->root()->nodelist();
         $this->assertEquals(array('string', 'Comment', 'string'), $this->block_types($nodelist) );
@@ -58,7 +60,7 @@ class BlockTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_with_custom_tag() {
-        return;
+        $this->markTestSkipped('Problem with Block->parse (shift on non-object)');
         Template::register_tag("testtag", '\Liquid\Block');
         try {
             $template = Template::parse( "{% testtag %} {% endtesttag %}");

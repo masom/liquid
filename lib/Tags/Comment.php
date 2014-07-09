@@ -3,7 +3,8 @@
 namespace Liquid\Tags;
 
 class Comment extends \Liquid\Tag {
-    public function render($context) {
+
+    public function render(&$context) {
         return '';
     }
 

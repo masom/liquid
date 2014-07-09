@@ -70,6 +70,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_resource_limits_render_length() {
+        /** @var Template $t */
         $t = Template::parse("0123456789");
         $limits = $t->resource_limits();
         $limits["render_length_limit"] = 5;
@@ -84,7 +85,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function test_resource_limits_render_score() {
         $this->markTestSkipped('test_resource_limits_render_score');
-
+        /** @var Template $t */
         $t = Template::parse("{% for a in (1..10) %} {% for a in (1..10) %} foo {% endfor %} {% endfor %}");
         $limits =& $t->resource_limits();
         $limits["render_score_limit"] = 50;
@@ -102,6 +103,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_resource_limits_assign_score() {
+        /** @var Template $t */
         $t = Template::parse("{% assign foo = 42 %}{% assign bar = 23 %}");
         $limits = $t->resource_limits();
         $limits['assign_score_limit'] = 1;
@@ -115,6 +117,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_resource_limits_aborts_rendering_after_first_error() {
+        /** @var Template $t */
         $t = Template::parse("{% for a in (1..100) %} foo1 {% endfor %} bar {% for a in (1..100) %} foo2 {% endfor %}");
         $limits = $t->resource_limits();
         $limits["render_score_limit"] = 50;
@@ -126,6 +129,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_resource_limits_hash_in_template_gets_updated_even_if_no_limits_are_set() {
+        /** @var Template $t */
         $t = Template::parse("{% for a in (1..100) %} {% assign foo = 1 %} {% endfor %}");
         $t->render();
         $limits = $t->resource_limits();
