@@ -228,6 +228,9 @@ class Variable {
             }
         }
 
+        if ($output === true || $output === false ){
+            return $output ? 'true' : 'false';
+        }
         return $output;
     }
 }

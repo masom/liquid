@@ -2,6 +2,7 @@
 
 namespace Liquid\Tags;
 
+use Liquid\Lexer;
 use \Liquid\Parser;
 use \Liquid\Liquid;
 use \Liquid\Utils;
@@ -84,7 +85,7 @@ class ForTag extends \Liquid\Block {
 
         $collection = $context[$this->collection_name];
 
-        if (!is_array($collection)) { //todo figure if we can iterate.
+        if (!is_array($collection) && !($collection instanceof \Iterator)) {
             return $this->render_else($context);
         }
 
@@ -123,6 +124,8 @@ class ForTag extends \Liquid\Block {
 
 
         $context->stack(function($context) use ($self, &$result, &$for_block, &$segment, &$variable_name, &$name, $length) {
+            /** @var \Liquid\Context $context */
+
             foreach($segment as $key => $item) {
                 $context[$variable_name] = $item;
                 $context['forloop'] = array(
@@ -186,7 +189,7 @@ class ForTag extends \Liquid\Block {
     public function strict_parse(&$markup) {
         $p = new Parser($markup);
 
-        $this->variable_name = $p->consume('id');
+        $this->variable_name = $p->consume(Lexer::TOKEN_ID);
         if (!$p->try_id('in')) {
             throw new \Liquid\Exceptions\SyntaxError("For loops require an 'in' clause");
         }
@@ -198,7 +201,7 @@ class ForTag extends \Liquid\Block {
 
         $this->attributes = array();
 
-        while($p->look('id') && $p->look('colon', 1)) {
+        while($p->look(Lexer::TOKEN_ID) && $p->look(Lexer::TOKEN_COLON, 1)) {
             $attribute = $p->try_id('limit');
 
             if (!$attribute || $p->try_id('offset')) {
@@ -212,7 +215,7 @@ class ForTag extends \Liquid\Block {
             $this->attributes[$attribute] = $val;
         }
 
-        $p->consume('end_of_string');
+        $p->consume(Lexer::TOKEN_ENDOFSTRING);
     }
 
     /**

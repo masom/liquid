@@ -8,18 +8,21 @@ use \Liquid\Template;
 class VariableTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function test_simple_variable() {
+        /** @var Template $template */
         $template = Template::parse('{{test}}');
         $this->assertEquals('worked', $template->render(array('test'=>'worked')));
         $this->assertEquals('worked wonderfully', $template->render(array('test'=>'worked wonderfully')));
     }
 
     public function test_simple_with_whitespaces() {
+        /** @var Template $template */
         $template = Template::parse('  {{test}}  ');
         $this->assertEquals('  worked  ', $template->render(array('test'=>'worked')));
         $this->assertEquals('  worked wonderfully  ', $template->render(array('test'=>'worked wonderfully')));
     }
 
     public function test_ignore_unknown() {
+        /** @var Template $template */
         $template = Template::parse('{{ test }}');
         $this->assertEquals('', $template->render());
     }
@@ -56,6 +59,7 @@ class VariableTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_assigns_not_polluted_from_template() {
+        /** @var Template $template */
         $template = Template::parse("{{ test }}{% assign test = 'bar' %}{{ test }}");
         $assigns = $template->assigns();
         $assigns['test'] = 'baz';

@@ -392,7 +392,7 @@ class Context implements \ArrayAccess {
             $this->handle_not_found($key);
         }
 
-        $variable = $variable ?: $this->lookup_and_evaluate($scope, $key);
+        $variable = is_null($variable) ? $this->lookup_and_evaluate($scope, $key) : $variable;
 
         if (is_object($variable)) {
             if (method_exists($variable, 'to_liquid')){
