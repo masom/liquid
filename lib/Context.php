@@ -169,6 +169,11 @@ class Context implements \ArrayAccess {
         return $this->strainer;
     }
 
+    /**
+     * @param $filters
+     *
+     * @throws \InvalidArgumentException
+     */
     public function add_filters($filters) {
         $filters = array_filter(Arrays::flatten(array($filters)));
 
