@@ -19,6 +19,32 @@ class StandardFilters {
 
     const HTML_ESCAPE_ONCE_REGEXP = '/["><\']|&(?!([a-zA-Z]+|(#\d+));)/';
 
+    function __call( $name, $args )
+    {
+        if (isset(static::$METHOD_MAP[$name])) {
+            $method = static::$METHOD_MAP[$name];
+            switch(count($args)) {
+                case 0:
+                    return $this->{$method}();
+                case 1:
+                    return $this->{$method}($args[0]);
+                case 2:
+                    return $this->{$method}($args[0], $args[1]);
+                case 3:
+                    return $this->{$method}($args[0], $args[1], $args[2]);
+                case 4:
+                    return $this->{$method}($args[0], $args[1], $args[2], $args[3]);
+                case 5:
+                    return $this->{$method}($args[0], $args[1], $args[2], $args[3], $args[4]);
+                default:
+                    return call_user_func_array( array( $this, $method ), $args );
+                    break;
+            }
+        }
+        throw new \BadMethodCallException('Method `{$name}` is not defined.');
+    }
+
+
     public function size($input) {
         if (is_array($input) || $input instanceof \Countable) {
             return count($input);

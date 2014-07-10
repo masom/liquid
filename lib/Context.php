@@ -84,6 +84,13 @@ class Context implements \ArrayAccess {
     }
 
     /**
+     * @return bool
+     */
+    public function rethrow_errors() {
+        return $this->rethrow_errors;
+    }
+
+    /**
      * @return Environments
      */
     public function environments() {

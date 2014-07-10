@@ -153,8 +153,6 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
 
     public function test_render_bang_force_rethrow_errors_on_passed_context() {
 
-        $this->markTestSkipped();
-
         $context = new Context(array('drop' => new ErroneousDrop()));
         $t = new Template();
         $t->parse('{{ drop.bad_method }}');

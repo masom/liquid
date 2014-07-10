@@ -29,10 +29,10 @@ class StrainerTest extends \Liquid\Tests\TestCase {
         $this->assertFalse($strainer->is_invokable('instance_eval'));
         $this->assertFalse($strainer->is_invokable('__construct'));
         $this->assertFalse($strainer->is_invokable('__send__'));
-        $this->assertFalse($strainer->is_invokable('__call'));
         $this->assertFalse($strainer->is_invokable('__set'));
         $this->assertFalse($strainer->is_invokable('__get'));
 
+        $this->assertTrue($strainer->is_invokable('__call'));
         $this->assertTrue($strainer->is_invokable('size'));
     }
 
