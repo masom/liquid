@@ -11,7 +11,14 @@ class Strainer {
     /** @var array */
     protected static $global_methods;
 
+    /**
+     * @var array
+     */
     protected $instance_filters = array();
+
+    /**
+     * @var array
+     */
     protected $instance_methods = array();
 
     /** @var \Liquid\Context $context */
@@ -26,21 +33,36 @@ class Strainer {
         static::$global_methods = array();
     }
 
-    public function __construct( $context ) {
+    /**
+     * @param Context $context
+     */
+    public function __construct(&$context) {
         $this->context = $context;
     }
 
+    /**
+     * @param object $filter
+     */
     public static function global_filter($filter) {
         static::add_known_filter($filter);
 
         static::$filters[] = $filter;
     }
 
+    /**
+     * @param object $filter
+     */
     public static function add_known_filter($filter) {
         static::add_filter(static::$global_filters, static::$global_methods, $filter);
     }
 
-    public static function create($context, array $filters = array())
+    /**
+     * @param Context $context
+     * @param array $filters
+     *
+     * @return Strainer
+     */
+    public static function create(&$context = null, array $filters = array())
     {
         $filters = array_merge(static::$filters, $filters);
 
@@ -50,6 +72,7 @@ class Strainer {
         foreach($filters as $filter) {
             $instance->add_filter($instance->instance_filters, $instance->instance_methods, $filter);
         }
+
         return $instance;
     }
 
@@ -86,6 +109,10 @@ class Strainer {
         $known_filters[$class] = $filter;
     }
 
+    /**
+     * @param string $method
+     * @return mixed
+     */
     public function invoke($method) {
 
         $args = func_get_args();
@@ -122,6 +149,11 @@ class Strainer {
         }
     }
 
+    /**
+     * @param string $method
+     *
+     * @return bool
+     */
     public function is_invokable($method) {
         if (!isset($this->instance_methods[$method])) {
             return false;

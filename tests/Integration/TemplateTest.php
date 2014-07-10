@@ -4,6 +4,10 @@ namespace Liquid\Tests\Integration;
 
 use \Liquid\Context;
 use \Liquid\Template;
+use Liquid\Tests\Lib\ErroneousDrop;
+use Liquid\Tests\Lib\SomethingWithLength;
+use Liquid\Tests\Lib\TemplateContextDrop;
+
 
 class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
 
@@ -60,8 +64,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_resource_limits_works_with_custom_length_method() {
-        $this->markTestSkipped();
-
+        /** @var Template $t */
         $t = Template::parse("{% assign foo = bar %}");
         $limits = $t->resource_limits();
         $limits["render_length_limit"] = 42;
@@ -84,7 +87,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_resource_limits_render_score() {
-        $this->markTestSkipped('test_resource_limits_render_score');
+        $this->markTestSkipped('Problem with shift on a non-object ( Block )');
         /** @var Template $t */
         $t = Template::parse("{% for a in (1..10) %} {% for a in (1..10) %} foo {% endfor %} {% endfor %}");
         $limits =& $t->resource_limits();
@@ -137,14 +140,12 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_can_use_drop_as_context() {
-
         $this->markTestSkipped();
-
         $t = new Template();
         $registers = $t->registers();
         $registers['lulz'] = 'haha';
 
-        $drop = new OnTextDrop();
+        $drop = new TemplateContextDrop();
         $this->assertEquals('fizzbuzz', $t->parse('{{foo}}')->render($drop));
         $this->assertEquals('bar', $t->parse('{{bar}}')->render($drop));
         $this->assertEquals('haha', $t->parse("{{baz}}")->render($drop));

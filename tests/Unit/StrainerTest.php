@@ -15,14 +15,14 @@ class StrainerTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_strainer() {
-        $strainer = Strainer::create(null);
+        $strainer = Strainer::create();
 
         $this->assertEquals(5, $strainer->invoke('size', 'input'));
         $this->assertEquals('public', $strainer->invoke('public_filter'));
     }
 
     public function test_strainer_only_invokes_public_filter_methods() {
-        $strainer = Strainer::create(null);
+        $strainer = Strainer::create();
 
         $this->assertFalse($strainer->is_invokable('__test__'));
         $this->assertFalse($strainer->is_invokable('test'));
@@ -37,20 +37,20 @@ class StrainerTest extends \Liquid\Tests\TestCase {
     }
 
     public function test_strainer_returns_null_if_no_filter_method_found() {
-        $strainer = Strainer::create(null);
+        $strainer = Strainer::create();
 
         $this->assertNull($strainer->invoke('private_filter'));
         $this->assertNull($strainer->invoke('undef_the_filter'));
     }
 
     public function test_strainer_returns_first_arguments_if_no_method_and_arguments_given() {
-        $strainer = Strainer::create(null);
+        $strainer = Strainer::create();
 
         $this->assertEquals('password', $strainer->invoke('undef_the_method', 'password'));
     }
 
     public function test_strainer_only_allows_method_defined_in_filters() {
-        $strainer = Strainer::create(null);
+        $strainer = Strainer::create();
         $this->assertEquals('1 + 1', $strainer->invoke('instance_eval', '1 + 1'));
         $this->assertEquals('1 + 1', $strainer->invoke('eval', '1 + 1'));
         $this->assertEquals('puts', $strainer->invoke('__send__', 'puts', 'Hi Mom'));
