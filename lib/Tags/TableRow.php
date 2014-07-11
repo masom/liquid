@@ -5,6 +5,7 @@ namespace Liquid\Tags;
 use Liquid\Liquid;
 use Liquid\Utils;
 
+
 class TableRow extends \Liquid\Block {
 
     protected static $Syntax;
@@ -30,8 +31,8 @@ class TableRow extends \Liquid\Block {
             $this->attributes = array();
 
             preg_match_all(Liquid::$TagAttributes, $markup, $matches);
-            foreach($matches as $key => $value) {
-                $this->attributes[$key] = $value;
+            foreach($matches as $match) {
+                $this->attributes[$match[1]] = $match[2];
             }
         } else {
             throw new \Liquid\Exceptions\SyntaxError("Error in tag 'include' - Valid syntax: include '[template]' (with|for) [object|collection]");
@@ -43,7 +44,8 @@ class TableRow extends \Liquid\Block {
      *
      * @return string
      */
-    public function render($context) {
+    public function render(&$context) {
+        debug($this->collection_name);
         if (!isset($context[$this->collection_name])) {
             return '';
         }
@@ -67,7 +69,7 @@ class TableRow extends \Liquid\Block {
 
         $nodelist =& $this->nodelist;
         $self = $this;
-        $context->stack(function($context) use ($self, &$nodelist, &$collection, &$variable_name, &$result, &$length, &$row, &$col, &$cols) {
+        $context->stack(function(&$context) use ($self, &$nodelist, &$collection, &$variable_name, &$result, &$length, &$row, &$col, &$cols) {
             foreach($collection as $index => $item) {
                 $context[$variable_name] = $item;
                 $context['tablerowloop'] = array(
@@ -86,6 +88,7 @@ class TableRow extends \Liquid\Block {
 
                 $col++;
 
+                debug($nodelist);die;
                 $result .= "<td class=\"col{$col}\">" . $self->render_all($nodelist, $context) . '</td>';
 
                 if (($col == $cols) && ($index != $length - 1)) {
