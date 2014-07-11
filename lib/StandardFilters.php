@@ -148,6 +148,13 @@ class StandardFilters {
     }
 
     public function join($input, $glue = ' ') {
+        if ($input instanceof \ArrayObject ){
+            $input = $input->getArrayCopy();
+        }
+
+        if (empty($glue)) {
+            $glue = ' ';
+        }
         return implode($glue, Arrays::flatten(array($input)));
     }
 

@@ -59,4 +59,11 @@ class FilterTest extends \Liquid\Tests\IntegrationTestCase {
         $variable = new Variable("var | size");
         $this->assertEquals( 4, $variable->render($this->context));
     }
+
+    public function test_join() {
+        $this->context['var'] = array(1,2,3,4);
+
+        $variable = new Variable("var | join");
+        $this->assertEquals("1 2 3 4", $variable->render($this->context));
+    }
 }

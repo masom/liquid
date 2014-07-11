@@ -124,24 +124,33 @@ class Strainer {
             $class = $this->instance_methods[$method];
             $instance = $this->instance_filters[$class];
 
+            if (count($args)) {
+                $arg_count = 1;
+                if (isset($args[1])) {
+                    $arg_count += count($args[1]);
+                }
+            } else {
+                $arg_count = 0;
+            }
+
             /**
             * Optimize calling the method with less than 5 arguments
              */
-            switch(count($args)) {
+            switch($arg_count) {
                 case 0:
                     return $instance->{$method}();
                 case 1:
                     return $instance->{$method}($args[0]);
                 case 2:
-                    return $instance->{$method}($args[0], $args[1]);
+                    return $instance->{$method}($args[0], $args[1][0]);
                 case 3:
-                    return $instance->{$method}($args[0], $args[1], $args[2]);
+                    return $instance->{$method}($args[0], $args[1][0], $args[1][1]);
                 case 4:
-                    return $instance->{$method}($args[0], $args[1], $args[2], $args[3]);
+                    return $instance->{$method}($args[0], $args[1][0], $args[1][1], $args[1][2]);
                 case 5:
-                    return $instance->{$method}($args[0], $args[1], $args[2], $args[3], $args[4]);
+                    return $instance->{$method}($args[0], $args[1][0], $args[1][1], $args[1][2], $args[1][3]);
                 default:
-                    return call_user_func_array( array( $instance, $method ), $args );
+                    return call_user_func_array( array( $instance, $method ), $args[1] );
                 break;
             }
         } else {
