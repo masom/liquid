@@ -9,6 +9,7 @@ use Liquid\StandardFilters;
 use Liquid\Strainer;
 use Liquid\Tests\Lib\CanadianMoneyFilter;
 use Liquid\Tests\Lib\MoneyFilter;
+use Liquid\Tests\Lib\SubstituteFilter;
 use Liquid\Variable;
 
 
@@ -67,7 +68,7 @@ class FilterTest extends \Liquid\Tests\IntegrationTestCase {
         $this->assertEquals("1 2 3 4", $variable->render($this->context));
     }
 
-    public function test_sort(){
+    public function test_sort() {
         $this->context['value'] = 3;
         $this->context['numbers'] = array(2,1,4,3);
         $this->context['words'] = array('expected', 'as', 'alphabetic');
@@ -91,5 +92,34 @@ class FilterTest extends \Liquid\Tests\IntegrationTestCase {
 
         $variable = new Variable("var | strip_html");
         $this->assertEquals( "bla blub", $variable->render($this->context));
+    }
+    public function test_strip_html_ignore_comments_with_html(){
+        $this->context['var'] = "<!-- split and some <ul> tag --><b>bla blub</a>";
+
+        $variable = new Variable("var | strip_html");
+        $this->assertEquals( "bla blub", $variable->render($this->context));
+    }
+
+    public function test_capitalize() {
+        $this->context['var'] = "blub";
+
+        $variable = new Variable("var | capitalize");
+        $this->assertEquals( "Blub", $variable->render($this->context));
+    }
+
+    public function test_nonexistent_filter_is_ignored() {
+        $this->context['var'] = 1000;
+
+        $variable = new Variable("var | xyzzy");
+        $this->assertEquals( 1000, $variable->render($this->context));
+    }
+
+    public function test_filter_with_keyword_arguments() {
+        $this->context['surname'] = 'john';
+        $this->context->add_filters(new SubstituteFilter());
+
+        $variable = new Variable(" 'hello %{first_name}, %{last_name}' | substitute: first_name: surname, last_name: 'doe' ");
+        $output = $variable->render($this->context);
+        $this->assertEquals( 'hello john, doe', $output);
     }
 }

@@ -11,6 +11,12 @@ use \Liquid\Template;
 
 
 class Variable {
+
+    /**
+     * Extracted from Liquid::Variable as the string concat didn't work :(
+     */
+    const FILTER_ARGS_PARSER = '/(?::|,)\s*((?:\w+\s*\:\s*)?(?:(?:"[^"]*"|\'[^\']*\')|(?:[^\s,\|\'"]|(?:"[^"]*"|\'[^\']*\'))+))/';
+
     /**
      * @var array
      */
@@ -36,7 +42,6 @@ class Variable {
 
     protected static $LAX_Parse;
     protected static $LAX_FilterParser;
-    protected static $LAX_FilterArgsParser;
 
     const EasyParse = '/\A *(\w+(?:\.\w+)*) *\z/';
 
@@ -45,7 +50,6 @@ class Variable {
 
         static::$LAX_Parse = '/\s*(' . Liquid::$PART_QuotedFragment . ')(.*)/s';
         static::$LAX_FilterParser = '/'. Liquid::FilterSeparator .'\s*(.*)/s';
-        static::$LAX_FilterArgsParser = '/(?:' . Liquid::FilterArgumentSeparator . '|' . Liquid::ArgumentSeparator . ')\s*((?:\w+\s*\:\s*)?' . Liquid::$PART_QuotedFragment .')/';
     }
 
     /**
@@ -131,8 +135,7 @@ class Variable {
             if (preg_match('/\s*(\w+)/', $f, $filterMatch)) {
                 $filtername = $filterMatch[1];
 
-                preg_match_all(static::$LAX_FilterArgsParser, $f, $filterargs);
-
+                preg_match_all(static::FILTER_ARGS_PARSER, $f, $filterargs);
                 $filterargs = Arrays::flatten($filterargs[1]);
                 $this->filters[] = array($filtername, $filterargs);
             }
