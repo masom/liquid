@@ -41,7 +41,7 @@ class StandardFilters {
                     break;
             }
         }
-        throw new \BadMethodCallException('Method `{$name}` is not defined.');
+        throw new \BadMethodCallException("Method `{$name}` is not defined.");
     }
 
 
@@ -158,7 +158,17 @@ class StandardFilters {
         return implode($glue, Arrays::flatten(array($input)));
     }
 
+    /**
+     * @param array $input
+     * @param string $property
+     *
+     * @return array
+     */
     public function sort($input, $property = null) {
+        if ($input instanceof \ArrayObject){
+            $input = $input->getArrayCopy();
+        }
+
         $array = $this->flatten_if_necessary($input);
 
         if ($property == null) {
@@ -351,7 +361,7 @@ class StandardFilters {
         return empty($input) ? $default_value : $input;
     }
 
-    private function flattenif_necessary($input) {
+    private function flatten_if_necessary($input) {
         if (is_array($input)) {
             $ary = Arrays::flatten($input);
         } else {
