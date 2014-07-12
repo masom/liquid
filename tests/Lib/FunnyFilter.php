@@ -18,7 +18,7 @@ class FunnyFilter {
     }
 
     public function add_tag($input, $tag = "p", $id = "foo") {
-        return "<{$tag} id='{$id}'>{$input}</{$tag}>|";
+        return "<{$tag} id=\"{$id}\">{$input}</{$tag}>";
     }
 
     public function paragraph($input) {
@@ -26,6 +26,6 @@ class FunnyFilter {
     }
 
     public function link_to($name, $url) {
-        return "<a href='{$url}'>{$name}</a>|";
+        return "<a href=\"{$url}\">{$name}</a>";
     }
 }
