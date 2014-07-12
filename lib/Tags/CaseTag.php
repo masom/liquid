@@ -91,7 +91,8 @@ class CaseTag extends \Liquid\Block {
             foreach($blocks as $block) { /** @var \Liquid\Condition $block */
                 if ($block->isElse()) {
                     if ($execute_else_block) {
-                        return $self->render_all($block->attachment(), $context);
+                        $output = $self->render_all($block->attachment(), $context);
+                        break;
                     }
                 } elseif ($block->evaluate($context)) {
                     $execute_else_block = false;
