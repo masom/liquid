@@ -21,10 +21,10 @@ class Condition {
             '==' => function($cond, $left, $right) { return $cond->equal_variables($left, $right); },
             '!=' => function($cond, $left, $right) { return !$cond->equal_variables($left, $right); },
             '<>' => function($cond, $left, $right) { return !$cond->equal_variables($left, $right); },
-            '<' => '<',
-            '>' => '>',
-            '>=' => '>=',
-            '<=' => '<=',
+            '<' => 'smaller_than', // TODO document this behaviour
+            '>' => 'greater_than',
+            '>=' => 'greater_or_equal_to',
+            '<=' => 'smaller_or_equal_to',
             'contains' => function($cond, $left, $right) {
                 if (!$left || !$right) {
                     return false;
@@ -176,6 +176,21 @@ class Condition {
 
         if (is_callable($operation)) {
             return $operation($this, $left, $right);
+        } elseif(!is_object($left) && !is_object($right)) {
+            if ($left === null || $right === null){
+                return false;
+            }
+
+            switch($op) {
+                case '<':
+                    return $left < $right;
+                case '>':
+                    return $left > $right;
+                case '>=':
+                    return $left >= $right;
+                case '<=':
+                    return $left <= $right;
+            }
         } elseif (method_exists($left, $operation) && method_exists($right, $operation)) {
             return $left->{$operation}($right);
         } else {
