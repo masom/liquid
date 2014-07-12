@@ -31,8 +31,8 @@ class TableRow extends \Liquid\Block {
             $this->attributes = array();
 
             preg_match_all(Liquid::$TagAttributes, $markup, $matches);
-            foreach($matches as $match) {
-                $this->attributes[$match[1]] = $match[2];
+            foreach($matches[1] as $key => $match) {
+                $this->attributes[$match] = $matches[2][$key];
             }
         } else {
             throw new \Liquid\Exceptions\SyntaxError("Error in tag 'include' - Valid syntax: include '[template]' (with|for) [object|collection]");
@@ -45,17 +45,15 @@ class TableRow extends \Liquid\Block {
      * @return string
      */
     public function render(&$context) {
-        debug($this->collection_name);
         if (!isset($context[$this->collection_name])) {
             return '';
         }
 
         $collection = $context[$this->collection_name];
         $from = isset($this->attributes['offset']) && $this->attributes['offset'] ? (int) $context[$this->attributes['offset']] : 0;
-        $to = isset($this->attributes['limit']) && $this->attributes['limit'] ? $from - (int) $context[$this->attributes['limit']] : null;
+        $to = isset($this->attributes['limit']) && $this->attributes['limit'] ? $from + (int) $context[$this->attributes['limit']] : null;
 
         $collection = Utils::slice_collection($collection, $from, $to);
-
         $length = count($collection);
 
         $cols = (int) $context[$this->attributes['cols']];
@@ -81,14 +79,13 @@ class TableRow extends \Liquid\Block {
                     'rindex' => $length - $index,
                     'rindex0' => $length - $index - 1,
                     'first' => ($index == 0),
-                    'last' => ($index == 1),
+                    'last' => ($index == $length - 1),
                     'col_first' => ($col==0),
                     'col_last' => ($col == $cols - 1)
                 );
 
                 $col++;
 
-                debug($nodelist);die;
                 $result .= "<td class=\"col{$col}\">" . $self->render_all($nodelist, $context) . '</td>';
 
                 if (($col == $cols) && ($index != $length - 1)) {
@@ -98,6 +95,7 @@ class TableRow extends \Liquid\Block {
                 }
             }
         });
+
         $result .= "</tr>\n";
         return $result;
     }

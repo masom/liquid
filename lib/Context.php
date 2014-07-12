@@ -301,7 +301,8 @@ class Context implements \ArrayAccess {
      * ArrayAccess
      */
     public function offsetExists($offset) {
-        return $this->resolve($offset) ? true : false;
+        $offset = $this->resolve($offset);
+        return (is_array($offset) || !is_null($offset));
     }
 
     /**
