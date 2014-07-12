@@ -370,7 +370,7 @@ class Context implements \ArrayAccess {
         $variable = null;
 
         foreach($this->scopes as $s) {
-            if (empty($key) || !isset($s[$key])){
+            if (!isset($s[$key])){
                 continue;
             }
 
@@ -397,7 +397,7 @@ class Context implements \ArrayAccess {
             }
         }
 
-        if (empty($key) || !isset($scope[$key])) {
+        if (!isset($scope[$key])) {
             $this->handle_not_found($key);
         }
 
@@ -495,7 +495,7 @@ class Context implements \ArrayAccess {
      * @return mixed
      */
     public function lookup_and_evaluate(&$obj, $key) {
-        if (empty($key) || !isset($obj[$key])) {
+        if (!isset($obj[$key])) {
             return null;
         }
 
