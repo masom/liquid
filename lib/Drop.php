@@ -9,6 +9,12 @@ class Drop implements \ArrayAccess {
     protected $context;
 
     /**
+     * Allows mapping PHP reserved words to methods (ex: `non_zero?` => 'is_non_zero', `blank?` => 'is_blank' )
+     * @var array
+     */
+    protected $invokable_methods_map = array();
+
+    /**
      * @var array
      */
     protected $invokable_methods;
@@ -49,7 +55,16 @@ class Drop implements \ArrayAccess {
      */
     public function invoke_drop($method_or_key) {
 
+        /**
+         * Allow method names like `blank?`
+         */
+        if (isset($this->invokable_methods_map[$method_or_key])) {
+            $method = $this->invokable_methods_map[$method_or_key];
+            return $this->{$method}();
+        }
+
         if ($method_or_key && $method_or_key != static::EMPTY_STRING && $this->is_invokable($method_or_key)) {
+
             return $this->{$method_or_key}();
         } else {
             return $this->before_method($method_or_key);
@@ -150,7 +165,11 @@ class Drop implements \ArrayAccess {
                 $method = $method->getName();
             }
 
-            $this->invokable_methods = array_diff($public, $blacklist);
+            $this->invokable_methods = $this->invokable_methods_map + array_diff($public, $blacklist);
+        }
+
+        if (isset($this->invokable_methods_map[$method_name])) {
+            return true;
         }
 
         return in_array($method_name, $this->invokable_methods) && (method_exists($this, $method_name) || is_callable(array($this, $method_name)));
