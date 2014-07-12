@@ -7,7 +7,7 @@ namespace Liquid\Tests\Integration\Tags;
 use Liquid\Tests\IntegrationTestCase;
 
 
-class UnlessTagTest extends IntegrationTestCase {
+class UnlessElseTagTest extends IntegrationTestCase {
 
     public function test_unless() {
         $this->assert_template_result('  ',' {% unless true %} this text should not go into the output {% endunless %} ');

@@ -6,6 +6,10 @@ use \Liquid\Tests\Lib\HundredCentes;
 
 class CentsDrop extends \Liquid\Drop {
 
+    /**
+     * TODO Document this feature
+     * @var array
+     */
     protected $invokable_methods_map = array(
         'non_zero?' => 'is_non_zero'
     );
