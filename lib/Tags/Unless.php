@@ -17,7 +17,7 @@ class Unless extends \Liquid\Tags\IfTag {
         $context->stack(function($context) use ($self, &$blocks, &$return) {
             $first_block = reset($blocks);
 
-            if( !$first_block->evaluate($context)) {
+            if (!$first_block->evaluate($context)) {
                 $return = $self->render_all($first_block->attachment(), $context);
                 return;
             }
@@ -26,6 +26,7 @@ class Unless extends \Liquid\Tags\IfTag {
             $i = 0;
             foreach ($blocks as $block) {
                 if ($i < 1 || $i < $max ) {
+                    $i ++;
                     continue;
                 }
 
