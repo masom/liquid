@@ -110,6 +110,44 @@ class Condition {
      * @return bool
      */
     public function equal_variables($left, $right) {
+
+        $method = null;
+        if ($right === 'blank?') {
+            $method = 'is_blank';
+        } elseif ($right === 'empty?') {
+            $method = 'count';
+        }
+
+        if ($method) {
+            if (is_object($left)) {
+                if (method_exists($left, $method)) {
+                    return $left->{$method}() == 0;
+                } else {
+                    return null;
+                }
+            } else {
+                return empty($left);
+            }
+        }
+
+        if ($left === 'blank?') {
+            $method = 'is_blank';
+        } elseif($left === 'empty?') {
+            $method = 'count';
+        }
+
+        if ($method) {
+            if (is_object($right)) {
+                if (method_exists($right, $method)) {
+                    return $right->{$method}() == 0;
+                } else {
+                    return null;
+                }
+            } else {
+                return empty($left);
+            }
+        }
+
         return $left == $right;
     }
 
