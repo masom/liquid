@@ -140,7 +140,6 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     }
 
     public function test_can_use_drop_as_context() {
-        $this->markTestSkipped();
         $t = new Template();
         $registers = $t->registers();
         $registers['lulz'] = 'haha';

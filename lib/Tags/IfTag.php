@@ -52,14 +52,12 @@ class IfTag extends \Liquid\Block {
      * @param $tag
      * @param $markup
      * @param $tokens
-     *
-     * @return null|void
      */
     public function unknown_tag($tag, $markup, $tokens) {
         if ($tag === 'elseif' || $tag === 'else') {
-            return $this->push_block($tag, $markup);
+            $this->push_block($tag, $markup);
         } else {
-            return parent::unknown_tag($tag, $markup, $tokens);
+            parent::unknown_tag($tag, $markup, $tokens);
         }
     }
 
@@ -72,6 +70,7 @@ class IfTag extends \Liquid\Block {
         $blocks =& $this->blocks;
         $result = '';
         $self = $this;
+
         $context->stack(function($context) use ($self, &$blocks, &$result) {
             foreach($blocks as $block) {
                 if($block->evaluate($context)) {
@@ -98,6 +97,7 @@ class IfTag extends \Liquid\Block {
         }
 
         $this->blocks[] = $block;
+
 
         $this->nodelist = $block->attach(new Nodes());
 

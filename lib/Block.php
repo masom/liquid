@@ -52,7 +52,7 @@ class Block extends \Liquid\Tag {
     public function _parse($tokens) {
         $this->blank = true;
 
-        $this->nodelist = new Nodes();
+        $this->nodelist = $this->nodelist ?: new Nodes();
 
         $this->children = array();
 

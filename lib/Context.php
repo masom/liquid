@@ -43,7 +43,10 @@ class Context implements \ArrayAccess {
     protected $strainerMethodInvoker;
 
     private static $LITERALS = array(
-        null => null, 'nil' => null, 'null' => null, '' => null,
+        null => null,
+        'nil' => null,
+        'null' => null,
+        '' => null,
         'true' => true,
         'false' => false,
         'blank' => 'blank?',
