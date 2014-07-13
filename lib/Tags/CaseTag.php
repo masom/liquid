@@ -19,7 +19,9 @@ class CaseTag extends \Liquid\Block {
 
     public static function init() {
         static::$Syntax = '/(' . Liquid::$PART_QuotedFragment . ')/';
-        static::$WhenSyntax = '/(' . Liquid::$PART_QuotedFragment . ')(?:(?:\s+or\s+|\s*\,\s*)(' . Liquid::$PART_QuotedFragment . '.*))?/Ss';
+        //static::$WhenSyntax = '/(' . Liquid::$PART_QuotedFragment . ')(?:(?:\s+or\s+|\s*\,\s*)(' . Liquid::$PART_QuotedFragment . '.*))?/Ss';
+        // Taken from an irb dump as this ( ^^ ) line isn't working
+        static::$WhenSyntax = '/((?:(?:"[^"]*"|\'[^\']*\')|(?:[^\s,\|\'"]|(?:"[^"]*"|\'[^\']*\'))+))(?:(?:\s+or\s+|\s*\,\s*)((?:(?:"[^"]*"|\'[^\']*\')|(?:[^\s,\|\'"]|(?:"[^"]*"|\'[^\']*\'))+).*))?/s';
     }
 
     /**
