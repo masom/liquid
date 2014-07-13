@@ -47,7 +47,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
         $global = 0;
         $t = new Template();
         $assigns = $t->assigns();
-        $assigns['number'] = function() use (&$global){ $global += 1; };
+        $assigns['number'] = function() use (&$global){ $global += 1; return $global; };
 
         $this->assertEquals('1', $t->parse("{{number}}")->render());
         $this->assertEquals('1', $t->parse("{{number}}")->render());
@@ -57,7 +57,7 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
     public function test_lambda_is_called_once_from_custom_assigns_over_multiple_parses_and_renders() {
         $global = 0;
         $t = new Template();
-        $assigns = new \ArrayObject(array('number' => function() use (&$global){ $global += 1; }));
+        $assigns = new \ArrayObject(array('number' => function() use (&$global){ $global += 1; return $global; }));
         $this->assertEquals('1', $t->parse("{{number}}")->render($assigns));
         $this->assertEquals('1', $t->parse("{{number}}")->render($assigns));
         $this->assertEquals('1', $t->render($assigns));
