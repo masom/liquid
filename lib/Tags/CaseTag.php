@@ -108,7 +108,7 @@ class CaseTag extends \Liquid\Block {
      * @throws \Liquid\Exceptions\SyntaxError
      */
     private function record_when_condition($markup) {
-        while($markup) {
+        while($markup !== null) {
             $matches = null;
             if (!preg_match(static::$WhenSyntax, $markup, $matches)) {
                 throw new \Liquid\Exceptions\SyntaxError("Syntax Error in tag 'case' - Valid when condition: {% when [condition] [or condition2...] %}");
