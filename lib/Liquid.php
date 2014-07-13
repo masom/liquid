@@ -55,7 +55,8 @@ class Liquid {
         static::$TagAttributes               = '/' . static::$PART_TagAttributes . '/S';
         static::$AnyStartingTag              = '/'. $anyStartingTag . '/S';
         static::$PartialTemplateParser       = '/' . $partialTemplateParser . '/Ssm';
-        static::$TemplateParser              = '/(' . $partialTemplateParser . '|' . $anyStartingTag . ')/Ssm';
+        //        static::$TemplateParser              = '/(' . $partialTemplateParser . '|' . $anyStartingTag . ')/Ssm';
+        static::$TemplateParser = '/((?:(?:\{\%).*?(?:\%\})|(?:\{\{).*?(?:\}\}?))|(?:\{\{|\{\%))/Ssm';
 
         static::$VariableParser              = '/\[[^\]]+\]|' . static::VariableSegment . '+\??/S';
 

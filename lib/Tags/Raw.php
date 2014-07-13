@@ -10,17 +10,16 @@ class Raw extends \Liquid\Block {
     protected static $FullTokenPossiblyInvalid;
 
     public static function init() {
-        static::$FullTokenPossiblyInvalid = '/\A(.*)' . Liquid::TagStart . '\s*(\w+)\s*(.*)?' . Liquid::TagEnd .'\z/Ss';
+        static::$FullTokenPossiblyInvalid = '/\A(.*)' . Liquid::TagStart . '\s*(\w+)\s*(.*)?' . Liquid::TagEnd .'\z/sm';
     }
 
     /**
      * @param $tokens
      */
-    public function parse($tokens) {
+    public function _parse($tokens) {
         $this->nodelist = array();
 
-        while($token = array_shift($tokens)) {
-            $matches = null;
+        while (($token = $tokens->shift()) !== null) {
             if (preg_match(static::$FullTokenPossiblyInvalid, $token, $matches)) {
                 if ($matches[1] != '') {
                     $this->nodelist[] = $matches[1];
@@ -31,7 +30,7 @@ class Raw extends \Liquid\Block {
                 }
             }
 
-            if (!empty($token)) {
+            if ($token != '') {
                 $this->nodelist[] = $token;
             }
         }
