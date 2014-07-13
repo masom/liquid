@@ -148,7 +148,7 @@ class Condition {
             }
         }
 
-        return $left == $right;
+        return $left === $right;
     }
 
     /**

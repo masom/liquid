@@ -10,17 +10,14 @@ use \Liquid\Utils\Nodes;
 
 class CaseTag extends \Liquid\Block {
 
-    protected static $init = false;
     protected static $Syntax;
     protected static $WhenSyntax;
 
-
+    /** @var array */
     protected $blocks = array();
     protected $left;
 
     public static function init() {
-        static::$init = true;
-
         static::$Syntax = '/(' . Liquid::$PART_QuotedFragment . ')/';
         static::$WhenSyntax = '/(' . Liquid::$PART_QuotedFragment . ')(?:(?:\s+or\s+|\s*\,\s*)(' . Liquid::$PART_QuotedFragment . '.*))?/Ss';
     }
