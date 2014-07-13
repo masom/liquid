@@ -32,8 +32,8 @@ class Block extends \Liquid\Tag {
     public static function init() {
         static::$IsTag = '/\A' . \Liquid\Liquid::TagStart . '/';
         static::$IsVariable = '/\A' . \Liquid\Liquid::VariableStart . '/';
-        static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/s';
-        static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/s';
+        static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/sm';
+        static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/sm';
     }
 
     public function __call($method, $arguments){
@@ -56,7 +56,7 @@ class Block extends \Liquid\Tag {
 
         $this->children = array();
 
-        while( $token = $tokens->shift() ) {
+        while (($token = $tokens->shift()) !== null) {
             switch(true) {
             case preg_match(static::$IsTag, $token, $matches):
 
@@ -96,7 +96,7 @@ class Block extends \Liquid\Tag {
                 $this->children[] = $new_var;
                 $this->blank = false;
                 break;
-            case empty($token):
+            case $token === '':
                 break;
             default:
                 $this->nodelist[] = $token;

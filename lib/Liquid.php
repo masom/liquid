@@ -54,8 +54,8 @@ class Liquid {
         static::$QuotedFragment              = '/' . static::$PART_QuotedFragment . '/S';
         static::$TagAttributes               = '/' . static::$PART_TagAttributes . '/S';
         static::$AnyStartingTag              = '/'. $anyStartingTag . '/S';
-        static::$PartialTemplateParser       = '/' . $partialTemplateParser . '/Ss';
-        static::$TemplateParser              = '/(' . $partialTemplateParser . '|' . $anyStartingTag . ')/Ss';
+        static::$PartialTemplateParser       = '/' . $partialTemplateParser . '/Ssm';
+        static::$TemplateParser              = '/(' . $partialTemplateParser . '|' . $anyStartingTag . ')/Ssm';
 
         static::$VariableParser              = '/\[[^\]]+\]|' . static::VariableSegment . '+\??/S';
 

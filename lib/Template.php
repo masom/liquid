@@ -267,7 +267,7 @@ class Template {
 
         $tokens = preg_split(Liquid::$TemplateParser, $source, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
-        if (isset($tokens[0]) && empty($tokens[0])) {
+        if (isset($tokens[0]) && $tokens[0] === '') {
             array_shift($tokens);
         }
 
