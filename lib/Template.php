@@ -48,6 +48,13 @@ class Template {
     }
 
     /**
+     * @return array
+     */
+    public function errors() {
+        return $this->errors;
+    }
+
+    /**
      * @return \ArrayObject|ArrayObject
      */
     public function resource_limits() {

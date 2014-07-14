@@ -41,7 +41,7 @@ class IncludeTag extends \Liquid\Tag {
         }
     }
 
-    public function parse($tokens) {
+    public function _parse($tokens) {
     }
 
     /**
@@ -56,7 +56,7 @@ class IncludeTag extends \Liquid\Tag {
      *
      * @return null
      */
-    public function render($context) {
+    public function render(&$context) {
         $partial = $this->load_cached_partial($context);
 
         $variable = $context[$this->variable_name || substr($this->template_name, 1, strlen($this->template_name) -2 )];
