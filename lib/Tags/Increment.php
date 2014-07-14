@@ -18,14 +18,20 @@ class Increment extends \Liquid\Tag {
     /**
      * @param \Liquid\Context $context
      *
-     * @return null|string
+     * @return string
      */
-    public function render($context) {
-        $environment = reset($context->environments());
-        $value = (int) $environment[$this->variable] || 0;
-        $environment[$this->variable] = $value + 1;
+    public function render(&$context) {
+        $environments = $context->environments();
+        $env = $environments[0];
 
-        return (string) $value;
+        if (!isset($env[$this->variable])) {
+            $env[$this->variable] = 0;
+        }
+
+        $variable = $env[$this->variable];
+        $env[$this->variable] += 1;
+
+        return (string) $variable;
     }
 
     /**

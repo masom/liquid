@@ -1,6 +1,9 @@
 <?php
 
-namespace Liquid;
+namespace Liquid\Tags;
+
+use Liquid\Context;
+
 
 class Decrement extends \Liquid\Tag {
 
@@ -22,14 +25,18 @@ class Decrement extends \Liquid\Tag {
      *
      * @return string
      */
-    public function render($context) {
+    public function render(&$context) {
         $environments = $context->environments();
-        $environment = $environments[0];
+        $env =& $environments[0];
 
-        $value = $environment[$this->variable];
-        $value--;
-        $environment[$this->variable] = $value;
+        if (!isset($env[$this->variable])) {
+            $env[$this->variable] = 0;
+        }
 
-        return (string) $value;
+        $env[$this->variable] -= 1;
+
+        $variable = $env[$this->variable];
+
+        return (string) $variable;
     }
 }
