@@ -6,7 +6,9 @@ use \Liquid\Lexer;
 
 class Parser {
 
+    /** @var array */
     protected $tokens;
+    /** @var integer */
     protected $p = 0;
 
     /**
@@ -115,12 +117,12 @@ class Parser {
             return $this->variable_signature();
         } elseif ($token[0] == Lexer::TOKEN_STRING || $token[0] == Lexer::TOKEN_NUMBER) {
             return $this->consume();
-        } elseif ($token[0] === 'open_round') {
+        } elseif ($token[0] === Lexer::TOKEN_OPENROUND) {
             $this->consume();
             $first = $this->expression();
             $this->consume(Lexer::TOKEN_DOTDOT);
             $last = $this->expression();
-            $this->consume('close_round');
+            $this->consume(Lexer::TOKEN_CLOSEROUND);
 
             return "({$first}..{$last})";
         } else {
@@ -146,13 +148,13 @@ class Parser {
     public function variable_signature() {
         $str = $this->consume(Lexer::TOKEN_ID);
 
-        if ($this->look('open_square')) {
+        if ($this->look(Lexer::TOKEN_OPENSQUARE)) {
             $str .= $this->consume();
             $str .= $this->expression();
-            $str .= $this->consume('close_square');
+            $str .= $this->consume(Lexer::TOKEN_CLOSESQUARE);
         }
 
-        if ($this->look('dot')) {
+        if ($this->look(Lexer::TOKEN_DOT)) {
             $str .= $this->consume();
             $str .= $this->variable_signature();
         }

@@ -5,16 +5,6 @@ namespace Liquid;
 use \Liquid\Vendor\StringScanner\StringScanner;
 
 class Lexer {
-    protected static $SPECIALS = array(
-        '|' => 'pipe',
-        '.' => 'dot',
-        ':' => 'colon',
-        ',' => 'comma',
-        '[' => 'open_square',
-        ']' => 'close_square',
-        '(' => 'open_round',
-        ')' => 'close_round'
-    );
 
     const TOKEN_COMPARISON = 'comparison';
     const TOKEN_STRING = 'string';
@@ -28,6 +18,8 @@ class Lexer {
     const TOKEN_PIPE = 'pipe';
     const TOKEN_OPENSQUARE = 'open_square';
     const TOKEN_CLOSESQUARE = 'close_square';
+    const TOKEN_OPENROUND = 'open_round';
+    const TOKEN_CLOSEROUND = 'close_round';
 
     const IDENTIFIER = '/[\w\-?!]+/';
     const SINGLE_STRING_LITERAL = '/\'[^\\\']*\'/';
@@ -35,6 +27,17 @@ class Lexer {
     const NUMBER_LITERAL = '/-?\d+(\.\d+)?/';
     const DOTDOT = '/\.\./';
     const COMPARISON_OPERATOR = '/==|!=|<>|<=?|>=?|contains/';
+
+    protected static $SPECIALS = array(
+        '|' => Lexer::TOKEN_PIPE,
+        '.' => Lexer::TOKEN_DOT,
+        ':' => Lexer::TOKEN_COLON,
+        ',' => Lexer::TOKEN_COMMA,
+        '[' => Lexer::TOKEN_OPENSQUARE,
+        ']' => Lexer::TOKEN_CLOSESQUARE,
+        '(' => Lexer::TOKEN_OPENROUND,
+        ')' => Lexer::TOKEN_CLOSEROUND
+    );
 
     /** @var StringScanner */
     protected $ss;
@@ -49,6 +52,10 @@ class Lexer {
         $this->ss = new StringScanner(rtrim($input));
     }
 
+    /**
+     * @return array
+     * @throws Exceptions\SyntaxError
+     */
     public function tokenize() {
         $this->output = array();
 
@@ -58,7 +65,7 @@ class Lexer {
             switch(true) {
                 case $t = $this->ss->scan(static::COMPARISON_OPERATOR):
                     $tok = array(static::TOKEN_COMPARISON, $t);
-                    break; 
+                    break;
                 case $t = $this->ss->scan(static::SINGLE_STRING_LITERAL):
                     $tok = array(static::TOKEN_STRING, $t);
                     break;

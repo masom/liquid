@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="liquid" default="help" basedir=".">
-    <target name="tests" description="PHPUnit tests.">
-        <exec command="vendor/bin/phpunit --configuration tests/phpunit.xml tests" passthru="true" checkreturn="true" />
+    <target name="help">
+        <exec command="phing -f ${phing.file} -l" outputProperty="phing_targets" />
+        <echo>Please select a target.</echo>
+        <echo>${phing_targets}</echo>
     </target>
+
+    <target name="tests" description="PHPUnit tests with the LAX parser.">
+        <exec command="LIQUID_PARSER_MODE=lax vendor/bin/phpunit --configuration tests/phpunit.xml tests" passthru="true" checkreturn="true" />
+    </target>
+
+    <target name="tests-warn" description="PHPUnit tests with the WARN parser.">
+        <exec command="LIQUID_PARSER_MODE=warn vendor/bin/phpunit --configuration tests/phpunit.xml tests" passthru="true" checkreturn="true" />
+    </target>
+
+    <target name="tests-strict" description="PHPUnit tests with the WARN parser.">
+        <exec command="LIQUID_PARSER_MODE=strict vendor/bin/phpunit --configuration tests/phpunit.xml tests" passthru="true" checkreturn="true" />
+    </target>
+
 </project>
