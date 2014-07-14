@@ -7,9 +7,13 @@ php:
 
 matrix:
   allow_failures:
-    - php: hhvm
+    - php:
+      - hhvm
 
 before_script:
-    - composer install
+  - composer install
 
-script: vendor/bin/phing tests
+env:
+  - LIQUID_PARSER_MODE=lax
+
+script: phpunit --configuration tests/phpunit.xml tests
