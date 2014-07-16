@@ -47,6 +47,15 @@ class Template {
         $this->resource_limits = new ArrayObject();
     }
 
+    public function rethrow_errors($rethrow = null)
+    {
+        if ($rethrow !== null)
+        {
+            $this->rethrow_errors = (bool) $rethrow;
+        }
+
+        return $this->rethrow_errors;
+    }
     /**
      * @return array
      */
