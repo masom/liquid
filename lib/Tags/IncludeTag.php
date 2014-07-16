@@ -37,8 +37,8 @@ class IncludeTag extends \Liquid\Tag {
             $this->attributes = array();
 
             preg_match_all(Liquid::$TagAttributes, $markup, $matches);
-            foreach($matches[0] as $key => $value) {
-                $this->attributes[$key] = $value;
+            foreach($matches[1] as $key => $name) {
+                $this->attributes[$name] = $matches[2][$key];
             }
         } else {
             throw new \Liquid\Exceptions\SyntaxError("Error in tag 'include' - Valid syntax: include '[template]' (with|for) [object|collection]");
@@ -63,17 +63,19 @@ class IncludeTag extends \Liquid\Tag {
     public function render(&$context) {
         $partial = $this->load_cached_partial($context);
 
-        $variable = ($this->variable_name) ? $context[$this->variable_name] : $context[substr($this->template_name, 1, strlen($this->template_name) -2 )];
+        $template_name = substr($this->template_name, 1, strlen($this->template_name) -2 );
+
+        $variable = ($this->variable_name) ? $context[$this->variable_name] : $context[$template_name];
 
         $attributes =& $this->attributes;
 
         $return = null;
-        $context->stack(function($context) use (&$partial, &$variable, &$attributes, &$return) {
+        $context->stack(function($context) use (&$partial, &$variable, &$attributes, &$return, &$template_name) {
             foreach($attributes as $key => $value) {
                 $context[$key] = $context[$value];
             }
 
-            $tmp = explode('/', substr($this->template_name, 1, strlen($this->template_name) -2 ));
+            $tmp = explode('/', $template_name);
             $context_variable_name = end($tmp);
 
             if (is_array($variable) && !Arrays::is_assoc($variable)) {

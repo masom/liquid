@@ -101,6 +101,7 @@ class ArrayObject implements \ArrayAccess, \Iterator, \Countable {
 
     public function pop() {
         $array = new \ArrayObject();
+        $return = null;
 
         $i = 0;
         foreach($this->array as $a) {
@@ -117,5 +118,20 @@ class ArrayObject implements \ArrayAccess, \Iterator, \Countable {
 
         $this->array = $array;
         return $return;
+    }
+
+    /**
+     * Insert a new scope at the beginning of the scope list.
+     * @param $new_scope
+     */
+    public function push( $new_scope ) {
+        $scopes = new ArrayObject();
+        $scopes[] = $new_scope instanceof \ArrayObject ? $new_scope : new \ArrayObject($new_scope);
+
+        foreach($this->array as $scope) {
+            $scopes[] = $scope;
+        }
+
+        $this->array = $scopes;
     }
 }

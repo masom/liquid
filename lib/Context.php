@@ -249,7 +249,7 @@ class Context implements \ArrayAccess {
     public function push(array $new_scope = array()) {
         $this->scopes->push($new_scope);
 
-        if (count($this->scopes) > 100) {
+        if ($this->scopes->count() > 100) {
             throw new \Liquid\Exceptions\StackLevelError("Nesting too deep.");
         }
     }

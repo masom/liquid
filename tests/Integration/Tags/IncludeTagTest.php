@@ -65,7 +65,7 @@ class IncludeTagTest extends IntegrationTestCase {
         $this->assert_template_result(
             "Locale: test123 test321",
             "{% include 'locale_variables' echo1: echo1, echo2: more_echos.echo2 %}",
-            array(array('echo1' => 'test123'), 'more_echos' => array("echo2" => 'test321'))
+            array('echo1' => 'test123', 'more_echos' => array("echo2" => 'test321'))
         );
     }
 
