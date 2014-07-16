@@ -12,7 +12,7 @@ class CustomInclude extends Tag {
     protected static $Syntax;
     protected $template_name;
 
-    protected function init() {
+    public static function init() {
         static::$Syntax = '/(' . Liquid::$PART_QuotedFragment . '+)(\s+(?:with|for)\s+(' . Liquid::$PART_QuotedFragment . '+))?/';
     }
 
@@ -35,3 +35,5 @@ class CustomInclude extends Tag {
         return substr($this->template_name, 1, strlen($this->template_name - 2));
     }
 }
+
+CustomInclude::init();

@@ -29,7 +29,7 @@ class IncludeTag extends \Liquid\Tag {
         $matches = null;
         if (preg_match(static::$Syntax, $markup, $matches)) {
             $this->template_name = $matches[1];
-            $this->variable_name = $matches[3];
+            $this->variable_name = isset($matches[3]) ? $matches[3] : null;
             $this->attributes = array();
 
             preg_match_all(Liquid::$TagAttributes, $markup, $matches);
@@ -69,7 +69,8 @@ class IncludeTag extends \Liquid\Tag {
                 $context[$key] = $context[$value];
             }
 
-            $context_variable_name = end(explode('/', substr($this->template_name, 1, strlen($this->template_name) -2 )));
+            $tmp = explode('/', substr($this->template_name, 1, strlen($this->template_name) -2 ));
+            $context_variable_name = end($tmp);
 
             if (is_array($variable)) {
                 $new = array();
@@ -100,7 +101,7 @@ class IncludeTag extends \Liquid\Tag {
 
         $template_name = $context[$this->template_name];
 
-        if ($cached = $cached_partials[$template_name]) {
+        if (isset($cached_partials[$template_name]) && $cached = $cached_partials[$template_name]) {
             return $cached;
         }
 
@@ -121,14 +122,14 @@ class IncludeTag extends \Liquid\Tag {
      */
     public function read_template_from_file_system($context) {
         $registers = $context->registers();
-        $file_system = $registers['file_system'] || Template::file_system();
+        $file_system = $registers['file_system'] ? $registers['file_system'] : Template::filesystem();
 
         $reflection = new \ReflectionMethod($file_system, 'read_template_file');
         switch($reflection->getNumberOfParameters()) {
         case 1:
-            return $file_system->read_template_from_file($context[$this->template_name]);
+            return $file_system->read_template_file($context[$this->template_name]);
         case 2:
-            return $file_system->read_template_from_file($context[$this->template_name], $context);
+            return $file_system->read_template_file($context[$this->template_name], $context);
         default:
             throw new \InvalidArgumentException("file_system.read_template_file expects two parameters: (template_name, context)");
         }
