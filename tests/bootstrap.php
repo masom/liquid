@@ -1,6 +1,10 @@
 <?php
 
 date_default_timezone_set('UTC');
+/**
+ * If xdebug is installed a test for infinite template inclusion will fail with the default `max_nesting_level` ( 100 )
+ */
+ini_set('xdebug.max_nesting_level', 1000);
 
 $loader = require __DIR__ . '/../vendor/autoload.php';
 $loader->addPsr4('Liquid\\Tests\\', __DIR__);
@@ -20,7 +24,7 @@ function debug($data = null){
     $calledFrom = debug_backtrace();
     $caller = substr(str_replace(dirname(dirname(__DIR__)), '', $calledFrom[0]['file']), 1);
     $line = $calledFrom[0]['line'];
- 
+
     if (PHP_SAPI == 'cli') {
         echo "\n>>> {$caller} (line {$line})\n";
         print_r($data);

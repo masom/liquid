@@ -2,8 +2,11 @@
 
 namespace Liquid\Tags;
 
+use Liquid\Context;
 use \Liquid\Liquid;
 use \Liquid\Template;
+use Liquid\Utils\Registers;
+
 
 class IncludeTag extends \Liquid\Tag {
     protected static $Syntax;
@@ -121,8 +124,10 @@ class IncludeTag extends \Liquid\Tag {
      * @throws \InvalidArgumentException
      */
     public function read_template_from_file_system($context) {
+        /** @var Context $context */
+        /** @var Registers $registers */
         $registers = $context->registers();
-        $file_system = $registers['file_system'] ? $registers['file_system'] : Template::filesystem();
+        $file_system = $registers->offsetExists('file_system') ? $registers['file_system'] : Template::filesystem();
 
         $reflection = new \ReflectionMethod($file_system, 'read_template_file');
         switch($reflection->getNumberOfParameters()) {
