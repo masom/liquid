@@ -5,6 +5,7 @@ namespace Liquid\Tags;
 use Liquid\Context;
 use \Liquid\Liquid;
 use \Liquid\Template;
+use Liquid\Utils\Arrays;
 use Liquid\Utils\Registers;
 
 
@@ -62,7 +63,7 @@ class IncludeTag extends \Liquid\Tag {
     public function render(&$context) {
         $partial = $this->load_cached_partial($context);
 
-        $variable = $context[$this->variable_name || substr($this->template_name, 1, strlen($this->template_name) -2 )];
+        $variable = ($this->variable_name) ? $context[$this->variable_name] : $context[substr($this->template_name, 1, strlen($this->template_name) -2 )];
 
         $attributes =& $this->attributes;
 
@@ -75,18 +76,16 @@ class IncludeTag extends \Liquid\Tag {
             $tmp = explode('/', substr($this->template_name, 1, strlen($this->template_name) -2 ));
             $context_variable_name = end($tmp);
 
-            if (is_array($variable)) {
-                $new = array();
+            if (is_array($variable) && !Arrays::is_assoc($variable)) {
                 foreach($variable as &$value) {
                     $context[$context_variable_name] = $value;
 
-                    $new[] = $partial->render($context);
+                    $return .= $partial->render($context);
                 }
-
-                $return = $new;
             } else {
                 $context[$context_variable_name] = $variable;
-                $return = $partial->render($context);
+
+                $return .= $partial->render($context);
             }
         });
 

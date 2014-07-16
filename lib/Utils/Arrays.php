@@ -3,12 +3,29 @@
 namespace Liquid\Utils;
 
 class Arrays {
+
     /**
-     * http://stackoverflow.com/a/1320156/1014879
+     * Flatten an array
+     * @see http://stackoverflow.com/a/1320156/1014879
+     * @param array $array
+     * @return array
      */
     public static function flatten(array $array) {
         $return = array();
         array_walk_recursive($array, function($a) use (&$return) { $return[] = $a; });
         return $return;
+    }
+
+
+    /**
+     * Check if an array is associative.
+     *
+     * @see http://stackoverflow.com/a/4254008/1014879
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function is_assoc(array& $array) {
+        return (bool)count(array_filter(array_keys($array), 'is_string'));
     }
 }
