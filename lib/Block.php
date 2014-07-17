@@ -64,6 +64,7 @@ class Block extends \Liquid\Tag {
                     # if we found the proper block delimiter just end parsing here and let the outer block
                     # proceed
                     #
+
                     if ($this->block_delimiter() == $matches[1]) {
                         $this->end_tag();
                         return;

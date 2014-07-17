@@ -224,7 +224,7 @@ class ForTag extends \Liquid\Block {
      * @return array|string
      */
     private function render_else(&$context) {
-        return $this->else_block ? array($this->render_all($this->else_block, $context)) : '';
+        return $this->else_block ? $this->render_all($this->else_block, $context) : '';
     }
 
     /**
