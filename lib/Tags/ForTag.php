@@ -109,7 +109,7 @@ class ForTag extends \Liquid\Block {
         }
 
         if ($this->reversed) {
-            array_flip($segment);
+            $segment = array_reverse($segment);
         }
 
         $length = count($segment);

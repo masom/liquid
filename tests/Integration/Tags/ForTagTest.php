@@ -18,15 +18,13 @@ class ForTagTest extends IntegrationTestCase {
         $this->assert_template_result('yoyo','{%for item in array%}yo{%endfor%}', array('array' => array(1,2)));
         $this->assert_template_result(' yo ','{%for item in array%} yo {%endfor%}', array('array' => array(1)));
         $this->assert_template_result('','{%for item in array%}{%endfor%}', array('array' => array(1,2)));
-        $expected = <<<HERE
-
-        yo
-
-        yo
-
-        yo
-
-HERE;
+        $expected = "        \n" .
+            "        yo\n" .
+            "        \n" .
+            "        yo\n" .
+            "        \n" .
+            "        yo\n" .
+            "        ";
 
         $template = <<<HERE
         {%for item in array%}
