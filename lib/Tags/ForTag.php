@@ -99,7 +99,7 @@ class ForTag extends \Liquid\Block {
             $from = null;
         }
 
-        $limit = isset($this->attributes['limit']) ? $context[$this->attributes['limit']] : null;
+        $limit = isset($this->attributes['limit']) ? (int) $context[$this->attributes['limit']] : null;
         $to = $limit ? (int) $limit + $from : null;
 
         $segment = Utils::slice_collection($collection, $from, $to);
@@ -172,8 +172,8 @@ class ForTag extends \Liquid\Block {
             $this->attributes = array();
 
             if(preg_match_all(Liquid::$TagAttributes, $markup, $matches)) {
-                foreach($matches[1] as $key => $value) {
-                    $this->attributes[$key] = $value;
+                foreach($matches[1] as $key => $name) {
+                    $this->attributes[$name] = $matches[2][$key];
                 }
             }
         } else {
