@@ -13,7 +13,7 @@ class Utils {
      */
     public static function slice_collection($collection, $from, $to) {
         if (($from !=0 || $to != null) && is_array($collection)) {
-            return array_slice($collection, $from, $to - $from);
+            return array_slice($collection, $from, abs($to - $from));
         } else {
             return static::slice_collection_using_each($collection, $from, $to);
         }
