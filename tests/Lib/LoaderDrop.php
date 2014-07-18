@@ -28,16 +28,25 @@ class LoaderDrop extends Drop {
     /**
     * @param $data
      */
-    public function initialize($data) {
+    public function __construct(array $data = array()) {
         $this->data = $data;
     }
 
     /**
+     * TODO Document this behaviour
+     *
+     * Ideally implementing Iterator should be easier :(
      * @param callable $closure
+     * @param boolean &$stop Stop the iteration when the value becomes true.
      */
-    public function each(\Closure $closure) {
+    public function each(\Closure $closure, &$stop) {
         $this->each_called = true;
+
         foreach($this->data as $el){
+            if ($stop) {
+                break;
+            }
+
             $closure($el);
         }
     }

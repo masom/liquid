@@ -12,8 +12,11 @@ class Utils {
      * @return array
      */
     public static function slice_collection($collection, $from, $to) {
-        if (($from !=0 || $to != null) && is_array($collection)) {
+        $fromTo = ($from !=0 || $to != null);
+        if ($fromTo && is_array($collection)) {
             return array_slice($collection, $from, abs($to - $from));
+        } elseif(is_object($collection) && method_exists($collection, 'load_slice')) {
+            return $collection->load_slice($from, $to);
         } else {
             return static::slice_collection_using_each($collection, $from, $to);
         }
@@ -41,6 +44,24 @@ class Utils {
 
         if (static::is_non_blank_string($collection)) {
             return array($collection);
+        }
+
+        if (is_object($collection) && method_exists($collection, 'each')) {
+            $stop = false;
+            $collection->each(function($item) use ($from, $to, &$index, &$segments, &$stop) {
+                if ($to && $to <= $index) {
+                    $stop = true;
+                    return;
+                }
+
+                if ($from <= $index) {
+                    $segments[] = $item;
+                }
+
+                $index++;
+            }, $stop );
+
+            return $segments;
         }
 
         foreach($collection as $item) {
