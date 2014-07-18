@@ -239,7 +239,7 @@ XPCTD;
             '{% if i == 1 %}' .
             '{% break %}' .
             '{% endif %}' .
-            '{(array( i }}' .
+            '{{ i }}' .
             '{% endfor %}' .
             '{% endfor %}';
 
@@ -284,7 +284,7 @@ XPCTD;
         '{% if i == 1 %}' .
         '{% continue %}' .
         '{% endif %}' .
-        '{(array( i }}' .
+        '{{ i }}' .
         '{% endfor %}' .
         '{% endfor %}';
         $expected = '23456';
@@ -304,28 +304,28 @@ XPCTD;
 
         $this->assert_template_result(
             'test string',
-            '{%for val in string%}array(array(val}}{%endfor%}',
+            '{%for val in string%}{{val}}{%endfor%}',
             array('string' => "test string")
         );
 
         $this->assert_template_result(
             'test string',
-            '{%for val in string limit:1%}array(array(val}}{%endfor%}',
+            '{%for val in string limit:1%}{{val}}{%endfor%}',
             array('string' => "test string")
         );
 
         $this->assert_template_result(
             'val-string-1-1-0-1-0-true-true-test string',
             '{%for val in string%}' .
-            '{(array(forloop.name}}-' .
-            '{(array(forloop.index}}-' .
-            '{(array(forloop.length}}-' .
-            '{(array(forloop.index0}}-' .
-            '{(array(forloop.rindex}}-' .
-            '{(array(forloop.rindex0}}-' .
-            '{(array(forloop.first}}-' .
-            '{(array(forloop.last}}-' .
-            '{(array(val}}{%endfor%}',
+            '{{forloop.name}}-' .
+            '{{forloop.index}}-' .
+            '{{forloop.length}}-' .
+            '{{forloop.index0}}-' .
+            '{{forloop.rindex}}-' .
+            '{{forloop.rindex0}}-' .
+            '{{forloop.first}}-' .
+            '{{forloop.last}}-' .
+            '{{val}}{%endfor%}',
             array('string' => "test string")
         );
     }

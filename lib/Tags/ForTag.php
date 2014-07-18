@@ -85,7 +85,8 @@ class ForTag extends \Liquid\Block {
 
         $collection = $context[$this->collection_name];
 
-        if (!is_array($collection) && !($collection instanceof \Iterator)) {
+        # Maintains Ruby 1.8.7 String#each behaviour on 1.9
+        if (!$this->is_iterable($collection)) {
             return $this->render_else($context);
         }
 
