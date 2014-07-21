@@ -32,11 +32,11 @@ class Arrays {
     /**
      * Return the first item of an iterator.
      *
-     * @param \Iterator $array
+     * @param array|\ArrayObject|\Iterator $array
      *
      * @return mixed|null
      */
-    public static function first(\Iterator $array) {
+    public static function first( $array) {
         foreach($array as $item) {
             return $item;
         }
