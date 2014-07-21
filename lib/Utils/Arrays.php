@@ -36,10 +36,29 @@ class Arrays {
      *
      * @return mixed|null
      */
-    public static function first( $array) {
+    public static function first($array) {
         foreach($array as $item) {
             return $item;
         }
         return null;
+    }
+
+    /**
+     * Return the last item of an iterator.
+     *
+     * @param array|\ArrayObject|\Iterator $array
+     *
+     * @return null
+     */
+    public static function last($array) {
+        if ($array instanceof \Liquid\Utils\ArrayObject) {
+            return $array->last();
+        }
+
+        foreach($array as $item) {
+            $last = $item;
+        }
+
+        return $last;
     }
 }

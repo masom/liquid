@@ -461,10 +461,10 @@ class Context implements \ArrayAccess {
                             $res = count($object);
                             break;
                         case 'first':
-                            $res = reset($object);
+                            $res = is_array($object) ? reset($object) : Arrays::first($object);
                             break;
                         case 'last':
-                            $res = end($object);
+                            $res = is_array($object) ? end($object) : Arrays::last($object);
                             break;
                         }
                     }
