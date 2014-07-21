@@ -17,7 +17,7 @@ class Unless extends \Liquid\Tags\IfTag {
         $context->stack(function($context) use ($self, &$blocks, &$return) {
             //TODO Arrays::first() ?
             foreach($blocks as $block) {
-                $first_block = reset($blocks);
+                $first_block = $block;
                 break;
             }
 
