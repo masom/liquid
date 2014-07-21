@@ -3,6 +3,9 @@
 namespace Liquid\Tags;
 
 
+use Liquid\Utils\Arrays;
+
+
 class Unless extends \Liquid\Tags\IfTag {
 
     /**
@@ -15,11 +18,9 @@ class Unless extends \Liquid\Tags\IfTag {
         $blocks =& $this->blocks;
         $return = '';
         $context->stack(function($context) use ($self, &$blocks, &$return) {
-            //TODO Arrays::first() ?
-            foreach($blocks as $block) {
-                $first_block = $block;
-                break;
-            }
+
+            /** @var \Liquid\Condition $first_block */
+            $first_block = Arrays::first($blocks);
 
             if (!$first_block->evaluate($context)) {
                 $return = $self->render_all($first_block->attachment(), $context);

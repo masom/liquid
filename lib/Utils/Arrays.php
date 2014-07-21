@@ -28,4 +28,18 @@ class Arrays {
     public static function is_assoc(array& $array) {
         return (bool)count(array_filter(array_keys($array), 'is_string'));
     }
+
+    /**
+     * Return the first item of an iterator.
+     *
+     * @param \Iterator $array
+     *
+     * @return mixed|null
+     */
+    public static function first(\Iterator $array) {
+        foreach($array as $item) {
+            return $item;
+        }
+        return null;
+    }
 }
