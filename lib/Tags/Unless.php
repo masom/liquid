@@ -15,7 +15,11 @@ class Unless extends \Liquid\Tags\IfTag {
         $blocks =& $this->blocks;
         $return = '';
         $context->stack(function($context) use ($self, &$blocks, &$return) {
-            $first_block = reset($blocks);
+            //TODO Arrays::first() ?
+            foreach($blocks as $block) {
+                $first_block = reset($blocks);
+                break;
+            }
 
             if (!$first_block->evaluate($context)) {
                 $return = $self->render_all($first_block->attachment(), $context);
