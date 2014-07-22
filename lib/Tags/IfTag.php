@@ -54,7 +54,7 @@ class IfTag extends \Liquid\Block {
      * @param $tokens
      */
     public function unknown_tag($tag, $markup, $tokens) {
-        if ($tag === 'elseif' || $tag === 'else') {
+        if ($tag === 'elsif' || $tag === 'else') {
             $this->push_block($tag, $markup);
         } else {
             parent::unknown_tag($tag, $markup, $tokens);

@@ -4,20 +4,22 @@ namespace Liquid;
 
 class Condition {
 
-    /** @var array */
+    /** @var \ArrayObject */
     protected static $OPERATORS;
 
     /** @var boolean */
     protected static $init = false;
 
     protected $child_relation;
+
     /** @var Condition */
     protected $child_condition;
+
     protected $attachment = null;
 
     public static function init() {
         static::$init = true;
-        static::$OPERATORS = array(
+        static::$OPERATORS = new \ArrayObject(array(
             '==' => function($cond, $left, $right) { return $cond->equal_variables($left, $right); },
             '!=' => function($cond, $left, $right) { return !$cond->equal_variables($left, $right); },
             '<>' => function($cond, $left, $right) { return !$cond->equal_variables($left, $right); },
@@ -36,18 +38,46 @@ class Condition {
 
                 return false;
             }
-        );
+        ));
     }
 
+    /**
+     * @return \ArrayObject
+     */
     public static function operators() {
         return static::$OPERATORS;
     }
 
+    /**
+     * @param mixed $left
+     * @param mixed $operator
+     * @param mixed $right
+     */
     public function __construct($left = null, $operator = null, $right = null) {
         $this->left = $left;
         $this->right = $right;
         $this->operator = $operator;
     }
+
+    /**
+     * @param $name
+     * @param $arguments
+     *
+     * @return array
+     * @throws \BadMethodCallException
+     */
+    public function __call( $name, $arguments )
+    {
+        switch($name) {
+            case 'or':
+                return $this->orCondition($arguments[0]);
+            case 'and':
+                return $this->andCondition($arguments[0]);
+            default:
+                throw new \BadMethodCallException("Method `{$name}` does not exists in class " . __CLASS__ );
+        }
+    }
+
 
     /**
      * @param Context $context
