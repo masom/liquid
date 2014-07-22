@@ -15,7 +15,7 @@ class Utils {
         $fromTo = ($from !=0 || $to != null);
         if ($fromTo && is_array($collection)) {
             return array_slice($collection, $from, abs($to - $from));
-        } elseif(is_object($collection) && method_exists($collection, 'load_slice')) {
+        } elseif($fromTo && is_object($collection) && method_exists($collection, 'load_slice')) {
             return $collection->load_slice($from, $to);
         } else {
             return static::slice_collection_using_each($collection, $from, $to);

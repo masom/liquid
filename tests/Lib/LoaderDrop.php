@@ -59,6 +59,7 @@ class LoaderDrop extends Drop {
      */
     public function load_slice($from, $to) {
         $this->load_slice_called = true;
-        return array_slice($this->data, $from, $to - 1);
+        $length = $to - $from;
+        return array_slice($this->data, $from, $length);
     }
 }
