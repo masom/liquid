@@ -95,7 +95,7 @@ class Tag {
      * @return bool
      */
     public function is_blank() {
-        return $this->blank ?: false;
+        return false;
     }
 
     /**

@@ -33,11 +33,4 @@ class Increment extends \Liquid\Tag {
 
         return (string) $variable;
     }
-
-    /**
-     * @return bool
-     */
-    public function is_blank() {
-        return false;
-    }
 }

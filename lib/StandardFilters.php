@@ -3,6 +3,8 @@
 namespace Liquid;
 
 use \Liquid\Utils\Arrays;
+use Liquid\Utils\InputIterator;
+
 
 class StandardFilters {
     protected static $HTML_ESCAPE = array(
@@ -14,7 +16,10 @@ class StandardFilters {
     );
 
     protected static $METHOD_MAP = array(
-        'default' => 'defaultFunction'
+        'default' => 'defaultFunction',
+        'round' => 'roundFunction',
+        'ceil' => 'ceilFunction',
+        'floor' => 'floorFunction'
     );
 
     const HTML_ESCAPE_ONCE_REGEXP = '/["><\']|&(?!([a-zA-Z]+|(#\d+));)/';
@@ -155,7 +160,8 @@ class StandardFilters {
         if (empty($glue)) {
             $glue = ' ';
         }
-        return implode($glue, Arrays::flatten(array($input)));
+        $iterator = new InputIterator($input);
+        return $iterator->join($glue);
     }
 
     /**
@@ -169,7 +175,8 @@ class StandardFilters {
             $input = $input->getArrayCopy();
         }
 
-        $array = $this->flatten_if_necessary($input);
+        $array = new InputIterator($input);
+        $array = $array->to_array();
 
         if ($property == null) {
             sort($array);
@@ -224,12 +231,13 @@ class StandardFilters {
     }
 
     public function reverse($input) {
-        $ary = Arrays::flatten(array($input));
-        return array_reverse($ary);
+        $ary = new InputIterator($input);
+        return $ary->reverse();
     }
 
     public function map($input, $property) {
-        $this->flatten_if_necessary($input, function($e) use ($property) {
+        $iterator = new InputIterator($input);
+        return $iterator->map(function($e) use ($property) {
             if($e instanceof \Closure || is_callable($e)) {
                 $e = $e();
             }
@@ -242,6 +250,16 @@ class StandardFilters {
         });
     }
 
+    public function round($input, $n = 0) {
+        return round($input, (int) $n);
+    }
+    public function ceil($input) {
+        return ceil($input);
+    }
+
+    public function floor($input) {
+        return floor($input);
+    }
     public function replace($input, $string, $replacement = '') {
         return preg_replace((string) $string, (string) $replacement, (string) $input);
     }
@@ -339,15 +357,15 @@ class StandardFilters {
         return $input % $operand;
     }
 
-    public function round($input, $n = 0) {
+    public function roundFunction($input, $n = 0) {
        return round($input, $n);
     }
 
-    public function ceil($input) {
+    public function ceilFunction($input) {
         return ceil($input);
     }
 
-    public function floor($input) {
+    public function floorFunction($input) {
         return floor($input);
     }
 
@@ -359,22 +377,6 @@ class StandardFilters {
         $is_blank = empty($input);
 
         return empty($input) ? $default_value : $input;
-    }
-
-    private function flatten_if_necessary($input) {
-        if (is_array($input)) {
-            $ary = Arrays::flatten($input);
-        } else {
-            $ary = Arrays::flatten(array($input));
-        }
-
-        foreach($ary as $key => &$value) {
-            if (is_object($value) && method_exists($value, 'to_liquid')) {
-                $value = $value->to_liquid();
-            }
-        }
-
-        return $ary;
     }
 
     /**

@@ -49,13 +49,6 @@ class IncludeTag extends \Liquid\Tag {
     }
 
     /**
-     * @return bool
-     */
-    public function is_blank() {
-        return false;
-    }
-
-    /**
      * @param \Liquid\Context $context
      *
      * @return null

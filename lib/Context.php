@@ -12,6 +12,9 @@ use \Liquid\Utils\Scopes;
 
 class Context implements \ArrayAccess {
 
+    /** @var string */
+    protected static $SQUARE_BRACKETED;
+
     /** @var Environments */
     protected $environments;
 
@@ -23,9 +26,6 @@ class Context implements \ArrayAccess {
 
     /** @var array */
     protected $errors = array();
-
-    /** @var boolean */
-    protected $rethrow_errors;
 
     /** @var ArrayObject */
     protected $resource_limits;
@@ -42,6 +42,12 @@ class Context implements \ArrayAccess {
     /** @var \ReflectionMethod */
     protected $strainerMethodInvoker;
 
+    /** @var \Closure */
+    protected $exception_handler;
+
+    /** @var array */
+    protected $parsed_variables = array();
+
     private static $LITERALS = array(
         null => null,
         'nil' => null,
@@ -52,6 +58,10 @@ class Context implements \ArrayAccess {
         'blank' => 'blank?',
         'empty' => 'empty?'
     );
+
+    public static function init() {
+        static::$SQUARE_BRACKETED = '/\A\[(.*)\]\z/m';
+    }
 
     /**
      * @param array $environments
@@ -67,7 +77,9 @@ class Context implements \ArrayAccess {
 
         $this->registers =  ($registers instanceof Registers) ? $registers : new Registers($registers);
 
-        $this->rethrow_errors = $rethrow_errors;
+        if ($rethrow_errors) {
+            $this->exception_handler = function(\Exception $e) { return true; };
+        }
 
         $resource_limits_defaults = array('render_score_current' => 0, 'assign_score_current' => 0);
         if (is_array($resource_limits)) {
@@ -210,10 +222,28 @@ class Context implements \ArrayAccess {
         return array_pop($this->interrupts);
     }
 
+    /**
+     * @param null $handler
+     *
+     * @return callable
+     */
+    public function exception_handler($handler = null) {
+        if ($handler) {
+            if (is_array($handler)) {
+                $this->exception_handler = function($e) use ($handler) { return call_user_func($handler, $e); };
+            } else {
+                $this->exception_handler = $handler;
+            }
+        }
+
+        return $this->exception_handler;
+    }
+
     public function handle_error(\Exception $e) {
         $this->errors[] = $e;
 
-        if ($this->rethrow_errors) {
+        $exception_handler = $this->exception_handler;
+        if ($exception_handler && $exception_handler($e)) {
             throw $e;
         }
 
@@ -389,16 +419,12 @@ class Context implements \ArrayAccess {
             }
         }
 
-        if (!$scope) {
+        if ($scope === null) {
             if ($this->environments) {
                 $scope = $this->environments->last();
             } else {
                 $scope = $this->scopes->last();
             }
-        }
-
-        if (!isset($scope[$key])) {
-            $this->handle_not_found($key);
         }
 
         $variable = is_null($variable) ? $this->lookup_and_evaluate($scope, $key) : $variable;
@@ -420,25 +446,51 @@ class Context implements \ArrayAccess {
     /**
      * @param string $markup
      *
+     * @return array
+     */
+    public function variable_parse($markup) {
+        preg_match_all(Liquid::$VariableParser, $markup, $matches);
+        $needs_resolution = false;
+        $parts = $matches[0];
+        if (preg_match(static::$SQUARE_BRACKETED, $parts[0], $bracketMatches)){
+            $needs_resolution = true;
+            $parts[0] = $bracketMatches[1];
+        }
+
+        return array('first' => array_shift($parts), 'needs_resolution' => $needs_resolution, 'rest' => $parts);
+    }
+
+    /**
+     * @param string $markup
+     *
+     * @return mixed
+     */
+    protected function parsed_variables($markup) {
+        if (!isset($this->parsed_variables[$markup])) {
+            $this->parsed_variables[$markup] = $this->variable_parse($markup);
+        }
+
+        return $this->parsed_variables[$markup];
+    }
+
+    /**
+     * @param string $markup
+     *
      * @return mixed
      */
     public function variable($markup) {
-        $parts = null;
-        preg_match_all(\Liquid\Liquid::$VariableParser, $markup, $parts);
+        $parts = $this->parsed_variables($markup);
 
-        $square_braketed = '/\A\[(.*)\]\z/s';
+        $first_part = $parts['first'];
 
-        $first_part = array_shift($parts[0]);
-
-        $matches = null;
-        if (preg_match($square_braketed, $first_part, $matches)) {
-            $first_part = $this->resolve($matches[1]);
+        if ($parts['needs_resolution']) {
+            $first_part = $this->resolve($first_part);
         }
 
         if ($object = $this->find_variable($first_part)) {
-            foreach($parts[0] as $part) {
+            foreach($parts['rest'] as $part) {
                 $matches = null;
-                $part_resolved = preg_match($square_braketed, $part, $matches);
+                $part_resolved = preg_match(static::$SQUARE_BRACKETED, $part, $matches);
 
                 if ($part_resolved) {
                     $part = $this->resolve($matches[1]);
@@ -475,7 +527,6 @@ class Context implements \ArrayAccess {
                         $object = $res;
                     }
                 } else {
-                    $this->handle_not_found($markup);
                     return null;
                 }
 
@@ -524,8 +575,5 @@ class Context implements \ArrayAccess {
             }
         }
     }
-
-    public function handle_not_found($variable) {
-        $this->errors[] = "Variable {{{$variable}}} not found";
-    }
 }
+Context::init();

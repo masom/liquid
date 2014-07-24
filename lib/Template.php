@@ -214,7 +214,9 @@ class Template {
         switch(true) {
         case $context instanceof Context:
             $context = array_shift($args);
-            $context->rethrow_errors($this->rethrow_errors);
+            if ($this->rethrow_errors) {
+                $context->exception_handler(function($e) { return true; });
+            }
             break;
         case $context instanceof Drop:
             $context = array_shift($args);
@@ -250,6 +252,10 @@ class Template {
 
             if (isset($last['filters'])) {
                 $context->add_filters($last['filters']);
+            }
+
+            if(isset($last['exception_handler'])) {
+                $context->exception_handler($last['exception_handler']);
             }
             break;
         case is_object($last):

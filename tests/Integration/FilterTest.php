@@ -72,7 +72,7 @@ class FilterTest extends \Liquid\Tests\IntegrationTestCase {
         $this->context['value'] = 3;
         $this->context['numbers'] = array(2,1,4,3);
         $this->context['words'] = array('expected', 'as', 'alphabetic');
-        $this->context['arrays'] = array(array('flattened'), array('are'));
+        $this->context['arrays'] = array('flower', 'are');
 
         $variable =  new Variable("numbers | sort");
         $this->assertEquals(array(1,2,3,4), $variable->render($this->context));
@@ -84,7 +84,7 @@ class FilterTest extends \Liquid\Tests\IntegrationTestCase {
         $this->assertEquals(array(3), $variable->render($this->context));
 
         $variable = new Variable("arrays | sort");
-        $this->assertEquals(array('are', 'flattened'), $variable->render($this->context));
+        $this->assertEquals(array('are', 'flower'), $variable->render($this->context));
     }
 
     public function test_strip_html() {

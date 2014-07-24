@@ -20,6 +20,9 @@ class Block extends \Liquid\Tag {
     /** @var string */
     protected static $ContentOfVariable;
 
+    /** @var string */
+    protected $block_delimiter;
+
     /** @var Nodes */
     protected $nodelist;
 
@@ -167,7 +170,10 @@ class Block extends \Liquid\Tag {
      * @return string
      */
     public function block_delimiter() {
-        return 'end' . $this->block_name();
+        if (!$this->block_delimiter) {
+            $this->block_delimiter = 'end' . $this->block_name();
+        }
+        return $this->block_delimiter;
     }
 
     /**

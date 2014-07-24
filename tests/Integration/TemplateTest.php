@@ -162,4 +162,29 @@ class TemplateTest extends \Liquid\Tests\IntegrationTestCase {
             $this->assertEquals( 'ruby error in drop', $e->getMessage());
         }
     }
+
+    public function test_exception_handler_doesnt_reraise_if_it_returns_false() {
+        $exception = null;
+        Template::parse("{{ 1 | divided_by: 0 }}")->render(
+            array(),
+            array(
+                'exception_handler' => function($e) use (&$exception) { $exception = $e; return false; }
+            )
+        );
+        $this->assertInstanceOf('\Exception', $exception);
+    }
+    public function test_exception_handler_does_reraise_if_it_returns_true() {
+        $exception = null;
+        try {
+            Template::parse("{{ 1 | divided_by: 0 }}")->render(
+                array(),
+                array(
+                    'exception_handler' => function($e) use (&$exception) { $exception = $e; return true; }
+                )
+            );
+            $this->fail('An exception should have been raised.');
+        } catch (\Exception $e) {
+            die(get_class($e));
+        }
+    }
 }

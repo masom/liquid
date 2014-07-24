@@ -387,21 +387,4 @@ class ContextTest extends \Liquid\Tests\TestCase {
         $this->assertEquals($this->context, $this->context['category']->context());
     }
 
-    public function test_strict_variables_not_found() {
-        $this->context['does_not_exists'];
-        $this->assertEquals(1, count($this->context->errors()));
-        $errors = $this->context->errors();
-        $this->assertEquals('Variable {{does_not_exists}} not found', $errors[0]);
-    }
-
-    public function test_strict_nested_variables_not_found() {
-
-        $this->context['hash'] = array('this' => 'exists');
-        $this->context['hash.does_not_exist'];
-
-        $this->assertEquals(1, count($this->context->errors()));
-        $errors = $this->context->errors();
-        $this->assertEquals('Variable {{hash.does_not_exist}} not found', $errors[0]);
-    }
-
 }

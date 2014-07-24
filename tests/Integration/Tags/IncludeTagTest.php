@@ -186,7 +186,6 @@ class IncludeTagTest extends IntegrationTestCase {
     }
 
     public function test_does_not_add_error_in_strict_mode_for_missing_variable() {
-        $this->markTestSkipped('Errors are always added.');
         Template::filesystem(new TestFileSystem());
 
         /** @var Template $a */

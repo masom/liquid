@@ -2,6 +2,7 @@
 
 namespace Liquid\Tags;
 
+use Liquid\Exceptions\SyntaxError;
 use \Liquid\Liquid;
 use Liquid\Utils\Registers;
 
@@ -18,6 +19,12 @@ class Cycle extends \Liquid\Tag {
         static::$NamedSyntax = '/\A(' . Liquid::$PART_QuotedFragment . ')\s*\:\s*(.*)/s';
     }
 
+    /**
+     * @param string $tag_name
+     * @param string $markup
+     * @param array  $options
+     * @throws SyntaxError
+     */
     public function __construct($tag_name, $markup, $options) {
         parent::__construct($tag_name, $markup, $options);
 
@@ -33,7 +40,7 @@ class Cycle extends \Liquid\Tag {
             break;
 
         default:
-            throw new \Liquid\Exceptions\SyntaxError("Syntax Error in 'cycle' - Valid syntax: cycle [name :] var [, var2, var3 ...]");
+            throw new SyntaxError("Syntax Error in 'cycle' - Valid syntax: cycle [name :] var [, var2, var3 ...]");
         }
     }
 
@@ -61,10 +68,11 @@ class Cycle extends \Liquid\Tag {
         return $result;
     }
 
-    public function is_blank() {
-        return false;
-    }
-
+    /**
+     * @param $markup
+     *
+     * @return array
+     */
     private function variables_from_string(&$markup) {
         $variables = explode(',', $markup);
 
