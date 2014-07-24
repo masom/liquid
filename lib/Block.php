@@ -2,6 +2,7 @@
 
 namespace Liquid;
 
+use Liquid\Exceptions\SyntaxError;
 use \Liquid\Liquid;
 use \Liquid\Tags\ContinueTag;
 use \Liquid\Tags\BreakTag;
@@ -11,10 +12,9 @@ use \Liquid\Variable;
 
 class Block extends \Liquid\Tag {
 
-    /** @var string */
-    protected static $IsTag;
-    /** @var string */
-    protected static $IsVariable;
+    const TAGSTART = '{%';
+    const VARSTART = '{{';
+
     /** @var string */
     protected static $FullToken;
     /** @var string */
@@ -30,8 +30,6 @@ class Block extends \Liquid\Tag {
     protected $warnings;
 
     public static function init() {
-        static::$IsTag = '/\A' . \Liquid\Liquid::TagStart . '/';
-        static::$IsVariable = '/\A' . \Liquid\Liquid::VariableStart . '/';
         static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/sm';
         static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/sm';
     }
@@ -57,9 +55,13 @@ class Block extends \Liquid\Tag {
         $this->children = array();
 
         while (($token = $tokens->shift()) !== null) {
-            switch(true) {
-            case preg_match(static::$IsTag, $token, $matches):
 
+            if ($token === null || $token === '') {
+                continue;
+            }
+
+            switch(true) {
+            case Utils::starts_with($token, static::TAGSTART):
                 if (preg_match(static::$FullToken, $token, $matches)) {
                     # if we found the proper block delimiter just end parsing here and let the outer block
                     # proceed
@@ -84,20 +86,19 @@ class Block extends \Liquid\Tag {
                         $this->nodelist[] = $new_tag;
                         $this->children[] = $new_tag;
                     } else {
+                        # this tag is not registered with the system
+                        # pass it to the current block for special handling or error reporting
                         $this->unknown_tag($matches[1], $matches[2], $tokens);
                     }
                 } else {
-                    $end_tag = Liquid::VariableEnd;
-                    throw new \Liquid\Exceptions\SyntaxError("Tag '{$token}' was not properly terminated with regexp: {$end_tag}");
+                    throw new SyntaxError("Tag '{$token}' was not properly terminated with regexp: " . Liquid::TagEnd);
                 }
                 break;
-            case preg_match(static::$IsVariable, $token, $matches):
+            case Utils::starts_with($token, static::VARSTART):
                 $new_var = $this->create_variable($token);
                 $this->nodelist[] = $new_var;
                 $this->children[] = $new_var;
                 $this->blank = false;
-                break;
-            case $token === '':
                 break;
             default:
                 $this->nodelist[] = $token;
@@ -108,6 +109,13 @@ class Block extends \Liquid\Tag {
         }
 
         $this->assert_missing_delimitation();
+    }
+
+    /**
+     * @return bool
+     */
+    public function is_blank() {
+        return $this->blank;
     }
 
     /**

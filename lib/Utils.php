@@ -5,6 +5,16 @@ namespace Liquid;
 class Utils {
 
     /**
+     * @param string $string
+     * @param string $prefix
+     *
+     * @return bool
+     */
+    public static function starts_with($string, $prefix) {
+        return (strpos($string, $prefix) === 0);
+    }
+
+    /**
      * @param $collection
      * @param $from
      * @param $to
