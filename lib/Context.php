@@ -2,7 +2,6 @@
 
 namespace Liquid;
 
-use \Liquid\Strainer;
 use \Liquid\Utils\Arrays;
 use \Liquid\Utils\ArrayObject;
 use \Liquid\Utils\Environments;
@@ -10,7 +9,8 @@ use \Liquid\Utils\Registers;
 use \Liquid\Utils\Scopes;
 
 
-class Context implements \ArrayAccess {
+class Context implements \ArrayAccess
+{
 
     /** @var string */
     protected static $SQUARE_BRACKETED;
@@ -48,6 +48,9 @@ class Context implements \ArrayAccess {
     /** @var array */
     protected $parsed_variables = array();
 
+    /** @var bool */
+    protected $this_stack_used = false;
+
     private static $LITERALS = array(
         null => null,
         'nil' => null,
@@ -59,7 +62,8 @@ class Context implements \ArrayAccess {
         'empty' => 'empty?'
     );
 
-    public static function init() {
+    public static function init()
+    {
         static::$SQUARE_BRACKETED = '/\A\[(.*)\]\z/m';
     }
 
@@ -67,24 +71,27 @@ class Context implements \ArrayAccess {
      * @param array $environments
      * @param array $outer_scope
      * @param array $registers
-     * @param bool  $rethrow_errors
+     * @param bool $rethrow_errors
      * @param array $resource_limits
      */
-    public function __construct(array $environments = array(), $outer_scope = array(), $registers = array(), $rethrow_errors = false, $resource_limits = array()) {
+    public function __construct(array $environments = array(), $outer_scope = array(), $registers = array(), $rethrow_errors = false, $resource_limits = array())
+    {
         $this->environments = new Environments(Arrays::flatten($environments));
 
         $this->scopes = new Scopes(array($outer_scope));
 
-        $this->registers =  ($registers instanceof Registers) ? $registers : new Registers($registers);
+        $this->registers = ($registers instanceof Registers) ? $registers : new Registers($registers);
 
         if ($rethrow_errors) {
-            $this->exception_handler = function(\Exception $e) { return true; };
+            $this->exception_handler = function (\Exception $e) {
+                return true;
+            };
         }
 
         $resource_limits_defaults = array('render_score_current' => 0, 'assign_score_current' => 0);
         if (is_array($resource_limits)) {
-            $this->resource_limits =  new ArrayObject($resource_limits + $resource_limits_defaults);
-        } elseif($resource_limits instanceof ArrayObject) {
+            $this->resource_limits = new ArrayObject($resource_limits + $resource_limits_defaults);
+        } elseif ($resource_limits instanceof ArrayObject) {
             $this->resource_limits = $resource_limits->merge($resource_limits_defaults);
         } else {
             $this->resource_limits = new ArrayObject($resource_limits_defaults);
@@ -101,35 +108,40 @@ class Context implements \ArrayAccess {
     /**
      * @return bool
      */
-    public function rethrow_errors() {
+    public function rethrow_errors()
+    {
         return $this->rethrow_errors;
     }
 
     /**
      * @return Environments
      */
-    public function environments() {
+    public function environments()
+    {
         return $this->environments;
     }
 
     /**
      * @return ArrayObject
      */
-    public function resource_limits() {
+    public function resource_limits()
+    {
         return $this->resource_limits;
     }
 
     /**
      * @return \Liquid\Utils\Registers
      */
-    public function registers() {
+    public function registers()
+    {
         return $this->registers;
     }
 
     /**
      *  context.scopes.last[@to] = val
      */
-    public function scopes_last_set($to, $val) {
+    public function scopes_last_set($to, $val)
+    {
         $last = $this->scopes->last();
         $last[$to] = $val;
     }
@@ -138,11 +150,12 @@ class Context implements \ArrayAccess {
      * @param string $key
      * @param $obj
      */
-    public function increment_used_resources($key, &$obj) {
+    public function increment_used_resources($key, &$obj)
+    {
 
         if (is_array($obj)) {
             $increment = count($obj);
-        } elseif(is_string($obj)) {
+        } elseif (is_string($obj)) {
             $increment = mb_strlen($obj);
         } else {
             $increment = 1;
@@ -155,14 +168,15 @@ class Context implements \ArrayAccess {
         $this->resource_limits[$key] += $increment;
     }
 
-    public function is_resource_limits_reached() {
+    public function is_resource_limits_reached()
+    {
         $limits = array(
             'render_length',
             'render_score',
             'assign_score'
         );
 
-        foreach($limits as $name){
+        foreach ($limits as $name) {
             if (isset($this->resource_limits[$name . '_limit']) && isset($this->resource_limits[$name . '_current'])) {
                 if ($this->resource_limits[$name . '_current'] > $this->resource_limits[$name . '_limit']) {
                     return true;
@@ -176,7 +190,8 @@ class Context implements \ArrayAccess {
     /**
      * @return \Liquid\Strainer
      */
-    public function strainer() {
+    public function strainer()
+    {
         if (!$this->strainer) {
             $this->strainer = Strainer::create($this, $this->filters);
         }
@@ -189,10 +204,11 @@ class Context implements \ArrayAccess {
      *
      * @throws \InvalidArgumentException
      */
-    public function add_filters($filters) {
+    public function add_filters($filters)
+    {
         $filters = array_filter(Arrays::flatten(array($filters)));
 
-        foreach($filters as $f) {
+        foreach ($filters as $f) {
             if (!is_object($f)) {
                 $class = gettype($f);
                 throw new \InvalidArgumentException("Expected object but got: `{$class}`");
@@ -202,7 +218,7 @@ class Context implements \ArrayAccess {
         }
 
         if ($this->strainer) {
-            foreach($filters as $f) {
+            foreach ($filters as $f) {
                 $this->strainer->extend($f);
             }
         } else {
@@ -210,15 +226,18 @@ class Context implements \ArrayAccess {
         }
     }
 
-    public function has_interrupt() {
+    public function has_interrupt()
+    {
         return !empty($this->interrupts);
     }
 
-    public function push_interrupt($e) {
+    public function push_interrupt($e)
+    {
         $this->interrupts[] = $e;
     }
 
-    public function pop_interrupt() {
+    public function pop_interrupt()
+    {
         return array_pop($this->interrupts);
     }
 
@@ -227,10 +246,13 @@ class Context implements \ArrayAccess {
      *
      * @return callable
      */
-    public function exception_handler($handler = null) {
+    public function exception_handler($handler = null)
+    {
         if ($handler) {
             if (is_array($handler)) {
-                $this->exception_handler = function($e) use ($handler) { return call_user_func($handler, $e); };
+                $this->exception_handler = function ($e) use ($handler) {
+                    return call_user_func($handler, $e);
+                };
             } else {
                 $this->exception_handler = $handler;
             }
@@ -239,7 +261,8 @@ class Context implements \ArrayAccess {
         return $this->exception_handler;
     }
 
-    public function handle_error(\Exception $e) {
+    public function handle_error(\Exception $e)
+    {
         $this->errors[] = $e;
 
         $exception_handler = $this->exception_handler;
@@ -247,28 +270,30 @@ class Context implements \ArrayAccess {
             throw $e;
         }
 
-        switch(true){
-        case $e instanceof \Liquid\Exceptions\SyntaxError:
-            return "Liquid syntax error: " . $e->getMessage();
-        default:
-            return "Liquid error: " . $e->getMessage();
+        switch (true) {
+            case $e instanceof \Liquid\Exceptions\SyntaxError:
+                return "Liquid syntax error: " . $e->getMessage();
+            default:
+                return "Liquid error: " . $e->getMessage();
         }
     }
 
     /**
      * @return array
      */
-    public function errors() {
+    public function errors()
+    {
         return $this->errors;
     }
 
     /**
      * @return mixed
      */
-    public function invoke() {
+    public function invoke()
+    {
         $args = func_get_args();
 
-        return $this->strainerMethodInvoker->invokeArgs( $this->strainer(), $args);
+        return $this->strainerMethodInvoker->invokeArgs($this->strainer(), $args);
     }
 
     /**
@@ -276,7 +301,8 @@ class Context implements \ArrayAccess {
      *
      * @throws Exceptions\StackLevelError
      */
-    public function push(array $new_scope = array()) {
+    public function push(array $new_scope = array())
+    {
         $this->scopes->push($new_scope);
 
         if ($this->scopes->count() > 100) {
@@ -287,7 +313,8 @@ class Context implements \ArrayAccess {
     /**
      * @param array $new_scopes
      */
-    public function merge(array $new_scopes) {
+    public function merge(array $new_scopes)
+    {
         $this->scopes->merge($new_scopes);
     }
 
@@ -295,7 +322,8 @@ class Context implements \ArrayAccess {
      * @return array
      * @throws Exceptions\ContextError
      */
-    public function pop() {
+    public function pop()
+    {
         if (count($this->scopes) == 1) {
             throw new \Liquid\Exceptions\ContextError();
         }
@@ -304,27 +332,41 @@ class Context implements \ArrayAccess {
 
     /**
      * @param callable $block
-     * @param array    $new_scope
+     * @param array $new_scope
      *
      * @throws \Exception
      */
-    public function stack(\Closure $block, array $new_scope = array()) {
-        $this->push($new_scope);
-
-        try{
-            $block($this);
-        } catch(\Exception $e) {
-            $this->pop();
-            throw $e;
+    public function stack(\Closure $block, array $new_scope = array())
+    {
+        $old_stack_used = $this->this_stack_used;
+        if ($new_scope) {
+            $this->push($new_scope);
+            $this->this_stack_used = true;
+        } else {
+            $this->this_stack_used = false;
         }
 
-        $this->pop();
+        try {
+            $block($this);
+        } catch (\Exception $e) {
+            if ($this->this_stack_used) {
+                $this->pop();
+                $this->this_stack_used = $old_stack_used;
+            }
+            throw $e;
+        } // TODO finally block when supported.
+
+        if ($this->this_stack_used) {
+            $this->pop();
+            $this->this_stack_used = $old_stack_used;
+        }
     }
 
     /**
      *
      */
-    public function clear_instance_assigns() {
+    public function clear_instance_assigns()
+    {
         /** @var \ArrayObject $scope */
         $scope = $this->scopes[0];
         $scope->exchangeArray(array());
@@ -333,7 +375,8 @@ class Context implements \ArrayAccess {
     /**
      * ArrayAccess
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         $offset = $this->resolve($offset);
         return (is_array($offset) || !is_null($offset));
     }
@@ -341,14 +384,19 @@ class Context implements \ArrayAccess {
     /**
      * ArrayAccess
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         return $this->resolve($offset);
     }
 
     /**
      * ArrayAccess
      */
-    public function offsetSet($offset, $value) {
+    public function offsetSet($offset, $value)
+    {
+        if (!$this->this_stack_used) {
+            $this->push(array());
+        }
         if (is_array($value)) {
             $value = new \ArrayObject($value);
         }
@@ -359,7 +407,8 @@ class Context implements \ArrayAccess {
     /**
      * ArrayAccess
      */
-    public function offsetUnset($offset) {
+    public function offsetUnset($offset)
+    {
         unset($this->scopes[0][$offset]);
     }
 
@@ -368,39 +417,43 @@ class Context implements \ArrayAccess {
      *
      * @return array|float|int|mixed
      */
-    public function resolve($key) {
+    public function resolve($key)
+    {
         if (isset(static::$LITERALS[$key])) {
             return static::$LITERALS[$key];
         }
 
         $matches = null;
-        switch(true) {
-        case preg_match('/\A\'(.*)\'\z/s', $key, $matches): //Single quoted strings
-            return $matches[1];
-        case preg_match('/\A"(.*)"\z/s', $key, $matches): // Double quoted
-            return $matches[1];
-        case preg_match('/\A(-?\d+)\z/', $key, $matches): // Integer
-            return (int) $matches[1];
-        case preg_match('/\A\((\S+)\.\.(\S+)\)\z/', $key, $matches): //Ranges
-            return range((int) $this->resolve($matches[1]), (int) $this->resolve($matches[2]));
-        case preg_match('/\A(-?\d[\d\.]+)\z/', $key, $matches): //Floats
-            return (float) $matches[1];
-        default:
-            return $this->variable($key);
+        switch (true) {
+            case preg_match('/\A\'(.*)\'\z/s', $key, $matches): //Single quoted strings
+                return $matches[1];
+            case preg_match('/\A"(.*)"\z/s', $key, $matches): // Double quoted
+                return $matches[1];
+            case preg_match('/\A(-?\d+)\z/', $key, $matches): // Integer
+                return (int)$matches[1];
+            case preg_match('/\A\((\S+)\.\.(\S+)\)\z/', $key, $matches): //Ranges
+                return range((int)$this->resolve($matches[1]), (int)$this->resolve($matches[2]));
+            case preg_match('/\A(-?\d[\d\.]+)\z/', $key, $matches): //Floats
+                return (float)$matches[1];
+            default:
+                return $this->variable($key);
         }
     }
 
     /**
+     * Fetches an object starting at the local scope and then moving up the hierachy
+     *
      * @param string $key
      *
      * @return Variable
      */
-    public function find_variable($key) {
+    public function find_variable($key)
+    {
         $scope = null;
         $variable = null;
 
-        foreach($this->scopes as $s) {
-            if (!isset($s[$key])){
+        foreach ($this->scopes as $s) {
+            if (!isset($s[$key])) {
                 continue;
             }
 
@@ -409,7 +462,7 @@ class Context implements \ArrayAccess {
         }
 
         if ($scope == null) {
-            foreach($this->environments as $e) {
+            foreach ($this->environments as $e) {
                 $variable = $this->lookup_and_evaluate($e, $key);
 
                 if ($variable !== null) {
@@ -430,7 +483,7 @@ class Context implements \ArrayAccess {
         $variable = is_null($variable) ? $this->lookup_and_evaluate($scope, $key) : $variable;
 
         if (is_object($variable)) {
-            if (method_exists($variable, 'to_liquid')){
+            if (method_exists($variable, 'to_liquid')) {
                 $variable = $variable->to_liquid();
             }
             //TODO Should an exception be raised / warning logged? This is potentially unsafe.
@@ -448,11 +501,12 @@ class Context implements \ArrayAccess {
      *
      * @return array
      */
-    public function variable_parse($markup) {
+    public function variable_parse($markup)
+    {
         preg_match_all(Liquid::$VariableParser, $markup, $matches);
         $needs_resolution = false;
         $parts = $matches[0];
-        if (preg_match(static::$SQUARE_BRACKETED, $parts[0], $bracketMatches)){
+        if (preg_match(static::$SQUARE_BRACKETED, $parts[0], $bracketMatches)) {
             $needs_resolution = true;
             $parts[0] = $bracketMatches[1];
         }
@@ -465,7 +519,8 @@ class Context implements \ArrayAccess {
      *
      * @return mixed
      */
-    protected function parsed_variables($markup) {
+    protected function parsed_variables($markup)
+    {
         if (!isset($this->parsed_variables[$markup])) {
             $this->parsed_variables[$markup] = $this->variable_parse($markup);
         }
@@ -478,7 +533,8 @@ class Context implements \ArrayAccess {
      *
      * @return mixed
      */
-    public function variable($markup) {
+    public function variable($markup)
+    {
         $parts = $this->parsed_variables($markup);
 
         $first_part = $parts['first'];
@@ -488,7 +544,7 @@ class Context implements \ArrayAccess {
         }
 
         if ($object = $this->find_variable($first_part)) {
-            foreach($parts['rest'] as $part) {
+            foreach ($parts['rest'] as $part) {
                 $matches = null;
                 $part_resolved = preg_match(static::$SQUARE_BRACKETED, $part, $matches);
 
@@ -508,16 +564,16 @@ class Context implements \ArrayAccess {
                     if (method_exists($object, $part)) {
                         $res = $object->{$part}();
                     } else {
-                        switch($part) {
-                        case 'size':
-                            $res = count($object);
-                            break;
-                        case 'first':
-                            $res = is_array($object) ? reset($object) : Arrays::first($object);
-                            break;
-                        case 'last':
-                            $res = is_array($object) ? end($object) : Arrays::last($object);
-                            break;
+                        switch ($part) {
+                            case 'size':
+                                $res = count($object);
+                                break;
+                            case 'first':
+                                $res = is_array($object) ? reset($object) : Arrays::first($object);
+                                break;
+                            case 'last':
+                                $res = is_array($object) ? end($object) : Arrays::last($object);
+                                break;
                         }
                     }
                     if (is_object($res) && method_exists($res, 'to_liquid')) {
@@ -545,7 +601,8 @@ class Context implements \ArrayAccess {
      *
      * @return mixed
      */
-    public function lookup_and_evaluate(&$obj, $key) {
+    public function lookup_and_evaluate(&$obj, $key)
+    {
         if (!isset($obj[$key])) {
             return null;
         }
@@ -553,7 +610,8 @@ class Context implements \ArrayAccess {
         $value = $obj[$key];
 
         if (($value instanceof \Closure || is_callable($value))
-            && (is_array($obj) || $obj instanceof \ArrayAccess)) {
+            && (is_array($obj) || $obj instanceof \ArrayAccess)
+        ) {
             /**
              * PHP doesn't really care if we pass more arguments.
              */
@@ -564,10 +622,11 @@ class Context implements \ArrayAccess {
         }
     }
 
-    public function squash_instance_assigns_with_environments() {
+    public function squash_instance_assigns_with_environments()
+    {
         $scope = $this->scopes->last();
-        foreach($scope as $k => $v) {
-            foreach($this->environments as $env) {
+        foreach ($scope as $k => $v) {
+            foreach ($this->environments as $env) {
                 if (isset($env[$k])) {
                     $scope[$k] = $this->lookup_and_evaluate($env, $k);
                     break;
@@ -576,4 +635,5 @@ class Context implements \ArrayAccess {
         }
     }
 }
+
 Context::init();

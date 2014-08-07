@@ -2,7 +2,8 @@
 
 namespace Liquid;
 
-class Drop implements \ArrayAccess {
+class Drop implements \ArrayAccess
+{
     const EMPTY_STRING = '';
 
     /** @var Context */
@@ -24,27 +25,33 @@ class Drop implements \ArrayAccess {
      *
      * @return null
      */
-    public function before_method($method) {
+    public function before_method($method)
+    {
         return null;
     }
 
-    public function resource_limits() {
+    public function resource_limits()
+    {
         return $this->context->resource_limits();
     }
 
-    public function has_interrupt() {
+    public function has_interrupt()
+    {
         return false;
     }
 
-    public function increment_used_resources() {
+    public function increment_used_resources()
+    {
 
     }
 
-    public function is_resource_limits_reached() {
+    public function is_resource_limits_reached()
+    {
         return false;
     }
 
-    public function errors() {
+    public function errors()
+    {
         return array();
     }
 
@@ -53,7 +60,8 @@ class Drop implements \ArrayAccess {
      *
      * @return mixed
      */
-    public function invoke_drop($method_or_key) {
+    public function invoke_drop($method_or_key)
+    {
 
         /**
          * Allow method names like `blank?`
@@ -76,7 +84,8 @@ class Drop implements \ArrayAccess {
      *
      * @return mixed
      */
-    public function context($context = null) {
+    public function context($context = null)
+    {
         if ($context) {
             $this->context = $context;
             return;
@@ -88,49 +97,56 @@ class Drop implements \ArrayAccess {
     /**
      * @return bool
      */
-    public function has_key() {
+    public function has_key()
+    {
         return true;
     }
 
     /**
      * @return string
      */
-    public function inspect() {
+    public function inspect()
+    {
         return __CLASS__;
     }
 
     /**
      * @return $this
      */
-    public function to_liquid() {
+    public function to_liquid()
+    {
         return $this;
     }
 
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         return __CLASS__;
     }
 
     /**
      * \ArrayAccess
      */
-    public function offsetExists($offset) {
+    public function offsetExists($offset)
+    {
         return true;
     }
 
     /**
      * \ArrayAccess
      */
-    public function offsetSet($key, $value) {
+    public function offsetSet($key, $value)
+    {
         return;
     }
 
     /**
      * \ArrayAccess
      */
-    public function offsetUnset($key) {
+    public function offsetUnset($key)
+    {
         return;
     }
 
@@ -141,7 +157,8 @@ class Drop implements \ArrayAccess {
      * @param string $key
      * @return mixed
      */
-    public function offsetGet($key) {
+    public function offsetGet($key)
+    {
         return $this->invoke_drop($key);
     }
 
@@ -150,7 +167,8 @@ class Drop implements \ArrayAccess {
      *
      * @return bool
      */
-    private function is_invokable($method_name) {
+    private function is_invokable($method_name)
+    {
         if (!$this->invokable_methods) {
             $reflection = new \ReflectionClass('\Liquid\Drop');
             $blacklist = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -158,10 +176,10 @@ class Drop implements \ArrayAccess {
             $reflection = new \ReflectionClass(get_class($this));
             $public = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-            foreach($public as &$method){
+            foreach ($public as &$method) {
                 $method = $method->getName();
             }
-            foreach($blacklist as &$method) {
+            foreach ($blacklist as &$method) {
                 $method = $method->getName();
             }
 

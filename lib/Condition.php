@@ -2,7 +2,8 @@
 
 namespace Liquid;
 
-class Condition {
+class Condition
+{
 
     /** @var \ArrayObject */
     protected static $OPERATORS;
@@ -17,34 +18,42 @@ class Condition {
 
     protected $attachment = null;
 
-    public static function init() {
+    public static function init()
+    {
         static::$init = true;
         static::$OPERATORS = new \ArrayObject(array(
-            '==' => function($cond, $left, $right) { return $cond->equal_variables($left, $right); },
-            '!=' => function($cond, $left, $right) { return !$cond->equal_variables($left, $right); },
-            '<>' => function($cond, $left, $right) { return !$cond->equal_variables($left, $right); },
+            '==' => function ($cond, $left, $right) {
+                    return $cond->equal_variables($left, $right);
+                },
+            '!=' => function ($cond, $left, $right) {
+                    return !$cond->equal_variables($left, $right);
+                },
+            '<>' => function ($cond, $left, $right) {
+                    return !$cond->equal_variables($left, $right);
+                },
             '<' => 'smaller_than', // TODO document this behaviour
             '>' => 'greater_than',
             '>=' => 'greater_or_equal_to',
             '<=' => 'smaller_or_equal_to',
-            'contains' => function($cond, $left, $right) {
-                if (!$left || !$right) {
+            'contains' => function ($cond, $left, $right) {
+                    if (!$left || !$right) {
+                        return false;
+                    }
+
+                    if (is_array($left)) {
+                        return in_array($left, $right) ? : isset($left[$right]);
+                    }
+
                     return false;
                 }
-
-                if (is_array($left)) {
-                    return in_array($left, $right) ?: isset($left[$right]);
-                }
-
-                return false;
-            }
         ));
     }
 
     /**
      * @return \ArrayObject
      */
-    public static function operators() {
+    public static function operators()
+    {
         return static::$OPERATORS;
     }
 
@@ -53,7 +62,8 @@ class Condition {
      * @param mixed $operator
      * @param mixed $right
      */
-    public function __construct($left = null, $operator = null, $right = null) {
+    public function __construct($left = null, $operator = null, $right = null)
+    {
         $this->left = $left;
         $this->right = $right;
         $this->operator = $operator;
@@ -66,15 +76,15 @@ class Condition {
      * @return array
      * @throws \BadMethodCallException
      */
-    public function __call( $name, $arguments )
+    public function __call($name, $arguments)
     {
-        switch($name) {
+        switch ($name) {
             case 'or':
                 return $this->orCondition($arguments[0]);
             case 'and':
                 return $this->andCondition($arguments[0]);
             default:
-                throw new \BadMethodCallException("Method `{$name}` does not exists in class " . __CLASS__ );
+                throw new \BadMethodCallException("Method `{$name}` does not exists in class " . __CLASS__);
         }
     }
 
@@ -84,40 +94,45 @@ class Condition {
      *
      * @return bool
      */
-    public function evaluate($context = null) {
-        $context = $context ?: new Context();
+    public function evaluate($context = null)
+    {
+        $context = $context ? : new Context();
 
         $result = $this->interpret_condition($this->left, $this->right, $this->operator, $context);
 
-        switch($this->child_relation) {
-        case 'or':
-            return $result || $this->child_condition->evaluate($context);
-        case 'and':
-            return $result && $this->child_condition->evaluate($context);
-        default:
-            return $result;
+        switch ($this->child_relation) {
+            case 'or':
+                return $result || $this->child_condition->evaluate($context);
+            case 'and':
+                return $result && $this->child_condition->evaluate($context);
+            default:
+                return $result;
         }
     }
 
     /**
      * was or
      */
-    public function orCondition($condition) {
+    public function orCondition($condition)
+    {
         return array($this->child_relation, $this->child_condition = 'or', $condition);
     }
 
     /**
      * was and
      */
-    public function andCondition($condition) {
+    public function andCondition($condition)
+    {
         return array($this->child_relation, $this->child_condition = 'and', $condition);
     }
 
-    public function attachment() {
+    public function attachment()
+    {
         return $this->attachment;
     }
 
-    public function attach($attachment) {
+    public function attach($attachment)
+    {
         $this->attachment = $attachment;
         return $this->attachment;
     }
@@ -125,12 +140,14 @@ class Condition {
     /**
      * @return bool
      */
-    public function isElse() {
+    public function isElse()
+    {
         return false;
     }
 
-    public function inspect() {
-        return '#<Condition ' . implode(' ', array_filter(array($this->left, $this->operator, $this->right))) .'>';
+    public function inspect()
+    {
+        return '#<Condition ' . implode(' ', array_filter(array($this->left, $this->operator, $this->right))) . '>';
     }
 
     /**
@@ -139,7 +156,8 @@ class Condition {
      *
      * @return bool
      */
-    public function equal_variables($left, $right) {
+    public function equal_variables($left, $right)
+    {
 
         $method = null;
         if ($right === 'blank?') {
@@ -162,7 +180,7 @@ class Condition {
 
         if ($left === 'blank?') {
             $method = 'is_blank';
-        } elseif($left === 'empty?') {
+        } elseif ($left === 'empty?') {
             $method = 'count';
         }
 
@@ -190,7 +208,8 @@ class Condition {
      * @return null
      * @throws Exceptions\ArgumentError
      */
-    public function interpret_condition($left, $right, $op, $context) {
+    public function interpret_condition($left, $right, $op, $context)
+    {
         if ($op == null) {
             return $context[$left];
         }
@@ -206,12 +225,12 @@ class Condition {
 
         if (is_callable($operation)) {
             return $operation($this, $left, $right);
-        } elseif(!is_object($left) && !is_object($right)) {
-            if ($left === null || $right === null){
+        } elseif (!is_object($left) && !is_object($right)) {
+            if ($left === null || $right === null) {
                 return false;
             }
 
-            switch($op) {
+            switch ($op) {
                 case '<':
                     return $left < $right;
                 case '>':

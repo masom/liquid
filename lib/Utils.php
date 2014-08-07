@@ -2,7 +2,8 @@
 
 namespace Liquid;
 
-class Utils {
+class Utils
+{
 
     /**
      * @param string $string
@@ -10,7 +11,8 @@ class Utils {
      *
      * @return bool
      */
-    public static function starts_with($string, $prefix) {
+    public static function starts_with($string, $prefix)
+    {
         return (strpos($string, $prefix) === 0);
     }
 
@@ -21,11 +23,12 @@ class Utils {
      *
      * @return array
      */
-    public static function slice_collection($collection, $from, $to) {
-        $fromTo = ($from !=0 || $to != null);
+    public static function slice_collection($collection, $from, $to)
+    {
+        $fromTo = ($from != 0 || $to != null);
         if ($fromTo && is_array($collection)) {
             return array_slice($collection, $from, abs($to - $from));
-        } elseif($fromTo && is_object($collection) && method_exists($collection, 'load_slice')) {
+        } elseif ($fromTo && is_object($collection) && method_exists($collection, 'load_slice')) {
             return $collection->load_slice($from, $to);
         } else {
             return static::slice_collection_using_each($collection, $from, $to);
@@ -37,7 +40,8 @@ class Utils {
      *
      * @return bool
      */
-    public static function is_non_blank_string($collection) {
+    public static function is_non_blank_string($collection)
+    {
         return (is_string($collection) && $collection != '');
     }
 
@@ -48,7 +52,8 @@ class Utils {
      *
      * @return array
      */
-    public static function slice_collection_using_each($collection, $from, $to) {
+    public static function slice_collection_using_each($collection, $from, $to)
+    {
         $segments = array();
         $index = 0;
 
@@ -58,7 +63,7 @@ class Utils {
 
         if (is_object($collection) && method_exists($collection, 'each')) {
             $stop = false;
-            $collection->each(function($item) use ($from, $to, &$index, &$segments, &$stop) {
+            $collection->each(function ($item) use ($from, $to, &$index, &$segments, &$stop) {
                 if ($to && $to <= $index) {
                     $stop = true;
                     return;
@@ -69,12 +74,12 @@ class Utils {
                 }
 
                 $index++;
-            }, $stop );
+            }, $stop);
 
             return $segments;
         }
 
-        foreach($collection as $item) {
+        foreach ($collection as $item) {
             if ($to && $to <= $index) {
                 break;
             }

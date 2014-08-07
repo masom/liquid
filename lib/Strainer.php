@@ -2,7 +2,8 @@
 
 namespace Liquid;
 
-class Strainer {
+class Strainer
+{
 
     /** @var array */
     protected static $filters;
@@ -27,7 +28,8 @@ class Strainer {
     /**
      * Re-initialize the Strainer.
      */
-    public static function init() {
+    public static function init()
+    {
         static::$filters = array();
         static::$global_filters = array();
         static::$global_methods = array();
@@ -36,14 +38,16 @@ class Strainer {
     /**
      * @param Context $context
      */
-    public function __construct(&$context) {
+    public function __construct(&$context)
+    {
         $this->context = $context;
     }
 
     /**
      * @param object $filter
      */
-    public static function global_filter($filter) {
+    public static function global_filter($filter)
+    {
         static::add_known_filter($filter);
 
         static::$filters[] = $filter;
@@ -52,7 +56,8 @@ class Strainer {
     /**
      * @param object $filter
      */
-    public static function add_known_filter($filter) {
+    public static function add_known_filter($filter)
+    {
         static::add_filter(static::$global_filters, static::$global_methods, $filter);
     }
 
@@ -69,7 +74,7 @@ class Strainer {
         /** @var Strainer $instance */
         $instance = new static($context);
 
-        foreach($filters as $filter) {
+        foreach ($filters as $filter) {
             $instance->add_filter($instance->instance_filters, $instance->instance_methods, $filter);
         }
 
@@ -79,7 +84,8 @@ class Strainer {
     /**
      * Mimicks the Hash.extend method.
      */
-    public function extend($filter) {
+    public function extend($filter)
+    {
         static::add_filter($this->instance_filters, $this->instance_methods, $filter);
     }
 
@@ -88,7 +94,8 @@ class Strainer {
      *   filters.each { |f| include f }
      *  end
      */
-    protected static function add_filter(&$known_filters, &$known_methods, $filter) {
+    protected static function add_filter(&$known_filters, &$known_methods, $filter)
+    {
         $class = get_class($filter);
 
         if (isset($known_filters[$class])) {
@@ -98,7 +105,7 @@ class Strainer {
 
         $methods = get_class_methods($filter);
 
-        foreach($methods as $method) {
+        foreach ($methods as $method) {
             if ($method === '__construct') {
                 continue;
             }
@@ -113,7 +120,8 @@ class Strainer {
      * @param string $method
      * @return mixed
      */
-    public function invoke($method) {
+    public function invoke($method)
+    {
 
         $args = func_get_args();
 
@@ -134,9 +142,9 @@ class Strainer {
             }
 
             /**
-            * Optimize calling the method with less than 5 arguments
+             * Optimize calling the method with less than 5 arguments
              */
-            switch($arg_count) {
+            switch ($arg_count) {
                 case 0:
                     return $instance->{$method}();
                 case 1:
@@ -150,8 +158,8 @@ class Strainer {
                 case 5:
                     return $instance->{$method}($args[0], $args[1][0], $args[1][1], $args[1][2], $args[1][3]);
                 default:
-                    return call_user_func_array( array( $instance, $method ), $args[1] );
-                break;
+                    return call_user_func_array(array($instance, $method), $args[1]);
+                    break;
             }
         } else {
             return array_shift($args);
@@ -163,13 +171,14 @@ class Strainer {
      *
      * @return bool
      */
-    public function is_invokable($method) {
+    public function is_invokable($method)
+    {
         if (!isset($this->instance_methods[$method])) {
             return false;
         }
 
         $class = $this->instance_methods[$method];
         $instance = $this->instance_filters[$class];
-        return is_callable( array( $instance, $method ) );
+        return is_callable(array($instance, $method));
     }
 }

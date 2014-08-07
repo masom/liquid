@@ -3,7 +3,8 @@
 namespace Liquid;
 
 
-class Document extends \Liquid\Block {
+class Document extends \Liquid\Block
+{
 
     /**
      * @param string $method
@@ -12,7 +13,8 @@ class Document extends \Liquid\Block {
      * @return static
      * @throws \BadMethodCallException
      */
-    public static function __callStatic($method, $args) {
+    public static function __callStatic($method, $args)
+    {
         if ($method == 'parse') {
             $tokens = $args[0];
             $options = $args[1];
@@ -21,10 +23,12 @@ class Document extends \Liquid\Block {
         throw new \BadMethodCallException();
     }
 
-    public function block_delimiter() {
+    public function block_delimiter()
+    {
         return array();
     }
 
-    public function assert_missing_delimitation() {
+    public function assert_missing_delimitation()
+    {
     }
 }

@@ -4,7 +4,8 @@ namespace Liquid;
 
 use \Liquid\Lexer;
 
-class Parser {
+class Parser
+{
 
     /** @var array */
     protected $tokens;
@@ -14,7 +15,8 @@ class Parser {
     /**
      * @param string $input
      */
-    public function __construct($input) {
+    public function __construct($input)
+    {
         $l = new Lexer($input);
         $this->tokens = $l->tokenize();
     }
@@ -22,7 +24,8 @@ class Parser {
     /**
      * @param integer $point
      */
-    public function jump($point) {
+    public function jump($point)
+    {
         $this->p = $point;
     }
 
@@ -32,7 +35,8 @@ class Parser {
      * @return mixed|null
      * @throws Exceptions\SyntaxError
      */
-    public function consume($type = null) {
+    public function consume($type = null)
+    {
         if (!isset($this->tokens[$this->p])) {
             throw new \Liquid\Exceptions\SyntaxError("Expected `{$type}` but was out of bound");
         }
@@ -59,7 +63,8 @@ class Parser {
      * @param string $type
      * @return string
      */
-    public function try_consume($type) {
+    public function try_consume($type)
+    {
         if (!isset($this->tokens[$this->p])) {
             return false;
         }
@@ -78,14 +83,15 @@ class Parser {
     /**
      * Like try_consume except for an id token of a certain name
      */
-    public function try_id($id) {
+    public function try_id($id)
+    {
         $token = $this->tokens[$this->p];
 
         if (!isset($this->tokens[$this->p])) {
             throw new \Liquid\Exceptions\SyntaxError("Expected and id but was out of bound");
         }
 
-        if($token[0] !== Lexer::TOKEN_ID || $token[1] !== $id) {
+        if ($token[0] !== Lexer::TOKEN_ID || $token[1] !== $id) {
             return false;
         }
 
@@ -110,7 +116,8 @@ class Parser {
         return $tok[0] === $type;
     }
 
-    public function expression() {
+    public function expression()
+    {
         $token = $this->tokens[$this->p];
 
         if ($token[0] === Lexer::TOKEN_ID) {
@@ -131,7 +138,8 @@ class Parser {
         }
     }
 
-    public function argument() {
+    public function argument()
+    {
         $str = '';
 
         if ($this->look(Lexer::TOKEN_ID) && $this->look(Lexer::TOKEN_COLON, 1)) {
@@ -145,7 +153,8 @@ class Parser {
         return $str;
     }
 
-    public function variable_signature() {
+    public function variable_signature()
+    {
         $str = $this->consume(Lexer::TOKEN_ID);
 
         if ($this->look(Lexer::TOKEN_OPENSQUARE)) {

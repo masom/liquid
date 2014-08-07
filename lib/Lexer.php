@@ -4,7 +4,8 @@ namespace Liquid;
 
 use \Liquid\Vendor\StringScanner\StringScanner;
 
-class Lexer {
+class Lexer
+{
 
     const TOKEN_COMPARISON = 'comparison';
     const TOKEN_STRING = 'string';
@@ -48,7 +49,8 @@ class Lexer {
     /**
      * @var string $input
      */
-    public function __construct($input) {
+    public function __construct($input)
+    {
         $this->ss = new StringScanner(rtrim($input));
     }
 
@@ -56,13 +58,14 @@ class Lexer {
      * @return array
      * @throws Exceptions\SyntaxError
      */
-    public function tokenize() {
+    public function tokenize()
+    {
         $this->output = array();
 
-        while(!$this->ss->eos) {
+        while (!$this->ss->eos) {
             $this->ss->skip('/\s*/');
             $tok = null;
-            switch(true) {
+            switch (true) {
                 case $t = $this->ss->scan(static::COMPARISON_OPERATOR):
                     $tok = array(static::TOKEN_COMPARISON, $t);
                     break;

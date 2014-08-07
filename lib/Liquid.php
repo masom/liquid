@@ -7,23 +7,24 @@ use \Liquid\Template;
 /**
  * Liquid 3.0
  */
-class Liquid {
+class Liquid
+{
 
     /** @var array */
     protected $config;
 
-    const FilterSeparator             = '\|';
-    const ArgumentSeparator           = ',';
-    const FilterArgumentSeparator     = ':';
-    const VariableAttributeSeparator  = '.';
-    const TagStart                    = '\{\%';
-    const TagEnd                      = '\%\}';
-    const VariableSignature           = '\(?[\w\-\.\[\]]+\)?';
-    const VariableSegment             = '[\w\-]';
-    const VariableStart               = '\{\{';
-    const VariableEnd                 = '\}\}';
-    const VariableIncompleteEnd       = '\}\}?';
-    const QuotedString                = '(?:"(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')';
+    const FilterSeparator = '\|';
+    const ArgumentSeparator = ',';
+    const FilterArgumentSeparator = ':';
+    const VariableAttributeSeparator = '.';
+    const TagStart = '\{\%';
+    const TagEnd = '\%\}';
+    const VariableSignature = '\(?[\w\-\.\[\]]+\)?';
+    const VariableSegment = '[\w\-]';
+    const VariableStart = '\{\{';
+    const VariableEnd = '\}\}';
+    const VariableIncompleteEnd = '\}\}?';
+    const QuotedString = '(?:"(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')';
 
 
     const ERROR_MODE_LAX = 'lax';
@@ -46,19 +47,19 @@ class Liquid {
          * PHP does not support evaluating statements when setting constants / class variables.
          */
         $partialTemplateParser = static::TagStart . '(?:' . static::QuotedString . '|.*?)*' . static::TagEnd . '|' . static::VariableStart . '(?:' . static::QuotedString . '|.*?)*' . static::VariableEnd;
-        $anyStartingTag                      = '\{\{|\{\%';
+        $anyStartingTag = '\{\{|\{\%';
 
-        static::$PART_QuotedFragment         = static::QuotedString . '|(?:[^\s,\|\'"]|' . static::QuotedString . ')+';
-        static::$PART_TagAttributes          = '(\w+)\s*\:\s*(' . static::$PART_QuotedFragment . ')';
+        static::$PART_QuotedFragment = static::QuotedString . '|(?:[^\s,\|\'"]|' . static::QuotedString . ')+';
+        static::$PART_TagAttributes = '(\w+)\s*\:\s*(' . static::$PART_QuotedFragment . ')';
 
-        static::$QuotedFragment              = '/' . static::$PART_QuotedFragment . '/S';
-        static::$TagAttributes               = '/' . static::$PART_TagAttributes . '/S';
-        static::$AnyStartingTag              = '/'. $anyStartingTag . '/S';
-        static::$PartialTemplateParser       = '/' . $partialTemplateParser . '/Ssm';
+        static::$QuotedFragment = '/' . static::$PART_QuotedFragment . '/S';
+        static::$TagAttributes = '/' . static::$PART_TagAttributes . '/S';
+        static::$AnyStartingTag = '/' . $anyStartingTag . '/S';
+        static::$PartialTemplateParser = '/' . $partialTemplateParser . '/Ssm';
         //        static::$TemplateParser              = '/(' . $partialTemplateParser . '|' . $anyStartingTag . ')/Ssm';
         static::$TemplateParser = '/((?:(?:\{\%).*?(?:\%\})|(?:\{\{).*?(?:\}\}?))|(?:\{\{|\{\%))/Ssm';
 
-        static::$VariableParser              = '/\[[^\]]+\]|' . static::VariableSegment . '+\??/S';
+        static::$VariableParser = '/\[[^\]]+\]|' . static::VariableSegment . '+\??/S';
 
 
         /**
