@@ -3,14 +3,13 @@
 namespace Liquid;
 
 use Liquid\Exceptions\SyntaxError;
-use \Liquid\Liquid;
 use \Liquid\Tags\ContinueTag;
 use \Liquid\Tags\BreakTag;
 use \Liquid\Utils\Nodes;
-use \Liquid\Variable;
 
 
-class Block extends \Liquid\Tag {
+class Block extends \Liquid\Tag
+{
 
     const TAGSTART = '{%';
     const VARSTART = '{{';
@@ -32,12 +31,14 @@ class Block extends \Liquid\Tag {
     /** @var array */
     protected $warnings;
 
-    public static function init() {
+    public static function init()
+    {
         static::$FullToken = '/\A' . \Liquid\Liquid::TagStart . '\s*(\w+)\s*(.*)?' . \Liquid\Liquid::TagEnd . '\z/sm';
         static::$ContentOfVariable = '/\A' . \Liquid\Liquid::VariableStart . '(.*)' . \Liquid\Liquid::VariableEnd . '\z/sm';
     }
 
-    public function __call($method, $arguments){
+    public function __call($method, $arguments)
+    {
         if ($method === 'parse') {
             return $this->_parse($arguments[0]);
         }
@@ -50,10 +51,11 @@ class Block extends \Liquid\Tag {
      *
      * @throws Exceptions\SyntaxError
      */
-    public function _parse($tokens) {
+    public function _parse($tokens)
+    {
         $this->blank = true;
 
-        $this->nodelist = $this->nodelist ?: new Nodes();
+        $this->nodelist = $this->nodelist ? : new Nodes();
 
         $this->children = array();
 
@@ -63,51 +65,50 @@ class Block extends \Liquid\Tag {
                 continue;
             }
 
-            switch(true) {
-            case Utils::starts_with($token, static::TAGSTART):
-                if (preg_match(static::$FullToken, $token, $matches)) {
-                    # if we found the proper block delimiter just end parsing here and let the outer block
-                    # proceed
-                    #
+            switch (true) {
+                case Utils::starts_with($token, static::TAGSTART):
+                    if (preg_match(static::$FullToken, $token, $matches)) {
 
-                    if ($this->block_delimiter() == $matches[1]) {
-                        $this->end_tag();
-                        return;
-                    }
-
-                    $tags = Template::tags();
-
-                    # fetch the tag from registered blocks.
-                    if (isset($tags[$matches[1]]) && $tag = $tags[$matches[1]]) {
-                        /** @var \Liquid\Tag $new_tag */
-                        $new_tag = $tag::parse($matches[1], $matches[2], $tokens, $this->options);
-
-                        if (!$new_tag->is_blank()) {
-                            $this->blank = false;
+                        # if we found the proper block delimiter just end parsing here and let the outer block
+                        # proceed
+                        if ($this->block_delimiter() == $matches[1]) {
+                            $this->end_tag();
+                            return;
                         }
 
-                        $this->nodelist[] = $new_tag;
-                        $this->children[] = $new_tag;
+                        $tags = Template::tags();
+
+                        # fetch the tag from registered blocks.
+                        if (isset($tags[$matches[1]]) && $tag = $tags[$matches[1]]) {
+                            /** @var \Liquid\Tag $new_tag */
+                            $new_tag = $tag::parse($matches[1], $matches[2], $tokens, $this->options);
+
+                            if (!$new_tag->is_blank()) {
+                                $this->blank = false;
+                            }
+
+                            $this->nodelist[] = $new_tag;
+                            $this->children[] = $new_tag;
+                        } else {
+                            # this tag is not registered with the system
+                            # pass it to the current block for special handling or error reporting
+                            $this->unknown_tag($matches[1], $matches[2], $tokens);
+                        }
                     } else {
-                        # this tag is not registered with the system
-                        # pass it to the current block for special handling or error reporting
-                        $this->unknown_tag($matches[1], $matches[2], $tokens);
+                        throw new SyntaxError("Tag '{$token}' was not properly terminated with regexp: " . Liquid::TagEnd);
                     }
-                } else {
-                    throw new SyntaxError("Tag '{$token}' was not properly terminated with regexp: " . Liquid::TagEnd);
-                }
-                break;
-            case Utils::starts_with($token, static::VARSTART):
-                $new_var = $this->create_variable($token);
-                $this->nodelist[] = $new_var;
-                $this->children[] = $new_var;
-                $this->blank = false;
-                break;
-            default:
-                $this->nodelist[] = $token;
-                if (preg_match('/\A\s*\z/', $token)) {
-                    $this->blank = true;
-                }
+                    break;
+                case Utils::starts_with($token, static::VARSTART):
+                    $new_var = $this->create_variable($token);
+                    $this->nodelist[] = $new_var;
+                    $this->children[] = $new_var;
+                    $this->blank = false;
+                    break;
+                default:
+                    $this->nodelist[] = $token;
+                    if (preg_match('/\A\s*\z/', $token)) {
+                        $this->blank = true;
+                    }
             }
         }
 
@@ -117,24 +118,27 @@ class Block extends \Liquid\Tag {
     /**
      * @return bool
      */
-    public function is_blank() {
+    public function is_blank()
+    {
         return $this->blank;
     }
 
     /**
      * @return string
      */
-    public function end_tag() {
+    public function end_tag()
+    {
     }
 
     /**
      * @return array
      */
-    public function warnings() {
-        $all_warnings = $this->warnings ?: array();
+    public function warnings()
+    {
+        $all_warnings = $this->warnings ? : array();
 
         if ($this->children) {
-            foreach($this->children as $node) {
+            foreach ($this->children as $node) {
                 if (!method_exists($node, 'warnings')) {
                     continue;
                 }
@@ -153,7 +157,8 @@ class Block extends \Liquid\Tag {
      *
      * @throws Exceptions\SyntaxError
      */
-    public function unknown_tag($tag, $params, $tokens) {
+    public function unknown_tag($tag, $params, $tokens)
+    {
         $block_name = $this->block_name();
         if ($tag === 'else') {
             $msg = "{$block_name} tag does not expect else tag";
@@ -169,17 +174,20 @@ class Block extends \Liquid\Tag {
     /**
      * @return string
      */
-    public function block_delimiter() {
+    public function block_delimiter()
+    {
         if (!$this->block_delimiter) {
             $this->block_delimiter = 'end' . $this->block_name();
         }
+
         return $this->block_delimiter;
     }
 
     /**
      * @return string
      */
-    public function block_name() {
+    public function block_name()
+    {
         return $this->tag_name;
     }
 
@@ -189,12 +197,13 @@ class Block extends \Liquid\Tag {
      * @return Variable
      * @throws Exceptions\SyntaxError
      */
-    public function create_variable($token) {
+    public function create_variable($token)
+    {
         $matches = null;
 
         preg_match_all(static::$ContentOfVariable, $token, $matches);
 
-        foreach($matches[1] as $match) {
+        foreach ($matches[1] as $match) {
             return new Variable($match, $this->options);
         }
 
@@ -207,14 +216,16 @@ class Block extends \Liquid\Tag {
      *
      * @return string
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         return $this->render_all($this->nodelist, $context);
     }
 
     /**
      * @throws Exceptions\SyntaxError
      */
-    protected function assert_missing_delimitation() {
+    protected function assert_missing_delimitation()
+    {
         throw new \Liquid\Exceptions\SyntaxError("`{$this->block_name()}` tag was never closed.");
     }
 
@@ -226,14 +237,15 @@ class Block extends \Liquid\Tag {
      * @throws \Exception
      * @throws Exceptions\MemoryError
      */
-    protected function render_all($items, &$context) {
+    protected function render_all($items, &$context)
+    {
         $output = array();
 
         $limits = $context->resource_limits();
         $limits['render_length_current'] = 0;
         $limits['render_score_current'] += count($items);
 
-        foreach($items as $token) {
+        foreach ($items as $token) {
             if ($context->has_interrupt()) {
                 break;
             }
@@ -248,8 +260,7 @@ class Block extends \Liquid\Tag {
                 $token_output = method_exists($token, 'render') ? $token->render($context) : $token;
                 $context->increment_used_resources('render_length_current', $token_output);
 
-                if ($context->is_resource_limits_reached())
-                {
+                if ($context->is_resource_limits_reached()) {
                     $limits['reached'] = true;
                     throw new \Liquid\Exceptions\MemoryError("Memory limits exceeded");
                 }
@@ -265,9 +276,9 @@ class Block extends \Liquid\Tag {
                 } else {
                     $output[] = $token_output;
                 }
-            } catch(\Liquid\Exceptions\MemoryError $e) {
+            } catch (\Liquid\Exceptions\MemoryError $e) {
                 throw $e;
-            } catch(\Liquid\Exceptions\LiquidException $e) {
+            } catch (\Liquid\Exceptions\LiquidException $e) {
                 $output[] = $context->handle_error($e);
             }
         }
