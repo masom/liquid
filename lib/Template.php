@@ -127,8 +127,9 @@ class Template
     {
         if ($error_mode) {
             static::$error_mode = $error_mode;
-            return;
+            return static::$error_mode;
         }
+
         return static::$error_mode ? : Liquid::ERROR_MODE_LAX;
     }
 

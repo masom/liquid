@@ -20,7 +20,8 @@ if ($env_mode = getenv('LIQUID_PARSER_MODE')) {
 \Liquid\Template::error_mode($mode);
 
 
-function debug($data = null){
+function debug($data = null)
+{
     $calledFrom = debug_backtrace();
     $caller = substr(str_replace(dirname(dirname(__DIR__)), '', $calledFrom[0]['file']), 1);
     $line = $calledFrom[0]['line'];
@@ -32,6 +33,6 @@ function debug($data = null){
     } else {
         echo "<pre><strong>{$caller}</strong>";
         echo " (line <strong>{$line}</strong>)";
-        echo "\n". str_replace('<', '&lt;', str_replace('>', '&gt;', print_r($data, true))) . "\n</pre>\n";
+        echo "\n" . str_replace('<', '&lt;', str_replace('>', '&gt;', print_r($data, true))) . "\n</pre>\n";
     }
 }
