@@ -5,30 +5,35 @@ namespace Liquid\Tests\Unit;
 
 use \Liquid\Template;
 
-class TokenizerTest extends \Liquid\Tests\TestCase {
+class TokenizerTest extends \Liquid\Tests\TestCase
+{
 
     /** @var \ReflectionMethod */
     protected $method;
 
-    protected function setUp() {
+    protected function setUp()
+    {
         if (!$this->method) {
             $this->method = new \ReflectionMethod('\Liquid\Template', 'tokenize');
             $this->method->setAccessible(true);
         }
     }
 
-    protected function tokenize($source) {
+    protected function tokenize($source)
+    {
         $template = new Template();
 
         return $this->method->invoke($template, $source);
     }
 
-    public function test_tokenize_strings() {
+    public function test_tokenize_strings()
+    {
         $this->assertEquals(array(' '), $this->tokenize(' ')->tokens());
         $this->assertEquals(array('hello world'), $this->tokenize('hello world')->tokens());
     }
 
-    public function test_tokenize_variables() {
+    public function test_tokenize_variables()
+    {
         $this->assertEquals(array('{{funk}}'), $this->tokenize('{{funk}}')->tokens());
 
         $this->assertEquals(array(' ', '{{funk}}', ' '), $this->tokenize(' {{funk}} ')->tokens());
@@ -39,7 +44,8 @@ class TokenizerTest extends \Liquid\Tests\TestCase {
         $this->assertEquals(array(' ', '{{ funk }}', ' '), $this->tokenize(' {{ funk }} ')->tokens());
     }
 
-    public function test_tokenize_blocks() {
+    public function test_tokenize_blocks()
+    {
         $this->assertEquals(array('{%comment%}'), $this->tokenize('{%comment%}')->tokens());
         $this->assertEquals(array(' ', '{%comment%}', ' '), $this->tokenize(' {%comment%} ')->tokens());
 

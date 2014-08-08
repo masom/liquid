@@ -36,19 +36,16 @@ class IfElseTagTest extends IntegrationTestCase
 
     public function test_if_or()
     {
-        //$this->assert_template_result(' YES ', '{% if a or b %} YES {% endif %}', array('a' => true, 'b' => true));
-        //$this->assert_template_result(' YES ', '{% if a or b %} YES {% endif %}', array('a' => true, 'b' => false));
-        debug('THIS BELOW');
+        $this->assert_template_result(' YES ', '{% if a or b %} YES {% endif %}', array('a' => true, 'b' => true));
+        $this->assert_template_result(' YES ', '{% if a or b %} YES {% endif %}', array('a' => true, 'b' => false));
         $this->assert_template_result(' YES ', '{% if a or b %} YES {% endif %}', array('a' => false, 'b' => true));
-        //$this->assert_template_result('', '{% if a or b %} YES {% endif %}', array('a' => false, 'b' => false));
-        return;
+        $this->assert_template_result('', '{% if a or b %} YES {% endif %}', array('a' => false, 'b' => false));
         $this->assert_template_result(' YES ', '{% if a or b or c %} YES {% endif %}', array('a' => false, 'b' => false, 'c' => true));
         $this->assert_template_result('', '{% if a or b or c %} YES {% endif %}', array('a' => false, 'b' => false, 'c' => false));
     }
 
     public function test_if_or_with_operators()
     {
-        return;
         $this->assert_template_result(' YES ', '{% if a == true or b == true %} YES {% endif %}', array('a' => true, 'b' => true));
         $this->assert_template_result(' YES ', '{% if a == true or b == false %} YES {% endif %}', array('a' => true, 'b' => true));
         $this->assert_template_result('', '{% if a == false or b == false %} YES {% endif %}', array('a' => true, 'b' => true));

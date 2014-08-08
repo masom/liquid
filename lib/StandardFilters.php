@@ -2,6 +2,7 @@
 
 namespace Liquid;
 
+use Liquid\Exceptions\DivisionByZeroError;
 use \Liquid\Utils\Arrays;
 use Liquid\Utils\InputIterator;
 
@@ -418,12 +419,21 @@ class StandardFilters
         return $input * $operand;
     }
 
+    /**
+     * @param $input
+     * @param $operand
+     * @return float|null
+     * @throws DivisionByZeroError
+     */
     public function divided_by($input, $operand)
     {
         if (!is_numeric($input) || !is_numeric($operand)) {
             return null;
         }
 
+        if ($operand == 0.0) {
+            throw new DivisionByZeroError();
+        }
         return $input / $operand;
     }
 

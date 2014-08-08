@@ -5,9 +5,11 @@ namespace Liquid\Tests\Unit;
 use \Liquid\Lexer;
 
 
-class LexerText extends \Liquid\Tests\TestCase {
+class LexerText extends \Liquid\Tests\TestCase
+{
 
-    public function test_strings() {
+    public function test_strings()
+    {
         $lexer = new Lexer(' \'this is a test""\' "wat \'lol\'"');
         $tokens = $lexer->tokenize();
         $expected = array(
@@ -18,7 +20,8 @@ class LexerText extends \Liquid\Tests\TestCase {
         $this->assertEquals($expected, $tokens);
     }
 
-    public function test_integer() {
+    public function test_integer()
+    {
         $lexer = new Lexer('hi 50');
         $tokens = $lexer->tokenize();
         $expected = array(
@@ -29,7 +32,8 @@ class LexerText extends \Liquid\Tests\TestCase {
         $this->assertEquals($expected, $tokens);
     }
 
-    public function test_float() {
+    public function test_float()
+    {
         $lexer = new Lexer('hi 5.0');
         $tokens = $lexer->tokenize();
         $expected = array(
@@ -40,7 +44,8 @@ class LexerText extends \Liquid\Tests\TestCase {
         $this->assertEquals($expected, $tokens);
     }
 
-    public function test_comparison() {
+    public function test_comparison()
+    {
         $lexer = new Lexer('== <> contains');
         $tokens = $lexer->tokenize();
         $expected = array(
@@ -51,7 +56,8 @@ class LexerText extends \Liquid\Tests\TestCase {
         );
     }
 
-    public function test_specials() {
+    public function test_specials()
+    {
         $lexer = new Lexer('| .:');
         $tokens = $lexer->tokenize();
         $expected = array(
@@ -73,7 +79,8 @@ class LexerText extends \Liquid\Tests\TestCase {
         $this->assertEquals($expected, $tokens);
     }
 
-    public function test_fancy_identifiers() {
+    public function test_fancy_identifiers()
+    {
         $lexer = new Lexer('hi! five?');
         $tokens = $lexer->tokenize();
 
@@ -85,7 +92,8 @@ class LexerText extends \Liquid\Tests\TestCase {
         $this->assertEquals($expected, $tokens);
     }
 
-    public function test_whitespace() {
+    public function test_whitespace()
+    {
         $lexer = new Lexer("five|\n\t ==");
         $tokens = $lexer->tokenize();
         $expected = array(
@@ -97,12 +105,13 @@ class LexerText extends \Liquid\Tests\TestCase {
         $this->assertEquals($expected, $tokens);
     }
 
-    public function test_unexpected_character() {
+    public function test_unexpected_character()
+    {
         try {
             $lexer = new Lexer('%');
             $lexer->tokenize();
             $this->fail('A SyntaxError should have been raised.');
-        } catch(\Liquid\Exceptions\SyntaxError $e) {
+        } catch (\Liquid\Exceptions\SyntaxError $e) {
         }
     }
 }

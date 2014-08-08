@@ -4,8 +4,10 @@ namespace Liquid\Tests\Unit\Tags;
 
 use \Liquid\Template;
 
-class IfTagTest extends \Liquid\Tests\TestCase {
-    public function test_if_nodelist() {
+class IfTagTest extends \Liquid\Tests\TestCase
+{
+    public function test_if_nodelist()
+    {
         $template = Template::parse('{% if true %}IF{% else %}ELSE{% endif %}');
 
         $nodelist = $template->root()->nodelist();
