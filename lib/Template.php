@@ -264,7 +264,6 @@ class Template
                 //
                 if (!isset($last['registers']) && !isset($last['filters'])) {
                     $context->add_filters($last);
-                    break;
                 }
 
                 if (isset($last['registers']) && is_array($last['registers'])) {

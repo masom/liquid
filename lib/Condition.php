@@ -43,6 +43,9 @@ class Condition
                     if (is_array($left)) {
                         return in_array($left, $right) ? : isset($left[$right]);
                     }
+                    if (is_string($left)) {
+                        return strpos($left, $right) !== false;
+                    }
 
                     return false;
                 }

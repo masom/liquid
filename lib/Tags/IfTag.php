@@ -81,6 +81,7 @@ class IfTag extends \Liquid\Block
 
         $context->stack(function ($context) use ($self, &$blocks, &$result) {
             foreach ($blocks as $block) {
+                /** @var \Liquid\Condition $block */
                 if ($block->evaluate($context)) {
                     $result = $self->render_all($block->attachment(), $context);
                     return;

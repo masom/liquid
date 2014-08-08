@@ -111,14 +111,14 @@ class IfElseTagTest extends IntegrationTestCase
         $this->assert_template_result(' YES ', '{% if var %} YES {% endif %}', array('var' => "text"));
         $this->assert_template_result(' YES ', '{% if var %} YES {% endif %}', array('var' => true));
         $this->assert_template_result(' YES ', '{% if var %} YES {% endif %}', array('var' => 1));
-        $this->assert_template_result(' YES ', '{% if var %} YES {% endif %}', array('var' => array()));
-        $this->assert_template_result(' YES ', '{% if var %} YES {% endif %}', array('var' => array()));
+        $this->assert_template_result(' YES ', '{% if var %} YES {% endif %}', array('var' => new \ArrayObject()));
+        $this->assert_template_result(' YES ', '{% if var %} YES {% endif %}', array('var' => new \ArrayObject()));
         $this->assert_template_result(' YES ', '{% if "foo" %} YES {% endif %}');
         $this->assert_template_result(' YES ', '{% if foo.bar %} YES {% endif %}', array('foo' => array('bar' => true)));
         $this->assert_template_result(' YES ', '{% if foo.bar %} YES {% endif %}', array('foo' => array('bar' => "text")));
         $this->assert_template_result(' YES ', '{% if foo.bar %} YES {% endif %}', array('foo' => array('bar' => 1)));
-        $this->assert_template_result(' YES ', '{% if foo.bar %} YES {% endif %}', array('foo' => array('bar' => array())));
-        $this->assert_template_result(' YES ', '{% if foo.bar %} YES {% endif %}', array('foo' => array('bar' => array())));
+        $this->assert_template_result(' YES ', '{% if foo.bar %} YES {% endif %}', array('foo' => array('bar' => new \ArrayObject())));
+        $this->assert_template_result(' YES ', '{% if foo.bar %} YES {% endif %}', array('foo' => array('bar' => new \ArrayObject())));
 
         $this->assert_template_result(' YES ', '{% if var %} NO {% else %} YES {% endif %}', array('var' => false));
         $this->assert_template_result(' YES ', '{% if var %} NO {% else %} YES {% endif %}', array('var' => null));
