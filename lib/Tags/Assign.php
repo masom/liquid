@@ -6,24 +6,27 @@ use \Liquid\Liquid;
 use \Liquid\Variable;
 
 
-class Assign extends \Liquid\Tag {
+class Assign extends \Liquid\Tag
+{
     protected static $init = false;
     protected static $Syntax;
 
-    public static function init() {
+    public static function init()
+    {
         static::$init = true;
 
-        static::$Syntax = '/(' . Liquid::VariableSignature .')\s*=\s*(.*)\s*/s';
+        static::$Syntax = '/(' . Liquid::VariableSignature . ')\s*=\s*(.*)\s*/s';
     }
 
     /**
      * @param string $tag_name
      * @param string $markup
-     * @param array  $options
+     * @param array $options
      *
      * @throws \Liquid\Exceptions\SyntaxError
      */
-    public function __construct($tag_name, &$markup, $options) {
+    public function __construct($tag_name, &$markup, $options)
+    {
         parent::__construct($tag_name, $markup, $options);
 
         $matches = null;
@@ -40,7 +43,8 @@ class Assign extends \Liquid\Tag {
      *
      * @return null
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         $val = $this->from->render($context);
 
         $context->scopes_last_set($this->to, $val);
@@ -52,7 +56,8 @@ class Assign extends \Liquid\Tag {
     /**
      * @return bool
      */
-    public function is_blank() {
+    public function is_blank()
+    {
         return true;
     }
 }

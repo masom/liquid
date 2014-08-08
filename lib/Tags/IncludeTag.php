@@ -9,7 +9,8 @@ use Liquid\Utils\Arrays;
 use Liquid\Utils\Registers;
 
 
-class IncludeTag extends \Liquid\Tag {
+class IncludeTag extends \Liquid\Tag
+{
     protected static $Syntax;
 
     /** @var string */
@@ -17,17 +18,19 @@ class IncludeTag extends \Liquid\Tag {
 
     protected $attributes;
 
-    public static function init() {
+    public static function init()
+    {
         static::$Syntax = '/(' . Liquid::$PART_QuotedFragment . '+)(\s+(?:with|for)\s+(' . Liquid::$PART_QuotedFragment . '+))?/';
     }
 
     /**
      * @param string $tag_name
      * @param string $markup
-     * @param array  $options
+     * @param array $options
      * @throws \Liquid\Exceptions\SyntaxError
      */
-    public function __construct($tag_name, $markup, $options) {
+    public function __construct($tag_name, $markup, $options)
+    {
         parent::__construct($tag_name, $markup, $options);
 
         $matches = null;
@@ -37,7 +40,7 @@ class IncludeTag extends \Liquid\Tag {
             $this->attributes = array();
 
             preg_match_all(Liquid::$TagAttributes, $markup, $matches);
-            foreach($matches[1] as $key => $name) {
+            foreach ($matches[1] as $key => $name) {
                 $this->attributes[$name] = $matches[2][$key];
             }
         } else {
@@ -45,7 +48,8 @@ class IncludeTag extends \Liquid\Tag {
         }
     }
 
-    public function _parse($tokens) {
+    public function _parse($tokens)
+    {
     }
 
     /**
@@ -53,18 +57,19 @@ class IncludeTag extends \Liquid\Tag {
      *
      * @return null
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         $partial = $this->load_cached_partial($context);
 
-        $template_name = substr($this->template_name, 1, strlen($this->template_name) -2 );
+        $template_name = substr($this->template_name, 1, strlen($this->template_name) - 2);
 
         $variable = ($this->variable_name) ? $context[$this->variable_name] : $context[$template_name];
 
         $attributes =& $this->attributes;
 
         $return = null;
-        $context->stack(function($context) use (&$partial, &$variable, &$attributes, &$return, &$template_name) {
-            foreach($attributes as $key => $value) {
+        $context->stack(function ($context) use (&$partial, &$variable, &$attributes, &$return, &$template_name) {
+            foreach ($attributes as $key => $value) {
                 $context[$key] = $context[$value];
             }
 
@@ -72,7 +77,7 @@ class IncludeTag extends \Liquid\Tag {
             $context_variable_name = end($tmp);
 
             if (is_array($variable) && !Arrays::is_assoc($variable)) {
-                foreach($variable as &$value) {
+                foreach ($variable as &$value) {
                     $context[$context_variable_name] = $value;
 
                     $return .= $partial->render($context);
@@ -92,7 +97,8 @@ class IncludeTag extends \Liquid\Tag {
      *
      * @return mixed
      */
-    private function load_cached_partial($context) {
+    private function load_cached_partial($context)
+    {
         $registers = $context->registers();
         $cached_partials = $registers['cached_partial'];
 
@@ -112,25 +118,26 @@ class IncludeTag extends \Liquid\Tag {
     }
 
     /**
-     * @param \Liquid\$context
+     * @param \Liquid\ $context
      *
      * @return mixed
      * @throws \InvalidArgumentException
      */
-    public function read_template_from_file_system($context) {
+    public function read_template_from_file_system($context)
+    {
         /** @var Context $context */
         /** @var Registers $registers */
         $registers = $context->registers();
         $file_system = $registers->offsetExists('file_system') ? $registers['file_system'] : Template::filesystem();
 
         $reflection = new \ReflectionMethod($file_system, 'read_template_file');
-        switch($reflection->getNumberOfParameters()) {
-        case 1:
-            return $file_system->read_template_file($context[$this->template_name]);
-        case 2:
-            return $file_system->read_template_file($context[$this->template_name], $context);
-        default:
-            throw new \InvalidArgumentException("file_system.read_template_file expects two parameters: (template_name, context)");
+        switch ($reflection->getNumberOfParameters()) {
+            case 1:
+                return $file_system->read_template_file($context[$this->template_name]);
+            case 2:
+                return $file_system->read_template_file($context[$this->template_name], $context);
+            default:
+                throw new \InvalidArgumentException("file_system.read_template_file expects two parameters: (template_name, context)");
         }
     }
 }

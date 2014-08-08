@@ -2,5 +2,6 @@
 
 namespace Liquid\Exceptions;
 
-class LiquidException extends \RuntimeException {
+class LiquidException extends \RuntimeException
+{
 }

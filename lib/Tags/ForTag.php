@@ -8,7 +8,8 @@ use \Liquid\Liquid;
 use \Liquid\Utils;
 use \Liquid\Utils\Nodes;
 
-class ForTag extends \Liquid\Block {
+class ForTag extends \Liquid\Block
+{
 
     protected static $Syntax;
 
@@ -34,16 +35,18 @@ class ForTag extends \Liquid\Block {
      */
     protected $attributes = array();
 
-    public static function init() {
-        static::$Syntax = '/\A(' . Liquid::VariableSegment .'+)\s+in\s+(' . Liquid::$PART_QuotedFragment .'+)\s*(reversed)?/';
+    public static function init()
+    {
+        static::$Syntax = '/\A(' . Liquid::VariableSegment . '+)\s+in\s+(' . Liquid::$PART_QuotedFragment . '+)\s*(reversed)?/';
     }
 
     /**
      * @param string $tag_name
      * @param string $markup
-     * @param array  $options
+     * @param array $options
      */
-    public function __construct($tag_name, $markup, $options) {
+    public function __construct($tag_name, $markup, $options)
+    {
         parent::__construct($tag_name, $markup, $options);
 
         $this->parse_with_selected_parser($markup);
@@ -54,7 +57,8 @@ class ForTag extends \Liquid\Block {
     /**
      * @return array|\ArrayObject|Nodes
      */
-    public function nodelist() {
+    public function nodelist()
+    {
         if ($this->else_block) {
             return $this->for_block->merge($this->else_block);
         } else {
@@ -67,7 +71,8 @@ class ForTag extends \Liquid\Block {
      * @param $markup
      * @param $tokens
      */
-    public function unknown_tag($tag, $markup, $tokens) {
+    public function unknown_tag($tag, $markup, $tokens)
+    {
         if ($tag !== 'else') {
             return parent::unknown_tag($tag, $markup, $tokens);
         }
@@ -80,7 +85,8 @@ class ForTag extends \Liquid\Block {
      *
      * @return array|null|string
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         $registers = $context->registers();
 
         $collection = $context[$this->collection_name];
@@ -92,16 +98,16 @@ class ForTag extends \Liquid\Block {
 
         if (isset($this->attributes['offset'])) {
             if ($this->attributes['offset'] == 'continue') {
-                $from = (int) $registers['for'][$this->name];
+                $from = (int)$registers['for'][$this->name];
             } else {
-                $from = (int) $context[$this->attributes['offset']];
+                $from = (int)$context[$this->attributes['offset']];
             }
         } else {
             $from = null;
         }
 
-        $limit = isset($this->attributes['limit']) ? (int) $context[$this->attributes['limit']] : null;
-        $to = $limit ? (int) $limit + $from : null;
+        $limit = isset($this->attributes['limit']) ? (int)$context[$this->attributes['limit']] : null;
+        $to = $limit ? (int)$limit + $from : null;
 
         $segment = Utils::slice_collection($collection, $from, $to);
 
@@ -119,15 +125,15 @@ class ForTag extends \Liquid\Block {
 
         $self = $this;
         $result = null;
-        $variable_name = &$this->variable_name;
+        $variable_name = & $this->variable_name;
         $name =& $this->name;
         $for_block =& $this->for_block;
 
 
-        $context->stack(function($context) use ($self, &$result, &$for_block, &$segment, &$variable_name, &$name, $length) {
+        $context->stack(function ($context) use ($self, &$result, &$for_block, &$segment, &$variable_name, &$name, $length) {
             /** @var \Liquid\Context $context */
 
-            foreach($segment as $key => $item) {
+            foreach ($segment as $key => $item) {
                 $context[$variable_name] = $item;
                 $context['forloop'] = array(
                     'name' => $name,
@@ -136,7 +142,7 @@ class ForTag extends \Liquid\Block {
                     'index0' => $key,
                     'rindex' => $length - $key,
                     'rindex0' => $length - $key - 1,
-                    'first' => ($key==0),
+                    'first' => ($key == 0),
                     'last' => ($key == $length - 1)
                 );
 
@@ -162,7 +168,8 @@ class ForTag extends \Liquid\Block {
      *
      * @throws \Liquid\Exceptions\SyntaxError
      */
-    public function lax_parse(&$markup) {
+    public function lax_parse(&$markup)
+    {
         if (preg_match(static::$Syntax, $markup, $matches)) {
             $this->variable_name = $matches[1];
             $this->collection_name = $matches[2];
@@ -172,8 +179,8 @@ class ForTag extends \Liquid\Block {
 
             $this->attributes = array();
 
-            if(preg_match_all(Liquid::$TagAttributes, $markup, $matches)) {
-                foreach($matches[1] as $key => $name) {
+            if (preg_match_all(Liquid::$TagAttributes, $markup, $matches)) {
+                foreach ($matches[1] as $key => $name) {
                     $this->attributes[$name] = $matches[2][$key];
                 }
             }
@@ -187,7 +194,8 @@ class ForTag extends \Liquid\Block {
      *
      * @throws \Liquid\Exceptions\SyntaxError
      */
-    public function strict_parse(&$markup) {
+    public function strict_parse(&$markup)
+    {
         $p = new Parser($markup);
 
         $this->variable_name = $p->consume(Lexer::TOKEN_ID);
@@ -202,7 +210,7 @@ class ForTag extends \Liquid\Block {
 
         $this->attributes = array();
 
-        while($p->look(Lexer::TOKEN_ID) && $p->look(Lexer::TOKEN_COLON, 1)) {
+        while ($p->look(Lexer::TOKEN_ID) && $p->look(Lexer::TOKEN_COLON, 1)) {
             $attribute = $p->try_id('limit');
 
             if (!$attribute || $p->try_id('offset')) {
@@ -224,7 +232,8 @@ class ForTag extends \Liquid\Block {
      *
      * @return array|string
      */
-    private function render_else(&$context) {
+    private function render_else(&$context)
+    {
         return $this->else_block ? $this->render_all($this->else_block, $context) : '';
     }
 
@@ -233,7 +242,8 @@ class ForTag extends \Liquid\Block {
      *
      * @return bool
      */
-    private function is_iterable(&$collection) {
+    private function is_iterable(&$collection)
+    {
         return (is_array($collection) || $collection instanceof \ArrayAccess) || Utils::is_non_blank_string($collection);
     }
 }

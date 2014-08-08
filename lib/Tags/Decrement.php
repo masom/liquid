@@ -5,16 +5,18 @@ namespace Liquid\Tags;
 use Liquid\Context;
 
 
-class Decrement extends \Liquid\Tag {
+class Decrement extends \Liquid\Tag
+{
 
     protected $variable;
 
     /**
      * @param string $tag_name
      * @param string $markup
-     * @param array  $options
+     * @param array $options
      */
-    public function __construct($tag_name, $markup, $options) {
+    public function __construct($tag_name, $markup, $options)
+    {
         parent::__construct($tag_name, $markup, $options);
 
         $this->variable = trim($markup);
@@ -25,7 +27,8 @@ class Decrement extends \Liquid\Tag {
      *
      * @return string
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         $environments = $context->environments();
         $env =& $environments[0];
 
@@ -37,6 +40,6 @@ class Decrement extends \Liquid\Tag {
 
         $variable = $env[$this->variable];
 
-        return (string) $variable;
+        return (string)$variable;
     }
 }

@@ -3,9 +3,11 @@ namespace Liquid\Tags;
 
 use \Liquid\Interrupts\BreakInterrupt;
 
-class BreakTag extends \Liquid\Tag {
+class BreakTag extends \Liquid\Tag
+{
 
-    public function interrupt() {
+    public function interrupt()
+    {
         return new BreakInterrupt();
     }
 }

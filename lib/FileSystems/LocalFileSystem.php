@@ -2,7 +2,8 @@
 
 namespace Liquid\FileSystems;
 
-class LocalFileSystem {
+class LocalFileSystem
+{
 
     /** @var string */
     protected $root;
@@ -15,7 +16,8 @@ class LocalFileSystem {
      * @var string $root
      * @var string $pattern
      */
-    public function __construct($root, $pattern = '_%s.liquid') {
+    public function __construct($root, $pattern = '_%s.liquid')
+    {
         $this->root = $root;
         $this->pattern = $pattern;
     }
@@ -27,7 +29,8 @@ class LocalFileSystem {
      * @return string
      * @throws \Liquid\Exceptions\FileSystemError
      */
-    public function read_template_file($template_path, $context) {
+    public function read_template_file($template_path, $context)
+    {
         $full_path = $this->full_path($template_path);
 
         if (!file_exists($full_path)) {
@@ -43,7 +46,8 @@ class LocalFileSystem {
      * @return string
      * @throws \Liquid\Exceptions\FileSystemError
      */
-    public function full_path($template_path) {
+    public function full_path($template_path)
+    {
         if (!preg_match(static::ALLOWED_PATH_PATTERN, $template_path)) {
             throw new \Liquid\Exceptions\FileSystemError("Illegal template name `{$template_path}`");
         }
@@ -55,7 +59,7 @@ class LocalFileSystem {
             $full_path = implode('/', array($this->root, sprintf($this->pattern, $template_path)));
         }
 
-        if (!preg_match( '/\A' . realpath($this->root) .'/', realpath($full_path))) {
+        if (!preg_match('/\A' . realpath($this->root) . '/', realpath($full_path))) {
             throw new \Liquid\Exceptions\FileSystemError("Illegal template path `{$template_path}`");
         }
 

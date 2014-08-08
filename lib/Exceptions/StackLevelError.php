@@ -3,5 +3,6 @@
 namespace Liquid\Exceptions;
 
 
-class StackLevelError extends \Liquid\Exceptions\LiquidException {
+class StackLevelError extends \Liquid\Exceptions\LiquidException
+{
 }

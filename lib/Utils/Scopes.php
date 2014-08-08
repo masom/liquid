@@ -5,15 +5,17 @@ namespace Liquid\Utils;
 use \Liquid\Utils\ArrayObject;
 
 
-class Scopes extends ArrayObject {
+class Scopes extends ArrayObject
+{
 
     /**
      * @param array $array
      */
-    public function __construct(array $array = array()) {
+    public function __construct(array $array = array())
+    {
         $this->array = new ArrayObject();
 
-        foreach($array as $item) {
+        foreach ($array as $item) {
             $this->array[] = is_array($item) ? new \ArrayObject($item) : $item;
         }
     }
@@ -23,7 +25,8 @@ class Scopes extends ArrayObject {
      *
      * @return mixed
      */
-    public function offsetGet($offset) {
+    public function offsetGet($offset)
+    {
         if (!isset($this->array[$offset])) {
             $this->array[$offset] = new \ArrayObject();
         }
@@ -36,10 +39,11 @@ class Scopes extends ArrayObject {
      *
      * @return $this|void
      */
-    public function merge($new_scopes) {
+    public function merge($new_scopes)
+    {
         $scope = $this->array[0];
 
-        foreach($new_scopes as $k => $v) {
+        foreach ($new_scopes as $k => $v) {
             if (is_numeric($k)) {
                 $scope[] = $v;
             } else {

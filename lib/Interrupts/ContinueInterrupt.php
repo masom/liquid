@@ -2,5 +2,6 @@
 
 namespace Liquid\Interrupts;
 
-class ContinueInterrupt extends \Liquid\Interrupts\Interrupt {
+class ContinueInterrupt extends \Liquid\Interrupts\Interrupt
+{
 }

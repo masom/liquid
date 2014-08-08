@@ -2,9 +2,11 @@
 
 namespace Liquid\Utils;
 
-class Tokens extends ArrayObject {
+class Tokens extends ArrayObject
+{
 
-    public function tokens() {
+    public function tokens()
+    {
         return $this->array;
     }
 }

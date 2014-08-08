@@ -10,8 +10,9 @@ class InputIterator
     /**
      * @param mixed $input
      */
-    public function __construct($input) {
-        switch(true) {
+    public function __construct($input)
+    {
+        switch (true) {
             case $input instanceof \Iterator || $input instanceof \ArrayAccess || $input instanceof \ArrayObject:
                 $this->array = $input;
                 break;
@@ -34,7 +35,8 @@ class InputIterator
      *
      * @return string
      */
-    public function join($glue) {
+    public function join($glue)
+    {
         if (is_object($this->array)) {
             if ($this->array instanceof \ArrayObject) {
                 return implode($glue, $this->array->getArrayCopy());
@@ -42,7 +44,7 @@ class InputIterator
 
             $result = '';
 
-            foreach($this->array as $item) {
+            foreach ($this->array as $item) {
                 $result .= $glue . $item;
             }
 
@@ -55,7 +57,8 @@ class InputIterator
     /**
      * @return array
      */
-    public function reverse() {
+    public function reverse()
+    {
         if (is_array($this->array)) {
             return array_reverse($this->array);
         }
@@ -65,7 +68,7 @@ class InputIterator
         }
 
         $result = array();
-        foreach($this->array as $item) {
+        foreach ($this->array as $item) {
             $result[] = $item;
         }
 
@@ -75,8 +78,9 @@ class InputIterator
     /**
      * @param callable $closure
      */
-    public function each(\Closure $closure) {
-        foreach($this->array as $e) {
+    public function each(\Closure $closure)
+    {
+        foreach ($this->array as $e) {
             if (is_object($e) && method_exists($e, 'to_liquid')) {
                 $closure($e->to_liquid);
             } else {
@@ -88,7 +92,8 @@ class InputIterator
     /**
      * @return mixed
      */
-    public function to_array() {
+    public function to_array()
+    {
         if (is_array($this->array)) {
             return $this->array;
         }
@@ -98,7 +103,7 @@ class InputIterator
         }
 
         $result = array();
-        foreach($this->array as $item){
+        foreach ($this->array as $item) {
             $result[] = $item;
         }
 

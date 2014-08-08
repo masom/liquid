@@ -2,7 +2,8 @@
 
 namespace Liquid\Tags;
 
-class Capture extends \Liquid\Block {
+class Capture extends \Liquid\Block
+{
     const Syntax = '/(\w+)/';
 
     protected $to;
@@ -10,11 +11,12 @@ class Capture extends \Liquid\Block {
     /**
      * @param string $tag_name
      * @param string $markup
-     * @param array  $options
+     * @param array $options
      *
      * @throws \Liquid\Exceptions\SyntaxError
      */
-    public function __construct($tag_name, $markup, $options) {
+    public function __construct($tag_name, $markup, $options)
+    {
         parent::__construct($tag_name, $markup, $options);
 
         $matches = null;
@@ -30,7 +32,8 @@ class Capture extends \Liquid\Block {
      *
      * @return null
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         $output = parent::render($context);
 
         $context->scopes_last_set($this->to, $output);
@@ -43,7 +46,8 @@ class Capture extends \Liquid\Block {
     /**
      * @return bool
      */
-    public function is_blank() {
+    public function is_blank()
+    {
         return true;
     }
 }

@@ -2,14 +2,16 @@
 
 namespace Liquid\Tags;
 
-class Increment extends \Liquid\Tag {
+class Increment extends \Liquid\Tag
+{
 
     /**
      * @param string $tag_name
      * @param string $markup
-     * @param array  $options
+     * @param array $options
      */
-    public function __construct($tag_name, $markup, $options) {
+    public function __construct($tag_name, $markup, $options)
+    {
         parent::__construct($tag_name, $markup, $options);
 
         $this->variable = trim($markup);
@@ -20,7 +22,8 @@ class Increment extends \Liquid\Tag {
      *
      * @return string
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         $environments = $context->environments();
         $env = $environments[0];
 
@@ -31,6 +34,6 @@ class Increment extends \Liquid\Tag {
         $variable = $env[$this->variable];
         $env[$this->variable] += 1;
 
-        return (string) $variable;
+        return (string)$variable;
     }
 }

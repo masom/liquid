@@ -5,18 +5,21 @@ namespace Liquid\Tags;
 use Liquid\Liquid;
 
 
-class Raw extends \Liquid\Block {
+class Raw extends \Liquid\Block
+{
 
     protected static $FullTokenPossiblyInvalid;
 
-    public static function init() {
-        static::$FullTokenPossiblyInvalid = '/\A(.*)' . Liquid::TagStart . '\s*(\w+)\s*(.*)?' . Liquid::TagEnd .'\z/sm';
+    public static function init()
+    {
+        static::$FullTokenPossiblyInvalid = '/\A(.*)' . Liquid::TagStart . '\s*(\w+)\s*(.*)?' . Liquid::TagEnd . '\z/sm';
     }
 
     /**
      * @param $tokens
      */
-    public function _parse($tokens) {
+    public function _parse($tokens)
+    {
         $this->nodelist = array();
 
         while (($token = $tokens->shift()) !== null) {

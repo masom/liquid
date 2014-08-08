@@ -2,5 +2,6 @@
 
 namespace Liquid\Exceptions;
 
-class FileSystemError extends \Liquid\Exceptions\LiquidException {
+class FileSystemError extends \Liquid\Exceptions\LiquidException
+{
 }

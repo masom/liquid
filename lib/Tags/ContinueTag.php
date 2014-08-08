@@ -4,9 +4,11 @@ namespace Liquid\Tags;
 
 use \Liquid\Interrupts\ContinueInterrupt;
 
-class ContinueTag extends \Liquid\Tag {
+class ContinueTag extends \Liquid\Tag
+{
 
-    public function interrupt() {
+    public function interrupt()
+    {
         return new ContinueInterrupt();
     }
 }

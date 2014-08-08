@@ -4,30 +4,34 @@ namespace Liquid\Tags;
 
 use \Liquid\Condition;
 use \Liquid\ElseCondition;
+use Liquid\Lexer;
 use \Liquid\Liquid;
 use \Liquid\Parser;
 use \Liquid\Utils\Arrays;
 use \Liquid\Utils\Nodes;
 
-class IfTag extends \Liquid\Block {
+class IfTag extends \Liquid\Block
+{
     protected static $Syntax;
     protected static $ExpressionsAndOperators;
-    protected static $BOOLEAN_OPERATORS = array('and'=>'and', 'or'=>'or');
+    protected static $BOOLEAN_OPERATORS = array('and' => 'and', 'or' => 'or');
 
     /** @var \ArrayObject */
     protected $blocks;
 
-    public static function init() {
-        static::$Syntax = '/(' . Liquid::$PART_QuotedFragment .')\s*([=!<>a-z_]+)?\s*(' . Liquid::$PART_QuotedFragment . ')?/';
+    public static function init()
+    {
+        static::$Syntax = '/(' . Liquid::$PART_QuotedFragment . ')\s*([=!<>a-z_]+)?\s*(' . Liquid::$PART_QuotedFragment . ')?/';
         static::$ExpressionsAndOperators = '/(?:\b(?:\s?and\s?|\s?or\s?)\b|(?:\s*(?!\b(?:\s?and\s?|\s?or\s?)\b)(?:' . Liquid::$PART_QuotedFragment . '|\S+)\s*)+)/';
     }
 
     /**
      * @param string $tag_name
      * @param string $markup
-     * @param array  $options
+     * @param array $options
      */
-    public function __construct($tag_name, &$markup, &$options) {
+    public function __construct($tag_name, &$markup, &$options)
+    {
         parent::__construct($tag_name, $markup, $options);
 
         $this->blocks = new \ArrayObject();
@@ -38,10 +42,12 @@ class IfTag extends \Liquid\Block {
     /**
      * @return array|Nodes
      */
-    public function nodelist() {
+    public function nodelist()
+    {
         $blocks = array();
 
-        foreach($this->blocks as $block) { /** @var \Liquid\Condition $block */
+        foreach ($this->blocks as $block) {
+            /** @var \Liquid\Condition $block */
             $blocks[] = $block->attachment()->nodes();
         }
 
@@ -53,7 +59,8 @@ class IfTag extends \Liquid\Block {
      * @param $markup
      * @param $tokens
      */
-    public function unknown_tag($tag, $markup, $tokens) {
+    public function unknown_tag($tag, $markup, $tokens)
+    {
         if ($tag === 'elsif' || $tag === 'else') {
             $this->push_block($tag, $markup);
         } else {
@@ -66,14 +73,15 @@ class IfTag extends \Liquid\Block {
      *
      * @return string
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         $blocks =& $this->blocks;
         $result = '';
         $self = $this;
 
-        $context->stack(function($context) use ($self, &$blocks, &$result) {
-            foreach($blocks as $block) {
-                if($block->evaluate($context)) {
+        $context->stack(function ($context) use ($self, &$blocks, &$result) {
+            foreach ($blocks as $block) {
+                if ($block->evaluate($context)) {
                     $result = $self->render_all($block->attachment(), $context);
                     return;
                 }
@@ -89,7 +97,8 @@ class IfTag extends \Liquid\Block {
      *
      * @return Nodes
      */
-    private function push_block($tag, &$markup) {
+    private function push_block($tag, &$markup)
+    {
         if ($tag === 'else') {
             $block = new ElseCondition();
         } else {
@@ -110,7 +119,8 @@ class IfTag extends \Liquid\Block {
      * @return Condition
      * @throws \Liquid\Exceptions\SyntaxError
      */
-    public function lax_parse(&$markup) {
+    public function lax_parse(&$markup)
+    {
         preg_match_all(static::$ExpressionsAndOperators, $markup, $matches);
 
         $expressions = array_reverse($matches[0]);
@@ -121,16 +131,17 @@ class IfTag extends \Liquid\Block {
 
         $condition = new Condition($matches[1], isset($matches[2]) ? $matches[2] : null, isset($matches[3]) ? $matches[3] : null);
 
-        while($expressions) {
-            $operator = trim((string) array_shift($expressions));
+        //TODO Something is wrong here.
+        while ($expressions) {
+            $operator = trim((string)array_shift($expressions));
 
-            if (!preg_match(static::$Syntax, trim((string) array_shift($expressions)), $matches)) {
+            if (!preg_match(static::$Syntax, trim((string)array_shift($expressions)), $matches)) {
                 throw new \Liquid\Exceptions\SyntaxError("Syntax Error in tag 'if' - Valid syntax: if [expression]");
             }
 
             $new_condition = new Condition($matches[1], isset($matches[2]) ? $matches[2] : null, isset($matches[3]) ? $matches[3] : null);
 
-            if(!isset(static::$BOOLEAN_OPERATORS[$operator])) {
+            if (!isset(static::$BOOLEAN_OPERATORS[$operator])) {
                 throw new \Liquid\Exceptions\SyntaxError("Syntax Error in tag 'if' - Valid syntax: if [expression]");
             }
 
@@ -146,20 +157,33 @@ class IfTag extends \Liquid\Block {
      *
      * @return Condition
      */
-    public function strict_parse($markup) {
+    public function strict_parse($markup)
+    {
         $p = new Parser($markup);
 
         $condition = $this->parse_comparison($p);
 
-        while($op = ($p->try_id('and') || $p->try_id('or'))) {
+        while ($op = $this->get_op($p)) {
             $new_cond = $this->parse_comparison($p);
             $new_cond->{$op}($condition);
             $condition = $new_cond;
         }
 
-        $p->consume('end_of_string');
+        $p->consume(Lexer::TOKEN_ENDOFSTRING);
 
         return $condition;
+    }
+
+    /**
+     * @param Parser $p
+     * @return bool|null
+     */
+    private function get_op($p)
+    {
+        if ($op = $p->try_id('and') || $op = $p->try_id('or')) {
+            return $op;
+        }
+        return null;
     }
 
     /**
@@ -167,7 +191,8 @@ class IfTag extends \Liquid\Block {
      *
      * @return Condition
      */
-    private function parse_comparison($p) {
+    private function parse_comparison($p)
+    {
         $a = $p->expression();
 
         if ($op = $p->try_consume('comparison')) {
@@ -178,4 +203,5 @@ class IfTag extends \Liquid\Block {
         }
     }
 }
+
 IfTag::init();

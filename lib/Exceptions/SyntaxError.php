@@ -2,9 +2,11 @@
 
 namespace Liquid\Exceptions;
 
-class SyntaxError extends \Liquid\Exceptions\LiquidException {
+class SyntaxError extends \Liquid\Exceptions\LiquidException
+{
 
-    public function setMessage($message) {
+    public function setMessage($message)
+    {
         $this->message = $message;
     }
 }

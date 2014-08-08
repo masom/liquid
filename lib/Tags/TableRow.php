@@ -6,22 +6,25 @@ use Liquid\Liquid;
 use Liquid\Utils;
 
 
-class TableRow extends \Liquid\Block {
+class TableRow extends \Liquid\Block
+{
 
     protected static $Syntax;
 
-    public static function init() {
+    public static function init()
+    {
         static::$Syntax = '/(\w+)\s+in\s+(' . Liquid::$PART_QuotedFragment . '+)/';
     }
 
     /**
      * @param string $tag_name
      * @param string $markup
-     * @param array  $options
+     * @param array $options
      *
      * @throws \Liquid\Exceptions\SyntaxError
      */
-    public function __construct($tag_name, $markup, $options) {
+    public function __construct($tag_name, $markup, $options)
+    {
         parent::__construct($tag_name, $markup, $options);
 
         $matches = null;
@@ -31,7 +34,7 @@ class TableRow extends \Liquid\Block {
             $this->attributes = array();
 
             preg_match_all(Liquid::$TagAttributes, $markup, $matches);
-            foreach($matches[1] as $key => $match) {
+            foreach ($matches[1] as $key => $match) {
                 $this->attributes[$match] = $matches[2][$key];
             }
         } else {
@@ -44,19 +47,20 @@ class TableRow extends \Liquid\Block {
      *
      * @return string
      */
-    public function render(&$context) {
+    public function render(&$context)
+    {
         if (!isset($context[$this->collection_name])) {
             return '';
         }
 
         $collection = $context[$this->collection_name];
-        $from = isset($this->attributes['offset']) && $this->attributes['offset'] ? (int) $context[$this->attributes['offset']] : 0;
-        $to = isset($this->attributes['limit']) && $this->attributes['limit'] ? $from + (int) $context[$this->attributes['limit']] : null;
+        $from = isset($this->attributes['offset']) && $this->attributes['offset'] ? (int)$context[$this->attributes['offset']] : 0;
+        $to = isset($this->attributes['limit']) && $this->attributes['limit'] ? $from + (int)$context[$this->attributes['limit']] : null;
 
         $collection = Utils::slice_collection($collection, $from, $to);
         $length = count($collection);
 
-        $cols = (int) $context[$this->attributes['cols']];
+        $cols = (int)$context[$this->attributes['cols']];
 
         $row = 1;
         $col = 0;
@@ -67,20 +71,20 @@ class TableRow extends \Liquid\Block {
 
         $nodelist =& $this->nodelist;
         $self = $this;
-        $context->stack(function(&$context) use ($self, &$nodelist, &$collection, &$variable_name, &$result, &$length, &$row, &$col, &$cols) {
-            foreach($collection as $index => $item) {
+        $context->stack(function (&$context) use ($self, &$nodelist, &$collection, &$variable_name, &$result, &$length, &$row, &$col, &$cols) {
+            foreach ($collection as $index => $item) {
                 $context[$variable_name] = $item;
                 $context['tablerowloop'] = array(
                     'length' => $length,
                     'index' => $index + 1,
                     'index0' => $index,
                     'col' => $col + 1,
-                    'col0'=> $col,
+                    'col0' => $col,
                     'rindex' => $length - $index,
                     'rindex0' => $length - $index - 1,
                     'first' => ($index == 0),
                     'last' => ($index == $length - 1),
-                    'col_first' => ($col==0),
+                    'col_first' => ($col == 0),
                     'col_last' => ($col == $cols - 1)
                 );
 
